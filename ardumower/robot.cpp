@@ -502,6 +502,7 @@ void Robot::setRemotePPMState(unsigned long timeMicros, boolean remoteSpeedState
   }  
 }
 
+// driver protection
 // sets wheel motor actuators
 // - ensures that the motors (and gears) are not switched to 0% (or 100%) too fast (motorAccel)
 // - ensures that motors voltage is not higher than motorSpeedMax
