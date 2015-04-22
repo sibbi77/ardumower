@@ -73,6 +73,7 @@ Robot::Robot(){
   motorMowSenseErrorCounter = 0;
   motorMowRpm = 0;
   lastMowSpeed = 0;
+  lastSetMotorSpeedTime = 0;
 
   bumperLeftCounter = bumperRightCounter = 0;
   bumperLeft = bumperRight = false;          
@@ -502,28 +503,47 @@ void Robot::setRemotePPMState(unsigned long timeMicros, boolean remoteSpeedState
   }  
 }
 
-// driver protection
 // sets wheel motor actuators
-// - ensures that the motors (and gears) are not switched to 0% (or 100%) too fast (motorAccel)
-// - ensures that motors voltage is not higher than motorSpeedMax
+// - driver protection: delays polarity change until motor speed (EMV) is zero
+//   http://wiki.ardumower.de/images/a/a5/Motor_polarity_switch_protection.png 
+// - optional: ensures that the motors (and gears) are not switched to 0% (or 100%) too fast (motorAccel)
 void Robot::setMotorSpeed(int pwmLeft, int pwmRight, boolean useAccel){
-  // FIXME: we might need to ingore acceleration for PID controllers 
-  if (!useAccel){
-    motorLeftPWM = pwmLeft;
-    motorRightPWM = pwmRight;
-  } else {
+  if (useAccel){
     double accel = motorAccel * loopsTa;       
-    motorLeftPWM = (1.0 - accel) * motorLeftPWM + accel * ((double)pwmLeft); 
-    motorRightPWM = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);  
+    pwmLeft = (1.0 - accel) * motorLeftPWM + accel * ((double)pwmLeft); 
+    pwmRight = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);  
   }
+  // ----- driver protection (avoids driver explosion) ----------
+  float TaC = ((float) (millis() - lastSetMotorSpeedTime)) / 1000.0;    // sampling time in seconds
+  if (TaC > 1.0) TaC = 0;
+  lastSetMotorSpeedTime = millis();
+  if ( ((pwmLeft < 0) && (motorLeftPWM >= 0)) ||
+       ((pwmLeft > 0) && (motorLeftPWM <= 0)) ) { // changing direction should take place?    
+    if ( motorLeftEMF > 0.1) // reduce motor rotation? (will reduce EMF)
+      pwmLeft = motorLeftPWM - (motorLeftPWM * 2.0 * TaC); // reduce by 200% in one second            
+  }
+  if ( ((pwmRight < 0) && (motorRightPWM >= 0)) ||
+       ((pwmRight > 0) && (motorRightPWM <= 0)) ) { // changing direction should take place?    
+    if ( motorRightEMF > 0.1) // reduce motor rotation? (will reduce EMF)
+      pwmRight = motorRightPWM - (motorRightPWM * 2.0 * TaC); // reduce by 200% in one second            
+  }  
+  // compute electromotive force (sort of PWM low pass filter)
+  // added force:        pwm * sampling time
+  // force reduced by:   fraction * sampling time
+  float fraction = 5.0;
+  motorLeftEMF  = max(0, motorLeftEMF  -    motorLeftEMF  * fraction * TaC    +    abs(pwmLeft) * TaC );  
+  motorRightEMF = max(0, motorRightEMF -    motorRightEMF * fraction * TaC    +    abs(pwmRight) * TaC );  
+  // ---------------------------------
+  motorLeftPWM = pwmLeft;
+  motorRightPWM = pwmRight;
   /*Serial.print(motorLeftPWM);
   Serial.print("\t");
   Serial.println(motorRightPWM);*/
-  if (motorLeftSwapDir)
+  if (motorLeftSwapDir)  // swap pin polarity?
     setActuator(ACT_MOTOR_LEFT, -motorLeftPWM);
   else
     setActuator(ACT_MOTOR_LEFT, motorLeftPWM);
-  if (motorRightSwapDir)
+  if (motorRightSwapDir)   // swap pin polarity?
     setActuator(ACT_MOTOR_RIGHT, -motorRightPWM);
   else 
     setActuator(ACT_MOTOR_RIGHT, motorRightPWM);
