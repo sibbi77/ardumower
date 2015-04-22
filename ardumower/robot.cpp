@@ -1865,7 +1865,7 @@ void Robot::calcOdometry(){
   int odoRight = odometryRight;
   int ticksLeft = odoLeft - lastOdoLeft;
   int ticksRight = odoRight - lastOdoRight;
-  if ((ticksLeft == 0) || (ticksRight == 0)) return; // nothing to compute yet
+  //if ((ticksLeft == 0) || (ticksRight == 0)) return; // nothing to compute yet
   lastOdoLeft = odoLeft;
   lastOdoRight = odoRight;    
   double left_cm = ((double)ticksLeft) / ((double)odometryTicksPerCm);
