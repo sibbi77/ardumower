@@ -515,8 +515,8 @@ void Robot::setMotorSpeed(int pwmLeft, int pwmRight, boolean useAccel){
   }
   // ----- driver protection (avoids driver explosion) ----------
   float TaC = ((float) (millis() - lastSetMotorSpeedTime)) / 1000.0;    // sampling time in seconds
+  lastSetMotorSpeedTime = millis();  
   if (TaC > 1.0) TaC = 0;
-  lastSetMotorSpeedTime = millis();
   if ( ((pwmLeft < 0) && (motorLeftPWM >= 0)) ||
        ((pwmLeft > 0) && (motorLeftPWM <= 0)) ) { // changing direction should take place?    
     if ( motorLeftEMF > 0.1) // reduce motor rotation? (will reduce EMF)
@@ -704,7 +704,8 @@ void Robot::motorControl(){
   if (odometryUse){
     // Regelbereich entspricht maximaler PWM am Antriebsrad (motorSpeedMaxPwm), um auch an Steigungen höchstes Drehmoment für die Solldrehzahl zu gewährleisten
     motorLeftPID.x = motorLeftRpm;                 // IST 
-    motorLeftPID.w = motorLeftSpeed;               // SOLL 
+    motorLeftPID.w = motorLeftSpeed;               // SOLL
+    if (millis() < stateStartTime + 500) motorLeftPID.w = 0; // get zero speed first after state change  
     motorLeftPID.y_min = -motorSpeedMaxPwm;        // Regel-MIN
     motorLeftPID.y_max = motorSpeedMaxPwm;     // Regel-MAX
     motorLeftPID.max_output = motorSpeedMaxPwm;    // Begrenzung
@@ -719,6 +720,7 @@ void Robot::motorControl(){
     motorRightPID.Kd = motorLeftPID.Kd;          
     motorRightPID.x = motorRightRpm;               // IST
     motorRightPID.w = motorRightSpeed;             // SOLL
+    if (millis() < stateStartTime + 500) motorRightPID.w = 0; // get zero speed first after state change
     motorRightPID.y_min = -motorSpeedMaxPwm;       // Regel-MIN
     motorRightPID.y_max = motorSpeedMaxPwm;        // Regel-MAX
     motorRightPID.max_output = motorSpeedMaxPwm;   // Begrenzung
