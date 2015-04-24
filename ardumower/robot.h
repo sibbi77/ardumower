@@ -253,8 +253,8 @@ class Robot
     int motorRightSenseCounter ;
     unsigned long nextTimeMotorSense ;
     unsigned long lastSetMotorSpeedTime;
-    float motorLeftEMF;
-    float motorRightEMF;
+    unsigned long motorLeftZeroTimeout;
+    unsigned long motorRightZeroTimeout;
     // -------- mower motor state -----------------------
     // mower motor sppeed; range 0..motorMowSpeedMax
     float motorMowAccel       ;  // motor mower acceleration (warning: do not set too high)

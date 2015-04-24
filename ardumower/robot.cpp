@@ -57,6 +57,8 @@ Robot::Robot(){
   motorLeftSense = motorRightSense = 0;
   motorLeftSenseCounter = motorRightSenseCounter = 0;
   motorZeroSettleTime = 0;  
+  motorLeftZeroTimeout = 0;
+  motorRightZeroTimeout = 0;
   
   remoteSteer = remoteSpeed = remoteMow = remoteSwitch = 0;  
   remoteSteerLastTime = remoteSpeedLastTime =remoteMowLastTime =remoteSwitchLastTime = 0;
@@ -515,25 +517,23 @@ void Robot::setMotorSpeed(int pwmLeft, int pwmRight, boolean useAccel){
     pwmRight = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);  
   }
   // ----- driver protection (avoids driver explosion) ----------
-  float TaC = ((float) (millis() - lastSetMotorSpeedTime)) / 1000.0;    // sampling time in seconds
+  unsigned long TaC = millis() - lastSetMotorSpeedTime;    // sampling time in millis
   lastSetMotorSpeedTime = millis();  
-  if (TaC > 1.0) TaC = 0;
+  if (TaC > 1000) TaC = 0;  
   if ( ((pwmLeft < 0) && (motorLeftPWM >= 0)) ||
-       ((pwmLeft > 0) && (motorLeftPWM <= 0)) ) { // changing direction should take place?    
-    if ( motorLeftEMF > 0.1) // reduce motor rotation? (will reduce EMF)
-      pwmLeft = motorLeftPWM - (motorLeftPWM * 2.0 * TaC); // reduce by 200% in one second            
+       ((pwmLeft > 0) && (motorLeftPWM <= 0)) ) { // changing direction should take place?
+    if (motorLeftZeroTimeout != 0)
+      pwmLeft = motorLeftPWM - motorLeftPWM *  ((float)TaC)/200.0; // reduce speed
   }
   if ( ((pwmRight < 0) && (motorRightPWM >= 0)) ||
        ((pwmRight > 0) && (motorRightPWM <= 0)) ) { // changing direction should take place?    
-    if ( motorRightEMF > 0.1) // reduce motor rotation? (will reduce EMF)
-      pwmRight = motorRightPWM - (motorRightPWM * 2.0 * TaC); // reduce by 200% in one second            
-  }  
-  // compute electromotive force (sort of PWM low pass filter)
-  // added force:        pwm * sampling time
-  // force reduced by:   fraction * sampling time
-  float fraction = 5.0;
-  motorLeftEMF  = max(0, motorLeftEMF  -    motorLeftEMF  * fraction * TaC    +    abs(pwmLeft) * TaC );  
-  motorRightEMF = max(0, motorRightEMF -    motorRightEMF * fraction * TaC    +    abs(pwmRight) * TaC );  
+    if (motorRightZeroTimeout != 0) // reduce motor rotation? (will reduce EMF)      
+      pwmRight = motorRightPWM - motorRightPWM *   ((float)TaC)/200.0;  // reduce speed
+  }            
+  if (pwmLeft == 0) motorLeftZeroTimeout = max(0, ((int)(motorLeftZeroTimeout - TaC)) );
+    else motorLeftZeroTimeout = 300;  
+  if (pwmRight == 0) motorRightZeroTimeout = max(0, ((int)(motorRightZeroTimeout - TaC)) );      
+    else motorRightZeroTimeout = 300;  
   // ---------------------------------
   motorLeftPWM = pwmLeft;
   motorRightPWM = pwmRight;
