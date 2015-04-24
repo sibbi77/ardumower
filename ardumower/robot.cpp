@@ -1499,10 +1499,11 @@ void Robot::setNextState(byte stateNew, byte dir){
         imuRollHeading = scalePI(imuDriveHeading + PI/20);        
         imuRollDir = LEFT;
       }      
-      stateEndTime = millis() + rand() % motorRollTimeMax/2 + motorRollTimeMax/2 + motorZeroSettleTime;               
+      stateEndTime = millis() + random(motorRollTimeMax/2,motorRollTimeMax) + motorZeroSettleTime;               
+      //stateEndTime = millis() + rand() % motorRollTimeMax/2 + motorRollTimeMax/2 + motorZeroSettleTime;
       if (dir == RIGHT){
 	motorLeftSpeed = motorSpeedMax/1.25;
-	motorRightSpeed = -motorLeftSpeed/1.25;						
+	motorRightSpeed = -motorLeftSpeed;						
       } else {
 	motorRightSpeed = motorSpeedMax/1.25;
 	motorLeftSpeed = -motorRightSpeed/1.25;	

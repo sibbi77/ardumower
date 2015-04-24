@@ -129,12 +129,12 @@ Mower::Mower(){
   motorAccel       = 0.05;  // motor wheel acceleration - only functional when odometry is not in use (warning: do not set too high)
   motorSpeedMax       = 33;   // motor wheel max RPM
   motorSpeedMaxPwm    = 255;  // motor wheel max Pwm  (8-bit PWM=255, 10-bit PWM=1023)
-  motorPowerMax     = 50;    // motor wheel max power (Watt)
+  motorPowerMax     = 80;    // motor wheel max power (Watt)
   motorSenseRightScale = 15.3; // motor right sense scale (mA=(ADC-zero)/scale)
   motorSenseLeftScale = 15.3; // motor left sense scale  (mA=(ADC-zero)/scale)
   motorPowerIgnoreTime = 2000; // time to ignore motor power (ms)
-  motorZeroSettleTime   = 2000; // how long (ms) to wait for motors to settle at zero speed  
-  motorRollTimeMax    = 3000;  // max. roll time (ms)
+  motorZeroSettleTime   = 2000 ; // how long (ms) to wait for motors to settle at zero speed  
+  motorRollTimeMax    = 3500;  // max. roll time (ms)
   motorReverseTime    = 3500;  // max. reverse time (ms)
   motorForwTimeMax   = 60000; // max. forward time (ms) / timeout  
   motorBiDirSpeedRatio1 = 0.3;   // bidir mow pattern speed ratio 1
