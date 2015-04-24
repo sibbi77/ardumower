@@ -133,16 +133,17 @@ Mower::Mower(){
   motorSenseRightScale = 15.3; // motor right sense scale (mA=(ADC-zero)/scale)
   motorSenseLeftScale = 15.3; // motor left sense scale  (mA=(ADC-zero)/scale)
   motorPowerIgnoreTime = 2000; // time to ignore motor power (ms)
+  motorZeroSettleTime   = 2000; // how long (ms) to wait for motors to settle at zero speed  
   motorRollTimeMax    = 3000;  // max. roll time (ms)
   motorReverseTime    = 3500;  // max. reverse time (ms)
-  motorForwTimeMax   = 60000; // max. forward time (ms) / timeout
+  motorForwTimeMax   = 60000; // max. forward time (ms) / timeout  
   motorBiDirSpeedRatio1 = 0.3;   // bidir mow pattern speed ratio 1
   motorBiDirSpeedRatio2 = 0.92;   // bidir mow pattern speed ratio 2
   motorLeftPID.Kp       = 1.0;    // motor wheel PID controller
   motorLeftPID.Ki       = 0.05;
   motorLeftPID.Kd       = 0.0;
   motorRightSwapDir     = 0;    // inverse right motor direction? 
-  motorLeftSwapDir      = 1;    // inverse left motor direction?
+  motorLeftSwapDir      = 1;    // inverse left motor direction?   
   // ------ mower motor -------------------------------
   motorMowAccel       = 0.1;  // motor mower acceleration (warning: do not set too high)
   motorMowSpeedMax   = 255;    // motor mower max PWM

@@ -248,6 +248,7 @@ class Robot
     float motorLeftSense ;      // motor power (range 0..MAX_MOTOR_POWER)
     float motorRightSense ;
     int motorPowerIgnoreTime; 
+    int motorZeroSettleTime;     // how long (ms) to wait for motor to settle at zero speed
     int motorLeftSenseCounter ;  // motor current counter
     int motorRightSenseCounter ;
     unsigned long nextTimeMotorSense ;

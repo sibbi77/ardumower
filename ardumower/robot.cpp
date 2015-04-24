@@ -55,7 +55,8 @@ Robot::Robot(){
   motorRightSenseADC = motorLeftSenseADC = 0;
   motorLeftSenseCurrent = motorRightSenseCurrent = 0;     
   motorLeftSense = motorRightSense = 0;
-  motorLeftSenseCounter = motorRightSenseCounter = 0;  
+  motorLeftSenseCounter = motorRightSenseCounter = 0;
+  motorZeroSettleTime = 0;  
   
   remoteSteer = remoteSpeed = remoteMow = remoteSwitch = 0;  
   remoteSteerLastTime = remoteSpeedLastTime =remoteMowLastTime =remoteSwitchLastTime = 0;
@@ -705,7 +706,7 @@ void Robot::motorControl(){
     // Regelbereich entspricht maximaler PWM am Antriebsrad (motorSpeedMaxPwm), um auch an Steigungen höchstes Drehmoment für die Solldrehzahl zu gewährleisten
     motorLeftPID.x = motorLeftRpm;                 // IST 
     motorLeftPID.w = motorLeftSpeed;               // SOLL
-    if (millis() < stateStartTime + 500) motorLeftPID.w = 0; // get zero speed first after state change  
+    if (millis() < stateStartTime + motorZeroSettleTime) motorLeftPID.w = 0; // get zero speed first after state change  
     motorLeftPID.y_min = -motorSpeedMaxPwm;        // Regel-MIN
     motorLeftPID.y_max = motorSpeedMaxPwm;     // Regel-MAX
     motorLeftPID.max_output = motorSpeedMaxPwm;    // Begrenzung
@@ -720,7 +721,7 @@ void Robot::motorControl(){
     motorRightPID.Kd = motorLeftPID.Kd;          
     motorRightPID.x = motorRightRpm;               // IST
     motorRightPID.w = motorRightSpeed;             // SOLL
-    if (millis() < stateStartTime + 500) motorRightPID.w = 0; // get zero speed first after state change
+    if (millis() < stateStartTime + motorZeroSettleTime) motorRightPID.w = 0; // get zero speed first after state change
     motorRightPID.y_min = -motorSpeedMaxPwm;       // Regel-MIN
     motorRightPID.y_max = motorSpeedMaxPwm;        // Regel-MAX
     motorRightPID.max_output = motorSpeedMaxPwm;   // Begrenzung
@@ -737,7 +738,7 @@ void Robot::motorControl(){
   else{
     int leftSpeed = min(motorSpeedMaxPwm, max(-motorSpeedMaxPwm, map(motorLeftSpeed, -motorSpeedMax, motorSpeedMax, -motorSpeedMaxPwm, motorSpeedMaxPwm)));
     int rightSpeed =min(motorSpeedMaxPwm, max(-motorSpeedMaxPwm, map(motorRightSpeed, -motorSpeedMax, motorSpeedMax, -motorSpeedMaxPwm, motorSpeedMaxPwm)));
-    if (millis() < stateStartTime + 1000) {       
+    if (millis() < stateStartTime + motorZeroSettleTime) {       
       leftSpeed = rightSpeed = 0; // slow down at state start      
       if (mowPatternCurr != MOW_LANES) imuDriveHeading = imu.ypr.yaw; // set drive heading    
     }
@@ -1487,7 +1488,7 @@ void Robot::setNextState(byte stateNew, byte dir){
   } 
   else if (stateNew == STATE_REVERSE)  {
     motorLeftSpeed = motorRightSpeed = -motorSpeedMax/1.25;                    
-    stateEndTime = millis() + motorReverseTime;                     
+    stateEndTime = millis() + motorReverseTime + motorZeroSettleTime;                     
   }   
   else if (stateNew == STATE_ROLL) {                  
       imuDriveHeading = scalePI(imuDriveHeading + PI); // toggle heading 180 degree (IMU)
@@ -1498,7 +1499,7 @@ void Robot::setNextState(byte stateNew, byte dir){
         imuRollHeading = scalePI(imuDriveHeading + PI/20);        
         imuRollDir = LEFT;
       }      
-      stateEndTime = millis() + rand() % motorRollTimeMax/2 + motorRollTimeMax/2;               
+      stateEndTime = millis() + rand() % motorRollTimeMax/2 + motorRollTimeMax/2 + motorZeroSettleTime;               
       if (dir == RIGHT){
 	motorLeftSpeed = motorSpeedMax/1.25;
 	motorRightSpeed = -motorLeftSpeed/1.25;						
