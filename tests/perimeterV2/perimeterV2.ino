@@ -25,7 +25,7 @@
 
 Perimeter perimeter;
 unsigned long nextTime = 0;
-int counter = 0;
+int transitions = 0;
 boolean inside = true;
 int mode = 0;
 
@@ -40,40 +40,46 @@ void setup()  {
   
   ADCMan.init();
   perimeter.setPins(pinPerimeterLeft, pinPerimeterRight);          
+  perimeter.useDifferentialPerimeterSignal = true;
   
   perimeter.speedTest();
 }
 
 
-void printConsole(){
-    Console.print("cnt ");
-    Console.print(counter);
+void printConsole(){    
+    Console.print("trn ");
+    Console.print(transitions);
     Console.print("\t");    
     Console.print("min ");
-    Console.print((int)perimeter.getSignalMin());
+    Console.print((int)perimeter.getSignalMin(0));
     Console.print("\t");
     Console.print("max ");
-    Console.print((int)perimeter.getSignalMax());
+    Console.print((int)perimeter.getSignalMax(0));
     Console.print("\t");
     Console.print("avg ");
-    Console.print((int)perimeter.getSignalAvg());    
+    Console.print((int)perimeter.getSignalAvg(0));    
     Console.print("\t\t");
     Console.print("mag ");
     Console.print((int)perimeter.getMagnitude(0));        
     Console.print("\t");
+    Console.print((int)perimeter.getMagnitude(1));        
+    Console.print("\t");        
     Console.print("\t");    
     Console.print("smag ");    
-    Console.print((int)perimeter.getSmoothMagnitude());                
+    Console.print((int)perimeter.getSmoothMagnitude(0));                
     Console.print("\t");    
-    Console.print("qty ");        
-    Console.print(perimeter.getFilterQuality());
+    Console.print((int)perimeter.getSmoothMagnitude(1));                    
+    Console.print("\t");        
+    Console.print("qty ");  
+    Console.print("\t");        
+    Console.print(perimeter.getFilterQuality(0));
     Console.print("\t");
     Console.print("\t");
     Console.print("in ");
-    Console.print((int)perimeter.isInside());            
+    Console.print((int)perimeter.isInside(0));            
     Console.print("\t");
     Console.print("on ");
-    Console.print((int)(!perimeter.signalTimedOut()));            
+    Console.print((int)(!perimeter.signalTimedOut(0)));            
     Console.print("\t");
     Console.print("adc ");
     Console.print((int)(ADCMan.getCapturedChannels()));            
@@ -87,7 +93,7 @@ void printSerialChart(){
   int8_t *samples = ADCMan.getCapture(pinPerimeterLeft);      
   int sz = ADCMan.getCaptureSize(pinPerimeterLeft);      
   int mag = perimeter.getMagnitude(0);              
-  int qty = perimeter.getFilterQuality()*100.0;      
+  int qty = perimeter.getFilterQuality(0)*100.0;      
   for (int i=0; i < sz; i++){
     for (int w=0; w < 10; w++){
       if (i==0){
@@ -117,11 +123,11 @@ void loop()  {
   
   if (millis() >= nextTime){
     nextTime = millis() + 50;
-    if (perimeter.isInside() != inside){
-      inside = perimeter.isInside();
-      counter++;      
+    if (perimeter.isInside(0) != inside){
+      inside = perimeter.isInside(0);
+      transitions++;      
     }
-    if (perimeter.isInside()) digitalWrite(pinLED, HIGH);    
+    if (perimeter.isInside(0)) digitalWrite(pinLED, HIGH);    
       else digitalWrite(pinLED, LOW);    
 
     if (mode == 0){

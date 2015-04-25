@@ -439,8 +439,10 @@ void RemoteControl::sendPerimeterMenu(boolean update){
   if (update) Bluetooth.print("{:"); else Bluetooth.print(F("{.Perimeter`1000"));         
   Bluetooth.print(F("|e00~Use "));
   sendYesNo(robot->perimeterUse);  
-  Bluetooth.println(F("|e02~Value"));
-  Bluetooth.print(robot->perimeterMag);  
+  Bluetooth.println(F("|e02~Value l, r"));
+  Bluetooth.print(robot->perimeterLeftMag);  
+  Bluetooth.print(", ");
+  Bluetooth.print(robot->perimeterRightMag);
   sendSlider("e08", "Timed-out if below smag", robot->perimeter.timedOutIfBelowSmag, "", 1, 2000);  
   sendSlider("e04", "Trigger timeout", robot->perimeterTriggerTimeout, "", 1, 2000);
   sendSlider("e05", F("Track roll time"), robot->perimeterTrackRollTime, "", 1, 8000);       
@@ -450,8 +452,10 @@ void RemoteControl::sendPerimeterMenu(boolean update){
   sendPIDSlider("e07", F("Track"), robot->perimeterPID, 0.1, 100);  
   Bluetooth.print(F("|e09~Use differential signal "));
   sendYesNo(robot->perimeter.useDifferentialPerimeterSignal);    
-  Bluetooth.print(F("|e10~Swap coil polarity "));
-  sendYesNo(robot->perimeter.swapCoilPolarity);
+  Bluetooth.print(F("|e10~Swap left coil polarity "));
+  sendYesNo(robot->perimeter.swapCoilPolarity[0]);
+  Bluetooth.print(F("|e14~Swap right coil polarity "));
+  sendYesNo(robot->perimeter.swapCoilPolarity[1]);
   Bluetooth.print(F("|e13~Block inner wheel  "));
   sendYesNo(robot->trackingBlockInnerWheelWhilePerimeterStruggling);
   Bluetooth.println("}");                
@@ -465,7 +469,8 @@ void RemoteControl::processPerimeterMenu(String pfodCmd){
     else if (pfodCmd.startsWith("e07")) processPIDSlider(pfodCmd, "e07", robot->perimeterPID, 0.1, 100);    
     else if (pfodCmd.startsWith("e08")) processSlider(pfodCmd, robot->perimeter.timedOutIfBelowSmag, 1);    
     else if (pfodCmd.startsWith("e09")) robot->perimeter.useDifferentialPerimeterSignal = !robot->perimeter.useDifferentialPerimeterSignal;
-    else if (pfodCmd.startsWith("e10")) robot->perimeter.swapCoilPolarity = !robot->perimeter.swapCoilPolarity;
+    else if (pfodCmd.startsWith("e10")) robot->perimeter.swapCoilPolarity[0] = !robot->perimeter.swapCoilPolarity[0];
+    else if (pfodCmd.startsWith("e14")) robot->perimeter.swapCoilPolarity[1] = !robot->perimeter.swapCoilPolarity[1];
     else if (pfodCmd.startsWith("e11")) processSlider(pfodCmd, robot->trackingPerimeterTransitionTimeOut, 1);
     else if (pfodCmd.startsWith("e12")) processSlider(pfodCmd, robot->trackingErrorTimeOut, 1);
     else if (pfodCmd.startsWith("e13")) robot->trackingBlockInnerWheelWhilePerimeterStruggling = !robot->trackingBlockInnerWheelWhilePerimeterStruggling;          
@@ -1009,7 +1014,9 @@ void RemoteControl::run(){
       Bluetooth.print(",");
       Bluetooth.print(robot->perimeter.isInside(0));
       Bluetooth.print(",");            
-      Bluetooth.print(robot->perimeterMag);
+      Bluetooth.print(robot->perimeterLeftMag);
+      Bluetooth.print(",");
+      Bluetooth.print(robot->perimeterRightMag);
       Bluetooth.print(",");
       Bluetooth.print(robot->odometryLeft);
       Bluetooth.print(",");
@@ -1176,7 +1183,9 @@ void RemoteControl::run(){
         nextPlotTime = millis() + 200;            
         Bluetooth.print(perimeterCapture[perimeterCaptureIdx / 3]);          
         Bluetooth.print(",");                    
-        Bluetooth.print(robot->perimeterMag);
+        Bluetooth.print(robot->perimeterLeftMag);
+        Bluetooth.print(",");
+        Bluetooth.print(robot->perimeterRightMag);
         Bluetooth.print(",");
         Bluetooth.print(robot->perimeter.getSmoothMagnitude(0));
         Bluetooth.print(",");
@@ -1253,7 +1262,7 @@ void RemoteControl::readSerial(){
           // log raw sensors
           Bluetooth.println(F("{=Log sensors}"));
           Bluetooth.print(F("time,leftsen,rightsen,mowsen,sonleft,soncenter,sonright,"));
-          Bluetooth.print(F("perinside,permag,odoleft,odoright,yaw,pitch,roll,gyrox,gyroy,"));
+          Bluetooth.print(F("perinside,perlmag,perrmag,odoleft,odoright,yaw,pitch,roll,gyrox,gyroy,"));
           Bluetooth.print(F("gyroz,accx,accy,accz,comx,comy,comz,hdop,sats,gspeed,gcourse,"));
           Bluetooth.println(F("galt,lat,lon"));              
           pfodState = PFOD_LOG_SENSORS;
@@ -1289,7 +1298,7 @@ void RemoteControl::readSerial(){
           /*Bluetooth.print(F("{=Perimeter spectrum`"));
           Bluetooth.print(Perimeter.getFilterBinCount());
           Bluetooth.print(F("|freq (Hz)`0|magnitude`0~60~-1|selected band`0~60~-1}"));*/
-          Bluetooth.println(F("{=Perimeter`128|sig`1|mag`2|smag`3|in`4|cnt`5|on`6|qty`7}"));                   
+          Bluetooth.println(F("{=Perimeter`128|sig`1|magl`2|magr`3|smag`4|in`5|cnt`6|on`7|qty`8}"));                   
           nextPlotTime = 0;
           pfodState = PFOD_PLOT_PERIMETER;          
         }

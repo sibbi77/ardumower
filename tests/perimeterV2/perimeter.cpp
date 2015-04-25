@@ -2,6 +2,8 @@
   Ardumower (www.ardumower.de)
   Copyright (c) 2013-2014 by Alexander Grau
   Copyright (c) 2013-2014 by Sven Gennat
+  
+  Private-use only! (you need to ask for a commercial-use)
  
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -15,6 +17,8 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  
+  Private-use only! (you need to ask for a commercial-use)
 */
 
 
@@ -30,38 +34,45 @@
 // developer test to be activated in mower.cpp: 
 #ifdef USE_DEVELOPER_TEST
   // more motor driver friendly signal (receiver)
-  int8_t sigcode[]   = { 1,-1,0,0,0,
-                         1,-1,0,0,0,
-                        -1, 1,0,0,0,
-                         1,-1,0,0,0  };
+  int8_t sigcode_norm[]   = { 1,-1,0,0,0,
+                              1,-1,0,0,0,
+                             -1, 1,0,0,0,
+                              1,-1,0,0,0  };
 #else
   // http://grauonline.de/alexwww/ardumower/filter/filter.html    
   // "pseudonoise4_pw" signal
-  int8_t sigcode[] = { 1,1,-1,-1,1,-1,1,-1,-1,1,-1,1,1,-1,-1,1,-1,-1,1,-1,-1,1,1,-1 };   // if using coil and series capacitor, use this
-  //int8_t sigcode[]   = { 1,0,-1, 0,1,-1,1,-1, 0,1,-1,1,0,-1, 0,1,-1, 0,1,-1, 0,1,0,-1 };   // if using coil without series capacitor, use this
+  // if using reconstructed sender signal, use this
+  int8_t sigcode_norm[]        = { 1,1,-1,-1,1,-1,1,-1,-1,1,-1,1,1,-1,-1,1,-1,-1,1,-1,-1,1,1,-1 };   
+  // "pseudonoise4_pw" signal (differential)
+  // if using the coil differential signal, use this
+  int8_t sigcode_diff[]        = { 1,0,-1, 0,1,-1,1,-1, 0,1,-1,1,0,-1, 0,1,-1, 0,1,-1, 0,1,0,-1 };   
 #endif
 
 
 Perimeter::Perimeter(){    
+  useDifferentialPerimeterSignal = false;
+  swapCoilPolarity[0] = swapCoilPolarity[1] = false;
   timedOutIfBelowSmag = 300;
   callCounter = 0;
   mag[0] = mag[1] = 0;
-  smoothMag = 0;
-  filterQuality = 0;
-  signalCounter = 0;  
-  lastInsideTime = 0;    
+  smoothMag[0] = smoothMag[1] = 0;
+  filterQuality[0] = filterQuality[1] = 0;
+  signalCounter[0] = signalCounter[1] = 0;  
+  lastInsideTime[0] = lastInsideTime[1] = 0;    
 }
 
 void Perimeter::setPins(byte idx0Pin, byte idx1Pin){
   idxPin[0] = idx0Pin;
   idxPin[1] = idx1Pin;  
   // use max. 255 samples and multiple of signalsize
-  ADCMan.setCapture(idx0Pin, ((int)255 / sizeof sigcode) * sizeof sigcode, true); 
+  ADCMan.setCapture(idx0Pin, ((int)255 / sizeof sigcode_norm) * sizeof sigcode_norm, true); 
+  ADCMan.setCapture(idx1Pin, ((int)255 / sizeof sigcode_norm) * sizeof sigcode_norm, true); 
   
   Console.print("matchSignal size=");
-  Console.println(sizeof sigcode);  
+  Console.println(sizeof sigcode_norm);  
   Console.print("capture size=");
   Console.println(ADCMan.getCaptureSize(idx0Pin));  
+  Console.println(ADCMan.getCaptureSize(idx1Pin));  
 }
 
 void Perimeter::speedTest(){
@@ -82,8 +93,8 @@ int Perimeter::getMagnitude(byte idx){
   return mag[idx];
 }
 
-int Perimeter::getSmoothMagnitude(){  
-  return smoothMag;
+int Perimeter::getSmoothMagnitude(byte idx){  
+  return smoothMag[idx];
 }
 
 void Perimeter::printADCMinMax(int8_t *samples){
@@ -106,64 +117,66 @@ void Perimeter::matchedFilter(byte idx){
   if (callCounter == 100) {
     // statistics only
     callCounter = 0;
-    signalMin = 9999;
-    signalMax = -9999;
-    signalAvg = 0;  
+    signalMin[idx] = 9999;
+    signalMax[idx] = -9999;
+    signalAvg[idx] = 0;  
     for (int i=0; i < sampleCount; i++){
       int8_t v = samples[i];
-      signalAvg += v;
-      signalMin = min(signalMin, v);
-      signalMax = max(signalMax, v);
+      signalAvg[idx] += v;
+      signalMin[idx] = min(signalMin[idx], v);
+      signalMax[idx] = max(signalMax[idx], v);
     }
-    signalAvg = ((double)signalAvg) / ((double)(sampleCount));
+    signalAvg[idx] = ((double)signalAvg[idx]) / ((double)(sampleCount));
   }
-  /*for (int i=0; i < sampleCount; i++) {
-    if (samples[i]>0) samples[i]=1;
-      else samples[i] = -1;
-  }*/
   // magnitude for tracking (fast but inaccurate)    
-  mag[idx] = corrFilter(sigcode, sizeof sigcode, samples, sampleCount-sizeof sigcode, filterQuality);        
+  int16_t sigcode_size = sizeof sigcode_norm;
+  int8_t *sigcode = sigcode_norm;  
+  if (useDifferentialPerimeterSignal) sigcode = sigcode_diff;
+  mag[idx] = corrFilter(sigcode, sigcode_size, samples, sampleCount-sigcode_size, filterQuality[idx]);
+  if (swapCoilPolarity[idx]) mag[idx] *= -1;        
   // smoothed magnitude used for signal-off detection
-  smoothMag = 0.99 * smoothMag + 0.01 * ((float)abs(mag[idx]));
+  //smoothMag[idx] = 0.99 * smoothMag[idx] + 0.01 * ((float)abs(mag[idx]));
+  smoothMag[idx] = 0.95 * smoothMag[idx] + 0.05 * ((float)mag[idx]);
 
   // perimeter inside/outside detection
   if (mag[idx] > 0){
-    signalCounter = min(signalCounter+1, 3);    
+    signalCounter[idx] = min(signalCounter[idx]+1, 3);    
   } else {
-    signalCounter = max(signalCounter-1, -3);    
+    signalCounter[idx] = max(signalCounter[idx]-1, -3);    
   }
-  if (signalCounter < 0){
-    lastInsideTime = millis();
+  if (signalCounter[idx] < 0){
+    lastInsideTime[idx] = millis();
   } 
     
   ADCMan.restart(idxPin[idx]);    
-  callCounter++;
+  if (idx == 0) callCounter++;
 }
 
-int16_t Perimeter::getSignalMin(){
-  return signalMin;
+int16_t Perimeter::getSignalMin(byte idx){
+  return signalMin[idx];
 }
 
-int16_t Perimeter::getSignalMax(){
-  return signalMax;
+int16_t Perimeter::getSignalMax(byte idx){
+  return signalMax[idx];
 }
 
-int16_t Perimeter::getSignalAvg(){
-  return signalAvg;
-}
-
-float Perimeter::getFilterQuality(){
-  return filterQuality;
-}
-
-boolean Perimeter::isInside(){
-  return (signalCounter < 0);  
+int16_t Perimeter::getSignalAvg(byte idx){
+  return signalAvg[idx];
 }
 
 
-boolean Perimeter::signalTimedOut(){
-  if (getSmoothMagnitude() < timedOutIfBelowSmag) return true;
-  if (millis() - lastInsideTime > 8000) return true;
+float Perimeter::getFilterQuality(byte idx){
+  return filterQuality[idx];
+}
+
+boolean Perimeter::isInside(byte idx){
+  return (signalCounter[idx] < 0);  
+}
+
+
+boolean Perimeter::signalTimedOut(byte idx){
+  if (getSmoothMagnitude(idx) < timedOutIfBelowSmag) return true;
+  if (millis() - lastInsideTime[idx] > 8000) return true;
   return false;
 }
 
@@ -191,10 +204,14 @@ int16_t Perimeter::corrFilter(int8_t *H, int16_t M, int8_t *ip, int16_t nPts, fl
       if (sum > sumMax) sumMax = sum;
       if (sum < sumMin) sumMin = sum;
       ip++;
-  }
-  quality = abs((float)(sumMax + sumMin))/((float)sumMax);  
-  if (sumMax > -sumMin) return sumMax;
-    else return sumMin;  
+  }      
+  if (sumMax > -sumMin) {
+    quality = ((float)sumMax) / ((float)-sumMin);
+    return sumMax;
+  } else {
+    quality = ((float)-sumMin) / ((float)sumMax);
+    return sumMin;
+  }  
 }
 
 

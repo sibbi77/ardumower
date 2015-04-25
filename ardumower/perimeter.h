@@ -61,7 +61,7 @@ class Perimeter
     // use differential perimeter signal as input for the matched filter? 
     bool useDifferentialPerimeterSignal;
     // swap coil polarity?
-    bool swapCoilPolarity;  
+    bool swapCoilPolarity[2];  
   private:
     unsigned long lastInsideTime[2];
     byte idxPin[2]; // channel for idx

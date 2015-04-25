@@ -26,7 +26,7 @@
 
 #include "robot.h"
 
-#define MAGIC 38
+#define MAGIC 39
 
 char* stateNames[]={"OFF ", "RC  ", "FORW", "ROLL", "REV ", "CIRC", "ERR ", "PFND", "PTRK", "PROL", "PREV", "STAT", "CHARG", "STCHK",
   "CREV", "CROL", "CFOR", "MANU", "ROLW" };
@@ -87,7 +87,7 @@ Robot::Robot(){
   imuRollHeading = 0;
   imuRollDir = LEFT;  
   
-  perimeterMag = 0;
+  perimeterLeftMag = perimeterRightMag = 0;
   perimeterInside = true;
   perimeterCounter = 0;  
   perimeterLastTransitionTime = 0;
@@ -196,7 +196,8 @@ void Robot::loadSaveUserSettings(boolean readflag){
   eereadwrite(readflag, addr, perimeterPID.Ki);
   eereadwrite(readflag, addr, perimeterPID.Kd);
   eereadwrite(readflag, addr, perimeter.useDifferentialPerimeterSignal);        
-  eereadwrite(readflag, addr, perimeter.swapCoilPolarity);  
+  eereadwrite(readflag, addr, perimeter.swapCoilPolarity[0]);  
+  eereadwrite(readflag, addr, perimeter.swapCoilPolarity[1]);
   eereadwrite(readflag, addr, trackingBlockInnerWheelWhilePerimeterStruggling);  
   eereadwrite(readflag, addr, lawnSensorUse);
   eereadwrite(readflag, addr, imuUse);
@@ -590,44 +591,33 @@ void Robot::motorControlImuRoll(){
 
 
 // PID controller: track perimeter 
-void Robot::motorControlPerimeter(){      
-  if ((millis() > stateStartTime + 5000) && (millis() > perimeterLastTransitionTime + trackingPerimeterTransitionTimeOut)){
-    // robot is wheel-spinning while tracking => roll to get ground again
-    if (trackingBlockInnerWheelWhilePerimeterStruggling == 0){
-    if (perimeterMag < 0) setMotorSpeed( -motorSpeedMaxPwm/1.5, motorSpeedMaxPwm/1.5, false);
-        else setMotorSpeed( motorSpeedMaxPwm/1.5, -motorSpeedMaxPwm/1.5, false);}
-
-    else if (trackingBlockInnerWheelWhilePerimeterStruggling == 1){
-      if (perimeterMag < 0) setMotorSpeed( 0, motorSpeedMaxPwm/1.5, false);
-        else setMotorSpeed( motorSpeedMaxPwm/1.5, 0, false);
-    }
-
-    if (millis() > perimeterLastTransitionTime + trackingErrorTimeOut){      
-      Console.println("Error: tracking error");
-      addErrorCounter(ERR_TRACKING);
-      //setNextState(STATE_ERROR,0);
-      setNextState(STATE_PERI_FIND,0);
-    }
-    return;
-  }   
-  if (perimeterMag < 0) perimeterPID.x = -1;
-    else if (perimeterMag > 0) perimeterPID.x = 1; 
-    else perimeterPID.x = 0;
-  perimeterPID.w = 0;
-  /*perimeterPID.Kp= 50;
-  perimeterPID.Ki= 10;
-  perimeterPID.Kd= 10;*/
+void Robot::motorControlPerimeter(){
+  static float lmag = 0;
+  static float rmag = 0;
+  lmag = 0.95 * lmag + 0.05 * perimeterLeftMag;
+  rmag = 0.95 * rmag + 0.05 * perimeterRightMag;               
+  if (lmag < 0) {
+    setMotorSpeed(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
+    //perimeterPID.x = -1;
+  } 
+  else if (rmag > 0) {
+    setMotorSpeed(motorSpeedMaxPwm/2, -motorSpeedMaxPwm/2, false);
+    //perimeterPID.x = 1;
+  } 
+  else {
+    setMotorSpeed(motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
+    //perimeterPID.x = 0;
+  }  
+  /*perimeterPID.w = 0;  
   perimeterPID.y_min = -motorSpeedMaxPwm;
   perimeterPID.y_max = motorSpeedMaxPwm;		
   perimeterPID.max_output = motorSpeedMaxPwm;
   perimeterPID.compute();
-  //setMotorSpeed( motorLeftPWM  +perimeterPID.y, 
-  //               motorRightPWM -perimeterPID.y, false);      
   setMotorSpeed( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 - perimeterPID.y)), 
-                 max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);      
+                 max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);*/      
   /*Console.print(perimeterPID.x);
   Console.print("\t");          
-  Console.println(perimeterPID.y);  */
+  Console.println(perimeterPID.y);*/  
 }
 
 // PID controller: correct direction during normal driving (requires IMU)
@@ -870,9 +860,9 @@ void Robot::printInfo(Stream &s){
   Streamprint(s, "v%1d ", consoleMode);			    
   Streamprint(s, "%4s ", stateNames[stateCurr]);			    
   if (consoleMode == CONSOLE_PERIMETER){
-    Streamprint(s, "sig min %4d max %4d avg %4d mag %5d qty %3d",
+    Streamprint(s, "sig min %4d max %4d avg %4d lmag %5d rmag %5d qty %3d",
       (int)perimeter.getSignalMin(0), (int)perimeter.getSignalMax(0), (int)perimeter.getSignalAvg(0),
-      perimeterMag, (int)(perimeter.getFilterQuality(0)*100.0));
+      perimeterLeftMag, perimeterRightMag, (int)(perimeter.getFilterQuality(0)*100.0));
     Streamprint(s, "  in %2d  cnt %4d  on %1d\r\n",  
       (int)perimeterInside, perimeterCounter, (int)(!perimeter.signalTimedOut(0)) );      
   } else {  
@@ -1241,7 +1231,8 @@ void Robot::readSensors(){
   }   
   if ((perimeterUse) && (millis() >= nextTimePerimeter)){    
     nextTimePerimeter = millis() +  50; // 50    
-    perimeterMag = readSensor(SEN_PERIM_LEFT);
+    perimeterLeftMag = readSensor(SEN_PERIM_LEFT);
+    perimeterRightMag = readSensor(SEN_PERIM_RIGHT);    
     if ((perimeter.isInside(0) != perimeterInside)){      
       perimeterCounter++;
       perimeterLastTransitionTime = millis();

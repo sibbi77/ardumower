@@ -308,7 +308,8 @@ class Robot
     int perimeterTrackRollTime ;   // perimter tracking roll time (ms)
     int perimeterTrackRevTime  ;   // perimter tracking reverse time (ms)
     PID perimeterPID ;             // perimeter PID controller
-    int perimeterMag ;             // perimeter magnitude
+    int perimeterLeftMag ;             // perimeter magnitude left coil
+    int perimeterRightMag ;             // perimeter magnitude right coil
     boolean perimeterInside ;      // is inside perimeter?
     unsigned long perimeterTriggerTime; // time to trigger perimeter transition (timeout)
     int perimeterTriggerTimeout;   // perimeter trigger timeout (ms)

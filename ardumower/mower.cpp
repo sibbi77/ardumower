@@ -168,9 +168,9 @@ Mower::Mower(){
   perimeterTriggerTimeout = 0; // perimeter trigger timeout (ms)  
   perimeterTrackRollTime  = 3000;   // perimter tracking roll time (ms)
   perimeterTrackRevTime   = 2000;   // perimter tracking reverse time (ms)
-  perimeterPID.Kp    = 60.0;  // perimeter PID controller
-  perimeterPID.Ki    = 6.0;
-  perimeterPID.Kd    = 5.0;  
+  perimeterPID.Kp    = 1.0;  // perimeter PID controller
+  perimeterPID.Ki    = 2.0;
+  perimeterPID.Kd    = 2.0;  
   trackingPerimeterTransitionTimeOut = 5000;
   trackingErrorTimeOut = 10000;
   trackingBlockInnerWheelWhilePerimeterStruggling = 0;
@@ -446,7 +446,7 @@ int Mower::readSensor(char type){
 
 // perimeter----------------------------------------------------------------------------------------------
     case SEN_PERIM_LEFT: return perimeter.getMagnitude(0); break;
-    //case SEN_PERIM_RIGHT: return Perimeter.getMagnitude(1); break;
+    case SEN_PERIM_RIGHT: return perimeter.getMagnitude(1); break;
     
 // battery------------------------------------------------------------------------------------------------
     case SEN_BAT_VOLTAGE: ADCMan.read(pinVoltageMeasurement);  return ADCMan.read(pinBatteryVoltage); break;
