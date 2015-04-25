@@ -607,7 +607,8 @@ void Robot::motorControlPerimeter(){
     //perimeterPID.x = 1;
   } 
   else {
-    setMotorSpeed(motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
+    //setMotorSpeed(motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
+    setMotorSpeed(motorSpeedMaxPwm, motorSpeedMaxPwm, false);
     //perimeterPID.x = 0;
   }  
   /*perimeterPID.w = 0;  
