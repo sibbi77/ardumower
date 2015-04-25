@@ -594,8 +594,10 @@ void Robot::motorControlImuRoll(){
 void Robot::motorControlPerimeter(){
   static float lmag = 0;
   static float rmag = 0;
-  lmag = 0.95 * lmag + 0.05 * perimeterLeftMag;
-  rmag = 0.95 * rmag + 0.05 * perimeterRightMag;               
+  //lmag = 0.5 * lmag + 0.5 * perimeterLeftMag;
+  //rmag = 0.5 * rmag + 0.5 * perimeterRightMag;               
+  lmag = perimeterLeftMag;
+  rmag = perimeterRightMag;
   if (lmag < 0) {
     setMotorSpeed(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
     //perimeterPID.x = -1;
