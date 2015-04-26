@@ -516,9 +516,7 @@ void Robot::setMotorSpeed(int pwmLeft, int pwmRight, boolean useAccel){
   } else {
     double accel = motorAccel * loopsTa;       
     motorLeftPWM = (1.0 - accel) * motorLeftPWM + accel * ((double)pwmLeft); 
-    if (abs(pwmLeft-motorLeftPWM) < 1) motorLeftPWM = 0;  // ensures pwm really becomes zero (0)
-    motorRightPWM = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);      
-    if (abs(pwmRight-motorRightPWM) < 1) motorRightPWM = 0;  // ensures pwm really becomes zero (0)
+    motorRightPWM = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);          
   }
   /*Serial.print(motorLeftPWM);
   Serial.print("\t");
