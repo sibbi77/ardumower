@@ -516,7 +516,9 @@ void Robot::setMotorSpeed(int pwmLeft, int pwmRight, boolean useAccel){
   } else {
     double accel = motorAccel * loopsTa;       
     motorLeftPWM = (1.0 - accel) * motorLeftPWM + accel * ((double)pwmLeft); 
-    motorRightPWM = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);  
+    if (abs(pwmLeft-motorLeftPWM) < 1) motorLeftPWM = 0;  // ensures pwm really becomes zero (0)
+    motorRightPWM = (1.0 - accel) * motorRightPWM + accel * ((double)pwmRight);      
+    if (abs(pwmRight-motorRightPWM) < 1) motorRightPWM = 0;  // ensures pwm really becomes zero (0)
   }
   /*Serial.print(motorLeftPWM);
   Serial.print("\t");
@@ -592,6 +594,7 @@ void Robot::motorControlImuRoll(){
 
 // PID controller: track perimeter 
 void Robot::motorControlPerimeter(){
+  static int periTrackState = 0;  
   static float lmag = 0;
   static float rmag = 0;
   //lmag = 0.5 * lmag + 0.5 * perimeterLeftMag;
@@ -599,17 +602,25 @@ void Robot::motorControlPerimeter(){
   lmag = perimeterLeftMag;
   rmag = perimeterRightMag;
   if (lmag < 0) {
-    setMotorSpeed(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
-    //perimeterPID.x = -1;
+    if (periTrackState == 1) setMotorSpeed(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
+      else {
+        setMotorSpeed(0, 0, false);
+        if ((motorLeftPWM == 0) && (motorRightPWM == 0)) periTrackState = 1;
+      } 
   } 
   else if (rmag > 0) {
-    setMotorSpeed(motorSpeedMaxPwm/2, -motorSpeedMaxPwm/2, false);
-    //perimeterPID.x = 1;
+     if (periTrackState == 2) setMotorSpeed(motorSpeedMaxPwm/2, -motorSpeedMaxPwm/2, false);
+      else {
+        setMotorSpeed(0, 0, false);
+        if ((motorLeftPWM == 0) && (motorRightPWM == 0)) periTrackState = 2;
+      } 
   } 
   else {
-    //setMotorSpeed(motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
-    setMotorSpeed(motorSpeedMaxPwm, motorSpeedMaxPwm, false);
-    //perimeterPID.x = 0;
+      if (periTrackState == 0)     setMotorSpeed(motorSpeedMaxPwm, motorSpeedMaxPwm, true);
+      else {
+        setMotorSpeed(0, 0, false);
+        if ((motorLeftPWM == 0) && (motorRightPWM == 0)) periTrackState = 0;
+      } 
   }  
   /*perimeterPID.w = 0;  
   perimeterPID.y_min = -motorSpeedMaxPwm;

@@ -487,8 +487,18 @@ int Mower::readSensor(char type){
 void Mower::setActuator(char type, int value){
   switch (type){
     case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    case ACT_MOTOR_LEFT: 
+      if (value == 0) digitalWrite(pinMotorEnable, LOW);
+        else {
+          if (!digitalRead(pinMotorEnable)) digitalWrite(pinMotorEnable, HIGH);    
+          setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+        }
+    case ACT_MOTOR_RIGHT: 
+      if (value == 0) digitalWrite(pinMotorEnable, LOW);    
+        else {
+          if (!digitalRead(pinMotorEnable)) digitalWrite(pinMotorEnable, HIGH);    
+          setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+        }
     case ACT_BUZZER: if (value == 0) noTone(pinBuzzer); else tone(pinBuzzer, value); break;
     case ACT_LED: digitalWrite(pinLED, value); break;    
     case ACT_USER_SW1: digitalWrite(pinUserSwitch1, value); break;     
