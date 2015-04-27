@@ -599,6 +599,18 @@ void Robot::motorControlPerimeter(){
   //rmag = 0.5 * rmag + 0.5 * perimeterRightMag;               
   lmag = perimeterLeftMag;
   rmag = perimeterRightMag;
+  
+  if ((millis() > stateStartTime + 5000) && (millis() > perimeterLastTransitionTime + trackingPerimeterTransitionTimeOut)){
+    // robot is not at perimeter anymore
+    if (millis() > perimeterLastTransitionTime + trackingErrorTimeOut){
+      Console.println("Error: tracking error");
+      addErrorCounter(ERR_TRACKING);
+      //setNextState(STATE_ERROR,0);
+      setNextState(STATE_PERI_FIND,0);
+    }
+    return;     
+  }
+  
   if (lmag < 0) {
     if (periTrackState == 1) setMotorSpeed(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, false);
       else {
