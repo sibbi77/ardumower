@@ -639,7 +639,11 @@ void Robot::motorControlImuRoll(){
 
 // PID controller: track perimeter 
 void Robot::motorControlPerimeter(){      
-  if ((millis() > stateStartTime + 5000) && (millis() > perimeterLastTransitionTime + trackingPerimeterTransitionTimeOut)){
+  static unsigned long lastTrackingTransitionTime = 0;
+  static bool lastInside = 0;
+  static int lastMag = 0;
+  static bool trackingForward = false;  
+  /*if ((millis() > stateStartTime + 5000) && (millis() > perimeterLastTransitionTime + trackingPerimeterTransitionTimeOut)){
     // robot is wheel-spinning while tracking => roll to get ground again
     if (trackingBlockInnerWheelWhilePerimeterStruggling == 0){
     if (perimeterMag < 0) setMotorPWM( -motorSpeedMaxPwm/1.5, motorSpeedMaxPwm/1.5, false);
@@ -657,19 +661,42 @@ void Robot::motorControlPerimeter(){
       setNextState(STATE_PERI_FIND,0);
     }
     return;
-  }   
-  if (perimeterMag < 0) perimeterPID.x = -1;
-    else if (perimeterMag > 0) perimeterPID.x = 1; 
-    else perimeterPID.x = 0;
-  perimeterPID.w = 0;
-  perimeterPID.y_min = -motorSpeedMaxPwm;
-  perimeterPID.y_max = motorSpeedMaxPwm;		
-  perimeterPID.max_output = motorSpeedMaxPwm;
-  perimeterPID.compute();
+  } */
+  if (trackingForward){
+    // forward
+    if (perimeterMag<0) setMotorPWM(motorSpeedMaxPwm*0.5, motorSpeedMaxPwm*0.6, true);    
+      else setMotorPWM(motorSpeedMaxPwm*0.6, motorSpeedMaxPwm*0.5, true);    
+  } else {
+    // rotate
+    if (perimeterMag<0) setMotorPWM(-motorSpeedMaxPwm/2, motorSpeedMaxPwm/2, true);
+      else setMotorPWM(motorSpeedMaxPwm/2, -motorSpeedMaxPwm/2, true);
+  }
+
+  if ( (perimeterMag != 0) && (sign(perimeterMag) != sign(lastMag)) ){
+    // we did a perimeter transition 
+    if (!trackingForward){
+      // we did rotate => now track forward again
+      trackingForward = true;
+    } else {    
+      // we are in forward motion
+      if (millis() < lastTrackingTransitionTime + 1000){
+        // transition was a small angle
+        trackingForward = true;
+      } else {
+        // transition was a large angle
+        trackingForward = false;
+      }      
+    }
+    lastTrackingTransitionTime = millis();
+    lastMag = perimeterMag;
+  } else {
+    // no transition yet => check forward timeout
+    if ((trackingForward) && (millis() > lastTrackingTransitionTime + 1000)) trackingForward = false;
+  }
   //setMotorPWM( motorLeftPWMCurr  +perimeterPID.y, 
   //               motorRightPWMCurr -perimeterPID.y, false);      
-  setMotorPWM( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 - perimeterPID.y)), 
-                 max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);      
+  //setMotorPWM( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 - perimeterPID.y)), 
+   //              max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);      
   /*Console.print(perimeterPID.x);
   Console.print("\t");          
   Console.println(perimeterPID.y);  */
