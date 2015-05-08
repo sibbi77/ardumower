@@ -49,6 +49,9 @@
 #endif
 
 
+int8_t upSamples[255];
+
+
 Perimeter::Perimeter(){    
   useDifferentialPerimeterSignal = false;
   swapCoilPolarity = false;
@@ -66,23 +69,27 @@ void Perimeter::setPins(byte idx0Pin, byte idx1Pin){
   idxPin[0] = idx0Pin;
   idxPin[1] = idx1Pin;  
 
-  switch (ADCMan.sampleRate){
+  /*switch (ADCMan.sampleRate){
     case SRATE_9615: subSample = 1; break;
     case SRATE_19231: subSample = 2; break;
     case SRATE_38462: subSample = 4; break;
-  }
-  
+  }*/
+  subSample = 4; 
   // use max. 255 samples and multiple of signalsize
-  int adcSampleCount = sizeof sigcode_norm * subSample;
-  ADCMan.setCapture(idx0Pin, ((int)255 / adcSampleCount) * adcSampleCount, true); 
-  ADCMan.setCapture(idx1Pin, ((int)255 / adcSampleCount) * adcSampleCount, true); 
+  int subSampleCount = sizeof sigcode_norm * subSample;  
+  //ADCMan.setCapture(idx0Pin, 255, true); 
+  //ADCMan.setCapture(idx1Pin, 255, true);   
+  ADCMan.setCapture(idx0Pin, ((int)255 / subSampleCount) * subSampleCount / subSample, true); 
+  ADCMan.setCapture(idx1Pin, ((int)255 / subSampleCount) * subSampleCount / subSample, true); 
  // ADCMan.setCapture(idx0Pin, adcSampleCount*2, true); 
  // ADCMan.setCapture(idx1Pin, adcSampleCount*2, true); 
   
   Console.print(F("matchSignal size="));
   Console.println(sizeof sigcode_norm);  
   Console.print(F("subSample="));  
-  Console.println((int)subSample);    
+  Console.println((int)subSample); 
+  Console.print(F("subSampleCount="));    
+  Console.println((int)subSampleCount); 
   Console.print(F("capture size="));
   Console.println(ADCMan.getCaptureSize(idx0Pin));  
 }
@@ -122,6 +129,18 @@ void Perimeter::printADCMinMax(int8_t *samples){
   Console.println((int)vmax);  
 }
 
+// upsampling (each source sample copied 'subSample' times to destination)
+void upSample(int8_t *samples, int sampleCount, int subSample, int8_t *upSamples){
+  int didx = 0;
+  for (int sidx=0; sidx < sampleCount; sidx++){
+    for (int j=0; j < subSample; j++){
+      upSamples[didx] = samples[sidx];
+      didx++;
+    }
+  }    
+}
+
+
 // perimeter V2 uses a digital matched filter
 void Perimeter::matchedFilter(byte idx){
   int16_t sampleCount = ADCMan.getCaptureSize(idxPin[0]);
@@ -144,7 +163,9 @@ void Perimeter::matchedFilter(byte idx){
   int16_t sigcode_size = sizeof sigcode_norm;
   int8_t *sigcode = sigcode_norm;  
   if (useDifferentialPerimeterSignal) sigcode = sigcode_diff;
-  mag[idx] = corrFilter(sigcode, subSample, sigcode_size, samples, sampleCount-sigcode_size*subSample, filterQuality[idx]);
+  upSample(samples, sampleCount, subSample, upSamples);
+  mag[idx] = corrFilter(sigcode, subSample, sigcode_size, upSamples, sampleCount*subSample - sigcode_size*subSample, filterQuality[idx]);
+  //mag[idx] = corrFilter(sigcode, subSample, sigcode_size, samples, sampleCount-sigcode_size*subSample, filterQuality[idx]);
   if (swapCoilPolarity) mag[idx] *= -1;        
   // smoothed magnitude used for signal-off detection
   smoothMag[idx] = 0.99 * smoothMag[idx] + 0.01 * ((float)abs(mag[idx]));
