@@ -2055,8 +2055,10 @@ void Robot::calcOdometry(){
   odometryTheta += wheel_theta; 
   
   motorLeftRpmCurr  = double ((( ((double)ticksLeft) / ((double)odometryTicksPerRevolution)) / ((double)(millis() - lastMotorRpmTime))) * 60000.0); 
-  motorRightRpmCurr = double ((( ((double)ticksRight) / ((double)odometryTicksPerRevolution)) / ((double)(millis() - lastMotorRpmTime))) * 60000.0);                
+  motorRightRpmCurr = double ((( ((double)ticksRight) / ((double)odometryTicksPerRevolution)) / ((double)(millis() - lastMotorRpmTime))) * 60000.0);                  
   lastMotorRpmTime = millis();
+  if (motorLeftPWMCurr < 0) motorLeftRpmCurr *= -1;
+  if (motorRightPWMCurr < 0) motorRightRpmCurr *= -1;
                
   if (imuUse){
     odometryX += avg_cm * sin(imu.ypr.yaw); 

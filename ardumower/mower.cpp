@@ -155,7 +155,8 @@ Mower::Mower(){
   motorMowAccel       = 0.1;  // motor mower acceleration (warning: do not set too high)
   motorMowSpeedMaxPwm   = 255;    // motor mower max PWM
   motorMowPowerMax = 50.0;     // motor mower max power (Watt)
-  motorMowModulate  = 0;      // motor mower cutter modulation?
+  motorMowRPMSensorAvail = 0;      // motor mower rpm sensor available?
+  motorMowModulate  = 0;      // use motor mower cutter modulation?  
   motorMowRPMSet        = 3300;   // motor mower RPM (only for cutter modulation)
   motorMowSenseScale = 15.3; // motor mower sense scale (mA=(ADC-zero)/scale)
   motorMowPID.Kp = 0.005;    // motor mower RPM PID controller
@@ -197,7 +198,7 @@ Mower::Mower(){
   imuRollPID.Ki     = 21;
   imuRollPID.Kd     = 0;  
   // ------ model R/C ------------------------------------
-  remoteUse         = 1;       // use model remote control (R/C)?
+  remoteUse         = 0;       // use model remote control (R/C)?
   // ------ battery -------------------------------------
   batMonitor = 1;              // monitor battery and charge voltage?
   batGoHomeIfBelow = 23.7;     // drive home voltage (Volt)
@@ -225,8 +226,9 @@ Mower::Mower(){
   stationForwTime    = 2000;    // charge station forward time (ms)
   stationCheckTime   = 2500;    // charge station reverse check time (ms)
   // ------ odometry ------------------------------------
-  odometryUse       = 1;       // use odometry?
-  twoWayOdometrySensorUse = 1; // use optional two-wire odometry sensor?
+  odometryAvail     = 1;       // odometry sensor available?
+  odometryUse       = 1;       // use odometry?  
+  twoWayOdometrySensorUse = 0; // use optional two-wire odometry sensor?
   odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
   odometryTicksPerCm = 13.49;  // encoder ticks per cm
   odometryWheelBaseCm = 36;    // wheel-to-wheel distance (cm)
@@ -256,18 +258,31 @@ ISR(PCINT0_vect){
   robot.setRemotePPMState(timeMicros, remoteSpeedState, remoteSteerState, remoteMowState, remoteSwitchState);    
 }
 
+
 // odometry signal change interrupt
 // mower motor speed sensor interrupt
+#ifdef __AVR__
 ISR(PCINT2_vect){
-  unsigned long timeMicros = micros();
-  boolean odometryLeftState = digitalRead(pinOdometryLeft);
-  boolean odometryLeftState2 = digitalRead(pinOdometryLeft2);
-  boolean odometryRightState = digitalRead(pinOdometryRight);  
-  boolean odometryRightState2 = digitalRead(pinOdometryRight2);  
-  boolean motorMowRpmState = digitalRead(pinMotorMowRpm);
-  robot.setOdometryState(timeMicros, odometryLeftState, odometryRightState, odometryLeftState2, odometryRightState2);   
-  robot.setMotorMowRPMState(motorMowRpmState);  
+  static byte oldPins = 0;
+  const byte newPins = PINK;
+  const byte setPins = (oldPins ^ newPins) & newPins; // Bitmask of newly set pins (rising edge)
+  // http://www.arduino.cc/en/Hacking/PinMapping2560
+  if (setPins & _BV(4)) robot.odometryLeft++;
+  if (setPins & _BV(6)) robot.odometryRight++;
+  if (setPins & _BV(3)) robot.motorMowRpmCounter++;
+  oldPins = newPins;  
 }
+#else
+  // TODO
+  //unsigned long timeMicros = micros();
+  //boolean odometryLeftState = digitalRead(pinOdometryLeft);
+  //boolean odometryLeftState2 = digitalRead(pinOdometryLeft2);
+  //boolean odometryRightState = digitalRead(pinOdometryRight);  
+  //boolean odometryRightState2 = digitalRead(pinOdometryRight2);  
+  //boolean motorMowRpmState = digitalRead(pinMotorMowRpm);
+  //robot.setOdometryState(timeMicros, odometryLeftState, odometryRightState, odometryLeftState2, odometryRightState2);   
+  //robot.setMotorMowRPMState(motorMowRpmState);  
+#endif
 
 // mower motor speed sensor interrupt
 //void rpm_interrupt(){
@@ -391,37 +406,55 @@ void Mower::setup(){
 
   // enable interrupts
   #ifdef __AVR__
-    // R/C
-    PCICR |= (1<<PCIE0);
-    PCMSK0 |= (1<<PCINT4);
-    PCMSK0 |= (1<<PCINT5);
-    PCMSK0 |= (1<<PCINT6);
-    PCMSK0 |= (1<<PCINT1);  
+    if (remoteUse){
+      Console.println(F("R/C: receiver available"));
+      // R/C
+      PCICR |= (1<<PCIE0);
+      PCMSK0 |= (1<<PCINT4);
+      PCMSK0 |= (1<<PCINT5);
+      PCMSK0 |= (1<<PCINT6);
+      PCMSK0 |= (1<<PCINT1);  
+    }
     
     // odometry
-    PCICR |= (1<<PCIE2);
-    PCMSK2 |= (1<<PCINT20);
-    PCMSK2 |= (1<<PCINT21);  
-    PCMSK2 |= (1<<PCINT22);
-    PCMSK2 |= (1<<PCINT23);          
+    if (odometryAvail){
+      Console.println(F("ODOMETRY: sensor available"));
+      PCICR |= (1<<PCIE2);
+      PCMSK2 |= (1<<PCINT20);
+      //PCMSK2 |= (1<<PCINT21);  
+      PCMSK2 |= (1<<PCINT22);
+      //PCMSK2 |= (1<<PCINT23);          
+    }
     
-    // mower motor speed sensor interrupt
-    //attachInterrupt(5, rpm_interrupt, CHANGE);
-    PCMSK2 |= (1<<PCINT19);  
+    if (motorMowRPMSensorAvail){
+      Console.println(F("RPM: motor mow rpm sensor available"));
+      // mower motor speed sensor interrupt
+      //attachInterrupt(5, rpm_interrupt, CHANGE);
+      PCMSK2 |= (1<<PCINT19);  
+    }
   #else
     // Due interrupts
-    attachInterrupt(pinOdometryLeft, PCINT2_vect, CHANGE);
-    attachInterrupt(pinOdometryLeft2, PCINT2_vect, CHANGE);
-    attachInterrupt(pinOdometryRight, PCINT2_vect, CHANGE);    
-    attachInterrupt(pinOdometryRight2, PCINT2_vect, CHANGE);            
+    if (odometryAvail){
+      Console.println(F("ODOMETRY: sensor available"));    
+      attachInterrupt(pinOdometryLeft, PCINT2_vect, CHANGE);
+      //attachInterrupt(pinOdometryLeft2, PCINT2_vect, CHANGE);
+      attachInterrupt(pinOdometryRight, PCINT2_vect, CHANGE);    
+      //attachInterrupt(pinOdometryRight2, PCINT2_vect, CHANGE);            
+    }
     
-    attachInterrupt(pinRemoteSpeed, PCINT0_vect, CHANGE);            
-    attachInterrupt(pinRemoteSteer, PCINT0_vect, CHANGE);            
-    attachInterrupt(pinRemoteMow, PCINT0_vect, CHANGE);   
-    attachInterrupt(pinRemoteSwitch, PCINT0_vect, CHANGE);       
+    if (remoteUse){
+      Console.println(F("R/C: receiver available"));
+      attachInterrupt(pinRemoteSpeed, PCINT0_vect, CHANGE);            
+      attachInterrupt(pinRemoteSteer, PCINT0_vect, CHANGE);            
+      attachInterrupt(pinRemoteMow, PCINT0_vect, CHANGE);   
+      attachInterrupt(pinRemoteSwitch, PCINT0_vect, CHANGE);       
+    }
     
     //attachInterrupt(pinMotorMowRpm, rpm_interrupt, CHANGE);
-    attachInterrupt(pinMotorMowRpm, PCINT2_vect, CHANGE);    
+    if (motorMowRPMSensorAvail){
+      Console.println(F("RPM: motor mow rpm sensor available"));
+      attachInterrupt(pinMotorMowRpm, PCINT2_vect, CHANGE);    
+    }
   #endif   
     
   // ADC

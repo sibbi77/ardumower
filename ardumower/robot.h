@@ -196,6 +196,7 @@ class Robot
     float gpsY ;   // Y position (m)
     unsigned long nextTimeGPS ;
     // -------- odometry state --------------------------
+    bool odometryAvail;            // odometry sensor available?
     char odometryUse       ;       // use odometry?
     char twoWayOdometrySensorUse;  // use optional two-wire odometry sensor?
     int odometryTicksPerRevolution ;   // encoder ticks per one full resolution
@@ -276,6 +277,7 @@ class Robot
     float motorMowAccel       ;  // motor mower acceleration (warning: do not set too high)
     int motorMowSpeedMaxPwm ;    // motor mower max PWM
     float motorMowPowerMax ;     // motor mower max power (Watt)
+    bool motorMowRPMSensorAvail;  // motor mower rpm sensor available?
     char motorMowModulate  ;      // motor mower cutter modulation?
     int motorMowRPMSet        ;   // motor mower RPM (only for cutter modulation)
     float motorMowSenseScale ; // motor mower sense scale (mA=(ADC-zero)/scale)
