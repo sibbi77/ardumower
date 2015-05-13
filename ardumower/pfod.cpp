@@ -290,12 +290,18 @@ void RemoteControl::sendMotorMenu(boolean update){
   Bluetooth.print(robot->motorLeftPWMCurr);
   Bluetooth.print(", ");  
   Bluetooth.print(robot->motorRightPWMCurr);   
+  Bluetooth.println(F("|a16~RPM Speed l, r"));    
+  Bluetooth.print(robot->motorLeftRpmCurr);
+  Bluetooth.print(", ");  
+  Bluetooth.print(robot->motorRightRpmCurr);
+
   sendSlider("a06", F("Speed max in rpm"), robot->motorSpeedMaxRpm, "", 1, 100);    
-  sendSlider("a15", F("Speed max in pwm"), robot->motorSpeedMaxPwm, "", 1, 255);      
+  sendSlider("a15", F("Speed max in pwm"), robot->motorSpeedMaxPwm, "", 1, 255);    
   sendSlider("a11", F("Accel"), robot->motorAccel, "", 1, 1000, 300);  
-  sendSlider("a18", F("Power ignore time"), robot->motorPowerIgnoreTime, "", 1, 8000);     
-  sendSlider("a07", F("Roll time max"), robot->motorRollTimeMax, "", 1, 8000);     
-  sendSlider("a08", F("Reverse time"), robot->motorReverseTime, "", 1, 8000);     
+  sendSlider("a18", F("Power ignore time"), robot->motorPowerIgnoreTime, "", 1, 8000); 
+  sendSlider("a19", F("MotorZeroSettleTime"), robot->motorZeroSettleTime, "", 1, 3000);       
+  sendSlider("a07", F("Roll time max"), robot->motorRollTimeMax, "", 1, 3000);     
+  sendSlider("a08", F("Reverse time"), robot->motorReverseTime, "", 1, 3000);     
   sendSlider("a09", F("Forw time max"), robot->motorForwTimeMax, "", 10, 80000);       
   sendSlider("a12", F("Bidir speed ratio 1"), robot->motorBiDirSpeedRatio1, "", 0.01, 1.0);       
   sendSlider("a13", F("Bidir speed ratio 2"), robot->motorBiDirSpeedRatio2, "", 0.01, 1.0);       
@@ -343,7 +349,9 @@ void RemoteControl::processMotorMenu(String pfodCmd){
     else if (pfodCmd.startsWith("a14")) processPIDSlider(pfodCmd, "a14", robot->motorLeftPID, 0.01, 3.0);
     else if (pfodCmd.startsWith("a16")) robot->motorLeftSwapDir = !robot->motorLeftSwapDir;
     else if (pfodCmd.startsWith("a17")) robot->motorRightSwapDir = !robot->motorRightSwapDir;  
-    else if (pfodCmd.startsWith("a18")) processSlider(pfodCmd, robot->motorPowerIgnoreTime, 1);        
+    else if (pfodCmd.startsWith("a18")) processSlider(pfodCmd, robot->motorPowerIgnoreTime, 1);
+    else if (pfodCmd.startsWith("a19")) processSlider(pfodCmd, robot->motorZeroSettleTime, 1);
+
     else if (pfodCmd == "a10") { 
       testmode = (testmode + 1) % 3;
       switch (testmode){
@@ -483,7 +491,7 @@ void RemoteControl::sendPerimeterMenu(boolean update){
   Bluetooth.print(F("|e00~Use "));
   sendYesNo(robot->perimeterUse);  
   Bluetooth.println(F("|e02~Value"));
-  Bluetooth.print(robot->perimeterMag);
+  Bluetooth.print(robot->perimeterMag);  
   if (robot->perimeterMag < 0) Bluetooth.print(" (inside)");
     else Bluetooth.print(" (outside)");     
   sendSlider("e08", F("Timed-out if below smag"), robot->perimeter.timedOutIfBelowSmag, "", 1, 2000);  
@@ -1293,9 +1301,9 @@ void RemoteControl::run(){
       Bluetooth.print(robot->motorLeftPWMCurr);      
       Bluetooth.print(",");                    
       Bluetooth.print(robot->motorRightPWMCurr);
-      Bluetooth.print(",");                                  
+      Bluetooth.print(",");
       Bluetooth.print(robot->motorLeftPID.eold);      
-      Bluetooth.print(",");                        
+      Bluetooth.print(",");
       Bluetooth.println(robot->motorRightPID.eold);            
     }
   }
@@ -1385,7 +1393,8 @@ bool RemoteControl::readSerial(){
         else if (pfodCmd == "c1") {
           // ADC calibration          
           ADCMan.calibrate();
-          robot->beep(2, false);      
+          robot->beep(2, false); 
+          Bluetooth.println("{}");     
         }
         else if (pfodCmd == "y11"){
           // motor control

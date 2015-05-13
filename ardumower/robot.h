@@ -114,7 +114,7 @@ enum {
   ERR_RTC_COMM,
   ERR_RTC_DATA,
   ERR_PERIMETER_TIMEOUT,
-  ERR_TRACKING,
+  ERR_TRACKING,  
   ERR_ODOMETRY_LEFT,
   ERR_ODOMETRY_RIGHT,
   ERR_BATTERY,
@@ -152,7 +152,7 @@ enum {
 };
 
 // roll types
-enum { LEFT, RIGHT };
+enum { LEFT, RIGHT, RANDOM };
 
 // mow patterns
 enum { MOW_RANDOM, MOW_LANES, MOW_BIDIR };
@@ -183,6 +183,7 @@ class Robot
     ttimer_t timer[MAX_TIMERS];
     datetime_t datetime;
     char timerUse          ;       // use timer?
+    char rtcUse            ;
     unsigned long nextTimeTimer ;        
     // -------- mow pattern -----------------------------    
     byte mowPatternCurr;
@@ -215,6 +216,10 @@ class Robot
     float motorLeftRpmCurr ; // left wheel rpm    
     float motorRightRpmCurr ; // right wheel rpm    
     unsigned long lastMotorRpmTime ;     
+    int motorRightRpmCounter ; // right wheel rpm counter
+    int motorLeftRpmCounter ; // left wheel rpm counter  
+    unsigned long lastMotorLeftRpmTime;
+    unsigned long lastMotorRightRpmTime;
     unsigned long nextTimeOdometry ;
     unsigned long nextTimeOdometryInfo ; 
     // -------- RC remote control state -----------------    
@@ -255,6 +260,15 @@ class Robot
     bool motorLeftSwapDir      ;    // inverse left motor direction?  
     int motorLeftSpeedRpmSet ; // set speed
     int motorRightSpeedRpmSet ;
+    int motorLeftSpeed ; // left speed setpoint
+    int motorRightSpeed ; //right speed setpoint
+    int lastMotorLeftSetpoint ;
+    int lastMotorRightSetpoint ;
+    int incMotorLeftSetpoint ;
+    int incMotorRightSetpoint ; 
+   	int  lastMotorLeftSpeed;
+   	int lastMotorRightSpeed;
+
     float motorLeftPWMCurr ; // current speed
     float motorRightPWMCurr ;
     int motorRightSenseADC ;
@@ -323,7 +337,7 @@ class Robot
     unsigned long nextTimeIMU ;
     // ------- perimeter state --------------------------
     Perimeter perimeter;
-    char perimeterUse       ;      // use perimeter?    
+    char perimeterUse       ;      // use perimeter?
     int perimeterTrackRollTime ;   // perimter tracking roll time (ms)
     int perimeterTrackRevTime  ;   // perimter tracking reverse time (ms)
     PID perimeterPID ;             // perimeter PID controller
@@ -337,6 +351,7 @@ class Robot
     int trackingPerimeterTransitionTimeOut;
     int trackingErrorTimeOut;    
     char trackingBlockInnerWheelWhilePerimeterStruggling;
+    byte rollDirection;
     //  --------- lawn state ----------------------------
     char lawnSensorUse     ;       // use capacitive Sensor
     int lawnSensorCounter;
@@ -426,7 +441,7 @@ class Robot
     virtual void setup();
     // robot main loop
     virtual void loop();        
-
+    
     virtual void resetIdleTime();
     
     // call this from R/C control interrupt
@@ -461,7 +476,7 @@ class Robot
     // other
     virtual void beep(int numberOfBeeps, boolean shortbeep);    
     virtual void printInfo(Stream &s);        
-    virtual void setUserSwitches(); 
+    virtual void setUserSwitches();        
     virtual void addErrorCounter(byte errType);    
     virtual void resetErrorCounters();
 protected:

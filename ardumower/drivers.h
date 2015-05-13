@@ -98,8 +98,64 @@ template <typename T> int sign(T val) {
     return (T(0) < val) - (val < T(0));
 }
 
-// ---------- EEPROM helpers ----------------------------------
 
+
+
+
+// ---------- driver functions ----------------------------------
+
+int freeRam();
+  
+// print helpers
+void StreamPrint_progmem(Print &out,PGM_P format,...);
+#define Serialprint(format, ...) StreamPrint_progmem(Serial,PSTR(format),##__VA_ARGS__)
+#define Streamprint(stream,format, ...) StreamPrint_progmem(stream,PSTR(format),##__VA_ARGS__)
+String verToString(int v);
+
+// time helpers
+void minutes2time(int minutes, timehm_t &time);
+int time2minutes(timehm_t time);
+String time2str(timehm_t time);
+String date2str(date_t date);
+
+String versionToStr(byte v[]);
+
+// I2C helpers
+void I2CwriteTo(uint8_t device, uint8_t address, uint8_t val);
+void i2c_eeprom_write_byte(int device, unsigned int address, uint8_t val);
+int I2CreadFrom(uint8_t device, uint8_t address, uint8_t num, uint8_t buff[], int retryCount = 0);
+int i2c_eeprom_read_byte(int device, unsigned int address);
+
+// rescale to -PI..+PI
+double scalePI(double v);
+
+// computes minimum distance between x radiant (current-value) and w radiant (set-value)
+double distancePI(double x, double w);
+
+// ultrasonic sensor
+unsigned int readHCSR04(int triggerPin, int echoPin);
+unsigned int readURM37(int triggerPin, int echoPin);
+
+// motor drivers
+void setPwmFrequency(int pin, int divisor);
+void setL298N(int pinDir, int pinPWM, int speed);
+void setL9958(int pinDir, int pinPWM, int speed);
+void setRomeoMotor(int pinDir, int pinPWM, int speed);
+void setMC33926(int pinDir, int pinPWM, int speed);
+
+// lawn sensor
+int measureLawnCapacity(int pinSend, int pinReceive);
+
+// real time drivers
+boolean readDS1307(datetime_t &dt);
+boolean setDS1307(datetime_t &dt);
+
+
+// Returns the day of week (0=Sunday, 6=Saturday) for a given date
+int getDayOfWeek(int month, int day, int year, int CalendarSystem);
+
+// ---------- EEPROM helpers ----------------------------------
+/*
 template <class T> int eewrite(int &ee, const T& value)
 {
     const byte* p = (const byte*)(const void*)&value;
@@ -129,57 +185,42 @@ template <class T> int eereadwrite(boolean readflag, int &ee, T& value)
     }
     return i;
 }
+*/
+
+template <class T> int eewrite(int &ee, const T& value)
+{
+    const byte* p = (const byte*)(const void*)&value;
+    int i;
+    for (i = 0; i < sizeof(value); i++)
+          i2c_eeprom_write_byte(0x50, ee++, *p++);
+    return i;
+}
+
+template <class T> int eeread(int &ee, T& value)
+{
+    byte* p = (byte*)(void*)&value;
+    int  i;
+    for (i = 0; i < sizeof(value); i++)
+          *p++ = i2c_eeprom_read_byte(0x50, ee++);
+    return i;
+}
+
+template <class T> int eereadwrite(boolean readflag, int &ee, T& value)
+{
+    byte* p = (byte*)(void*)&value;
+    int i;
+    for (i = 0; i < sizeof(value); i++)
+    { 
+       if (readflag) *p++ = i2c_eeprom_read_byte(0x50, ee++);
+         else i2c_eeprom_write_byte(0x50, ee++, *p++);
+    }
+    return i;
+}
 
 
-// ---------- driver functions ----------------------------------
-
-int freeRam();
-  
-// print helpers
-void StreamPrint_progmem(Print &out,PGM_P format,...);
-#define Serialprint(format, ...) StreamPrint_progmem(Serial,PSTR(format),##__VA_ARGS__)
-#define Streamprint(stream,format, ...) StreamPrint_progmem(stream,PSTR(format),##__VA_ARGS__)
-String verToString(int v);
-
-// time helpers
-void minutes2time(int minutes, timehm_t &time);
-int time2minutes(timehm_t time);
-String time2str(timehm_t time);
-String date2str(date_t date);
-
-String versionToStr(byte v[]);
-
-// I2C helpers
-void I2CwriteTo(uint8_t device, uint8_t address, uint8_t val);
-int I2CreadFrom(uint8_t device, uint8_t address, uint8_t num, uint8_t buff[], int retryCount = 0);
-
-// rescale to -PI..+PI
-double scalePI(double v);
-
-// computes minimum distance between x radiant (current-value) and w radiant (set-value)
-double distancePI(double x, double w);
-
-// ultrasonic sensor
-unsigned int readHCSR04(int triggerPin, int echoPin);
-unsigned int readURM37(int triggerPin, int echoPin);
-
-// motor drivers
-void setPwmFrequency(int pin, int divisor);
-void setL298N(int pinDir, int pinPWM, int speed);
-void setL9958(int pinDir, int pinPWM, int speed);
-void setRomeoMotor(int pinDir, int pinPWM, int speed);
-void setMC33926(int pinDir, int pinPWM, int speed);
-
-// lawn sensor
-int measureLawnCapacity(int pinSend, int pinReceive);
-
-// real time drivers
-boolean readDS1307(datetime_t &dt);
-boolean setDS1307(datetime_t &dt);
 
 
-// Returns the day of week (0=Sunday, 6=Saturday) for a given date
-int getDayOfWeek(int month, int day, int year, int CalendarSystem);
+
 
 #endif 
 

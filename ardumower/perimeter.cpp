@@ -51,7 +51,7 @@
 
 Perimeter::Perimeter(){    
   useDifferentialPerimeterSignal = true;
-  swapCoilPolarity = false;
+  swapCoilPolarity = true;
   timedOutIfBelowSmag = 300;
   timeOutSecIfNotInside = 8;
   callCounter = 0;
@@ -78,7 +78,7 @@ void Perimeter::setPins(byte idx0Pin, byte idx1Pin){
   ADCMan.setCapture(idx1Pin, ((int)255 / adcSampleCount) * adcSampleCount, true); 
  // ADCMan.setCapture(idx0Pin, adcSampleCount*2, true); 
  // ADCMan.setCapture(idx1Pin, adcSampleCount*2, true); 
-  
+
   Console.print(F("matchSignal size="));
   Console.println(sizeof sigcode_norm);  
   Console.print(F("subSample="));  

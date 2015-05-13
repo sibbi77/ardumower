@@ -139,7 +139,7 @@ class RemoteControl
     void processStationMenu(String pfodCmd);
     void processOdometryMenu(String pfodCmd);      
     void processDateTimeMenu(String pfodCmd);
-    void processFactorySettingsMenu(String pfodCmd); 
+    void processFactorySettingsMenu(String pfodCmd);    
     void processInfoMenu(String pfodCmd);
 
     // timer

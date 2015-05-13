@@ -44,72 +44,72 @@
 #include "due.h"
 
 // ------ pins---------------------------------------
-#define pinMotorEnable  37         // EN motors enable
-#define pinMotorLeftPWM 5          // M1_IN1 left motor PWM pin
-#define pinMotorLeftDir 31         // M1_IN2 left motor Dir pin
+#define pinMotorEnable  30         // EN motors enable
+#define pinMotorLeftPWM 7          // M1_IN1 left motor PWM pin
+#define pinMotorLeftDir 23         // M1_IN2 left motor Dir pin
 #define pinMotorLeftSense A1       // M1_FB  left motor current sense
-#define pinMotorLeftFault 25       // M1_SF  left motor fault
+#define pinMotorLeftFault 28       // M1_SF  left motor fault
                                                              
-#define pinMotorRightPWM  3        // M2_IN1 right motor PWM pin
-#define pinMotorRightDir 33        // M2_IN2 right motor Dir pin
+#define pinMotorRightPWM  6        // M2_IN1 right motor PWM pin
+#define pinMotorRightDir 25        // M2_IN2 right motor Dir pin
 #define pinMotorRightSense A0      // M2_FB  right motor current sense
-#define pinMotorRightFault 27      // M2_SF  right motor fault
+#define pinMotorRightFault 32      // M2_SF  right motor fault
                                     
-#define pinMotorMowPWM 2           // M1_IN1 mower motor PWM pin (if using MOSFET, use this pin)
-#define pinMotorMowDir 29          // M1_IN2 mower motor Dir pin (if using MOSFET, keep unconnected)
+#define pinMotorMowPWM 8           // M1_IN1 mower motor PWM pin
+#define pinMotorMowDir 24          // M1_IN2 mower motor Dir pin
 #define pinMotorMowSense A3        // M1_FB  mower motor current sense  
-#define pinMotorMowFault 26        // M1_SF  mower motor fault   (if using MOSFET/L298N, keep unconnected)
-#define pinMotorMowEnable 28       // EN mower motor enable      (if using MOSFET/L298N, keep unconnected)
-#define pinMotorMowRpm A11
+#define pinMotorMowFault 48        // M1_SF  mower motor fault
+#define pinMotorMowEnable 26       // EN mower motor enable
+#define pinMotorMowRpm 51
     
 #define pinBumperLeft 39           // bumper pins
-#define pinBumperRight 38
+#define pinBumperRight 37
 
-#define pinDropLeft 45           // drop pins                                                                                          Dropsensor - Absturzsensor
-#define pinDropRight 23          // drop pins                                                                                          Dropsensor - Absturzsensor
+#define pinDropLeft 49           // drop pins                                                                                          Dropsensor - Absturzsensor
+#define pinDropRight 50          // drop pins    
 
-#define pinSonarCenterTrigger 24   // ultrasonic sensor pins
-#define pinSonarCenterEcho 22
-#define pinSonarRightTrigger 30    
-#define pinSonarRightEcho 32
+#define pinSonarCenterTrigger 38   // ultrasonic sensor pins
+#define pinSonarCenterEcho 40
+#define pinSonarRightTrigger 42    
+#define pinSonarRightEcho 44
 #define pinSonarLeftTrigger 34         
 #define pinSonarLeftEcho 36
 #define pinPerimeterRight A4       // perimeter
 #define pinPerimeterLeft A5
 
 #define pinLED 13                  // LED
-#define pinBuzzer 53               // Buzzer
-#define pinTilt 35                 // Tilt sensor (required for TC-G158 board)
-#define pinButton 51               // digital ON/OFF button
+#define pinBuzzer 35               // Buzzer
+#define pinTilt 47                 // Tilt sensor (required for TC-G158 board)
+#define pinButton 53               // digital ON/OFF button
 #define pinBatteryVoltage A2       // battery voltage sensor
 #define pinBatterySwitch 4         // battery-OFF switch   
 #define pinChargeVoltage A9        // charging voltage sensor
 #define pinChargeCurrent A8        // charge current sensor
-#define pinChargeRelay 50          // charge relay
+#define pinChargeRelay 46        // charge relay
 #define pinRemoteMow 12            // remote control mower motor
 #define pinRemoteSteer 11          // remote control steering 
 #define pinRemoteSpeed 10          // remote control speed
-#define pinRemoteSwitch 52         // remote control switch
+#define pinRemoteSwitch 9         // remote control switch
 #define pinVoltageMeasurement A7   // test pin for your own voltage measurements
 #ifdef __AVR__
   #define pinOdometryLeft A12      // left odometry sensor
   #define pinOdometryLeft2 A13     // left odometry sensor (optional two-wire)
-  #define pinOdometryRight A14     // right odometry sensor 
-  #define pinOdometryRight2 A15    // right odometry sensor (optional two-wire)  
+  #define pinOdometryRight A15     // right odometry sensor
+  #define pinOdometryRight2 A14    // right odometry sensor (optional two-wire)
 #else
-  #define pinOdometryLeft DAC0     // left odometry sensor
-  #define pinOdometryLeft2 DAC1    // left odometry sensor (optional two-wire)
-  #define pinOdometryRight CANRX   // right odometry sensor  
-  #define pinOdometryRight2 CANTX  // right odometry sensor (optional two-wire)  
+  #define pinOdometryLeft A11     // left odometry sensor
+  #define pinOdometryLeft2 A6    // left odometry sensor (optional two-wire)
+  #define pinOdometryRight A10   // right odometry sensor  
+  #define pinOdometryRight2 A7  // right odometry sensor (optional two-wire)  
 #endif
-#define pinLawnFrontRecv 40        // lawn sensor front receive
-#define pinLawnFrontSend 41        // lawn sensor front sender 
-#define pinLawnBackRecv 42         // lawn sensor back receive
-#define pinLawnBackSend 43         // lawn sensor back sender 
-#define pinUserSwitch1 46          // user-defined switch 1
-#define pinUserSwitch2 47          // user-defined switch 2
-#define pinUserSwitch3 48          // user-defined switch 3
-#define pinRain 44                 // rain sensor
+#define pinLawnFrontRecv 31        // lawn sensor front receive
+#define pinLawnFrontSend 33        // lawn sensor front sender 
+#define pinLawnBackRecv 29         // lawn sensor back receive
+#define pinLawnBackSend 27         // lawn sensor back sender 
+#define pinUserSwitch1 41          // user-defined switch 1
+#define pinUserSwitch2 43          // user-defined switch 2
+#define pinUserSwitch3 45          // user-defined switch 3
+#define pinRain DAC0                 // rain sensor
 // IMU (compass/gyro/accel): I2C  (SCL, SDA) 
 // Bluetooth: Serial2 (TX2, RX2)
 // GPS: Serial3 (TX3, RX3) 
@@ -127,64 +127,59 @@ Mower robot;
 Mower::Mower(){
   name = "Ardumower";
   // ------- wheel motors -----------------------------
-  motorAccel       = 500;  // motor wheel acceleration - only functional when odometry is not in use (warning: do not set too low)
-  motorSpeedMaxRpm       = 25;   // motor wheel max RPM (WARNING: do not set too high, so there's still speed control when battery is low!)
+  motorAccel       = 0.002;  // motor wheel acceleration (warning: do not set too high)
+  motorSpeedMaxRpm       = 33.33;   // motor wheel max RPM
   motorSpeedMaxPwm    = 255;  // motor wheel max Pwm  (8-bit PWM=255, 10-bit PWM=1023)
-  motorPowerMax     = 75;    // motor wheel max power (Watt)
+  motorPowerMax     = 999999.0;    // motor wheel max power (Watt)
   motorSenseRightScale = 15.3; // motor right sense scale (mA=(ADC-zero)/scale)
   motorSenseLeftScale = 15.3; // motor left sense scale  (mA=(ADC-zero)/scale)
   motorPowerIgnoreTime = 2000; // time to ignore motor power (ms)
-  motorZeroSettleTime   = 2000 ; // how long (ms) to wait for motors to settle at zero speed
-  motorRollTimeMax    = 3000;  // max. roll time (ms)
-  motorReverseTime    = 3500;  // max. reverse time (ms)
+  motorZeroSettleTime   = 1000 ; // how long (ms) to wait for motors to settle at zero speed
+  motorRollTimeMax    = 1700;  // max. roll time (ms)
+  motorReverseTime    = 1400;  // max. reverse time (ms)
   motorForwTimeMax   = 60000; // max. forward time (ms) / timeout
   motorBiDirSpeedRatio1 = 0.3;   // bidir mow pattern speed ratio 1
   motorBiDirSpeedRatio2 = 0.92;   // bidir mow pattern speed ratio 2
-  // ---- normal control ---
-  motorLeftPID.Kp       = 0.87;    // motor wheel PID controller
-  motorLeftPID.Ki       = 0.29;
-  motorLeftPID.Kd       = 0.25;
-  /*// ---- fast control ---
-  motorLeftPID.Kp       = 1.76;    // motor wheel PID controller
-  motorLeftPID.Ki       = 0.87;
-  motorLeftPID.Kd       = 0.4;*/
-  
+  motorLeftPID.Kp = motorRightPID.Kp = 3.0;
+  motorLeftPID.Ki = motorRightPID.Ki = 0.0;
+  motorLeftPID.Kd = motorRightPID.Kd = 0.0;  
   motorRightSwapDir     = 0;    // inverse right motor direction? 
-  motorLeftSwapDir      = 1;    // inverse left motor direction?
+  motorLeftSwapDir      = 0;    // inverse left motor direction?
   // ------ mower motor -------------------------------
   motorMowAccel       = 0.1;  // motor mower acceleration (warning: do not set too high)
   motorMowSpeedMaxPwm   = 255;    // motor mower max PWM
-  motorMowPowerMax = 75.0;     // motor mower max power (Watt)
-  motorMowModulate  = 0;      // motor mower cutter modulation?
-  motorMowRPMSet        = 3300;   // motor mower RPM (only for cutter modulation)
-  motorMowSenseScale = 15.3; // motor mower sense scale (mA=(ADC-zero)/scale)
-  motorMowPID.Kp = 0.005;    // motor mower RPM PID controller
-  motorMowPID.Ki = 0.01;
-  motorMowPID.Kd = 0.01;
+  motorMowPowerMax = 999999.0;     // motor mower max power (Watt)
+  motorMowModulate  = 1;      // motor mower cutter modulation?
+  motorMowRPMSet        = 3333;   // motor mower RPM (only for cutter modulation)
+  motorMowSenseScale = 6.138; // motor mower sense scale (mA=(ADC-zero)/scale)
+  motorMowPID.Kp = 0.05;    // motor mower RPM PID controller
+  motorMowPID.Ki = 0.1;
+  motorMowPID.Kd = 0.0;
   //  ------ bumper -----------------------------------
-  bumperUse         = 0;      // has bumpers?
+  bumperUse         = 1;      // has bumpers? 
   //  ------ drop -----------------------------------
   dropUse          = 0;     // has drops?                                                                                              Dropsensor - Absturzsensor vorhanden ?
   dropcontact      = 1;     //contact 0-openers 1-closers                                                                              Dropsensor - Kontakt 0-Öffner - 1-Schließer betätigt gegen GND
   // ------ rain ------------------------------------
   rainUse          = 0;      // use rain sensor?
   // ------ sonar ------------------------------------
-  sonarUse          = 1;      // use ultra sonic sensor? (WARNING: robot will slow down, if enabled but not connected!)
-  sonarLeftUse      = 1;
-  sonarRightUse     = 1;
+  sonarUse          = 0;      // use ultra sonic sensor? (WARNING: robot will slow down, if enabled but not connected!)
+  sonarLeftUse      = 0;
+  sonarRightUse     = 0;
   sonarCenterUse    = 0;
-  sonarTriggerBelow = 900;    // ultrasonic sensor trigger distance
+  sonarTriggerBelow = 1200;    // ultrasonic sensor trigger distance
   // ------ perimeter ---------------------------------
-  perimeterUse       = 0;      // use perimeter?    
-  perimeterTriggerTimeout = 0;      // perimeter trigger timeout when escaping from inside (ms)  
+  perimeterUse       = 1;      // use perimeter?
+  perimeterTriggerTimeout = 0; // perimeter trigger timeout (ms)  
   perimeterTrackRollTime  = 3000;   // perimter tracking roll time (ms)
   perimeterTrackRevTime   = 2000;   // perimter tracking reverse time (ms)
-  perimeterPID.Kp    = 51.0;  // perimeter PID controller
-  perimeterPID.Ki    = 12.5;
-  perimeterPID.Kd    = 0.8;  
-  trackingPerimeterTransitionTimeOut = 2000;
-  trackingErrorTimeOut = 10000;
+  perimeterPID.Kp    = 20.0;  // perimeter PID controller
+  perimeterPID.Ki    = 0.0;
+  perimeterPID.Kd    = 0.0;
+  trackingPerimeterTransitionTimeOut = 1000;
+  trackingErrorTimeOut = 5000;
   trackingBlockInnerWheelWhilePerimeterStruggling = 1;
+  rollDirection = LEFT; // LEFT, RIGHT or RANDOM
   // ------ lawn sensor --------------------------------
   lawnSensorUse     = 0;       // use capacitive Sensor
   // ------  IMU (compass/accel/gyro) ----------------------
@@ -203,11 +198,11 @@ Mower::Mower(){
   batGoHomeIfBelow = 23.7;     // drive home voltage (Volt)
   batSwitchOffIfBelow = 21.7;  // switch off battery if below voltage (Volt)
   batSwitchOffIfIdle = 1;      // switch off battery if idle (minutes)
-  batFactor       = 0.495;      // battery conversion factor  / 10 due to arduremote bug, can be removed after fixing (look in robot.cpp)
-  batChgFactor    = 0.495;      // battery conversion factor  / 10 due to arduremote bug, can be removed after fixing (look in robot.cpp)
-  batFull          =29.4;      // battery reference Voltage (fully charged) PLEASE ADJUST IF USING A DIFFERENT BATTERY VOLTAGE! FOR a 12V SYSTEM TO 14.4V
-  batChargingCurrentMax =1.6;  // maximum current your charger can devliver
-  batFullCurrent  = 0.3;      // current flowing when battery is fully charged
+  batFactor       = 0.030897;     // battery conversion factor
+  batChgFactor    = 0.030897;     // battery conversion factor
+  batFull          =29.3;      // battery reference Voltage (fully charged) PLEASE ADJUST IF USING A DIFFERENT BATTERY VOLTAGE! FOR a 12V SYSTEM TO 14.4V
+  batChargingCurrentMax =4.6;  // maximum current your charger can devliver
+  batFullCurrent  = 0.6;      // current flowing when battery is fully charged
   startChargingIfBelow = 27.0; // start charging if battery Voltage is below
   chargingTimeout = 12600000; // safety timer for charging (ms) 12600000 = 3.5hrs
   // Sensorausgabe Konsole      (chgSelection =0)
@@ -220,20 +215,20 @@ Mower::Mower(){
   chgChange       = 0;          // Messwertumkehr von - nach +         1 oder 0
   chgNull         = 2;          // Nullduchgang abziehen (1 oder 2)
   // ------  charging station ---------------------------
-  stationRevTime     = 4000;    // charge station reverse time (ms)
-  stationRollTime    = 2000;    // charge station roll time (ms)
-  stationForwTime    = 2000;    // charge station forward time (ms)
+  stationRevTime     = 2100;    // charge station reverse time (ms)
+  stationRollTime    = 1500;    // charge station roll time (ms)
+  stationForwTime    = 2500;    // charge station forward time (ms)
   stationCheckTime   = 2500;    // charge station reverse check time (ms)
   // ------ odometry ------------------------------------
   odometryUse       = 1;       // use odometry?
-  twoWayOdometrySensorUse = 1; // use optional two-wire odometry sensor?
-  odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
-  odometryTicksPerCm = 13.49;  // encoder ticks per cm
+  twoWayOdometrySensorUse = 0;  // use optional two-wire odometry sensor?
+  odometryTicksPerRevolution = 300;   // encoder ticks per one full resolution
+  odometryTicksPerCm = 1.3839;  // encoder ticks per cm wheel 68cm
   odometryWheelBaseCm = 36;    // wheel-to-wheel distance (cm)
   odometryRightSwapDir = 0;       // inverse right encoder direction?
-  odometryLeftSwapDir  = 1;       // inverse left encoder direction?
+  odometryLeftSwapDir  = 0;       // inverse left encoder direction?
   // ----- GPS -------------------------------------------
-  gpsUse            = 0;       // use GPS?
+  gpsUse            = 1;       // use GPS?
   // ----- other -----------------------------------------
   buttonUse         = 1;       // has digital ON/OFF button?
   // ----- user-defined switch ---------------------------
@@ -242,6 +237,7 @@ Mower::Mower(){
   userSwitch3       = 0;       // user-defined switch 3 (default value)
   // ----- timer -----------------------------------------
   timerUse          = 0;       // use RTC and timer?
+  rtcUse            = 0;
   // ------ configuration end -------------------------------------------   
 }
 
@@ -258,12 +254,7 @@ ISR(PCINT0_vect){
 
 // odometry signal change interrupt
 // mower motor speed sensor interrupt
-// NOTE: when choosing a higher perimeter sample rate (38 kHz) and using odometry interrupts, 
-// the Arduino Mega cannot handle all ADC interrupts anymore - the result will be a 'noisy'
-// perimeter filter output (mag value) which disappears when disabling odometry interrupts.
-// SOLUTION: allow odometry interrupt handler nesting (see odometry interrupt function)
-// http://www.nongnu.org/avr-libc/user-manual/group__avr__interrupts.html
-ISR(PCINT2_vect, ISR_NOBLOCK){
+ISR(PCINT2_vect){
   unsigned long timeMicros = micros();
   boolean odometryLeftState = digitalRead(pinOdometryLeft);
   boolean odometryLeftState2 = digitalRead(pinOdometryLeft2);
@@ -275,8 +266,10 @@ ISR(PCINT2_vect, ISR_NOBLOCK){
 }
 
 // mower motor speed sensor interrupt
-//void rpm_interrupt(){
-//}
+void rpm_interrupt(){
+  boolean motorMowRpmState = digitalRead(pinMotorMowRpm);
+  robot.setMotorMowRPMState(motorMowRpmState);
+}
 
 
 // WARNING: never use 'Serial' in the Ardumower code - use 'Console' instead
@@ -291,7 +284,7 @@ void Mower::setup(){
     
   // http://sobisource.com/arduino-mega-pwm-pin-and-frequency-timer-control/
   // http://www.atmel.com/images/doc2549.pdf
-  #ifdef __AVR__  
+  #ifdef __AVR__
   // NOTE: next line commented out so we can use default 450 Hz PWM freq (perimeter v2 otherwise uses the same freq band) 
   //  TCCR3B = (TCCR3B & 0xF8) | 0x02;    // set PWM frequency 3.9 Khz (pin2,3,5) 
   #endif
@@ -299,7 +292,7 @@ void Mower::setup(){
   // i2c -- turn off internal pull-ups (and use external pull-ups)
   //digitalWrite(SDA, 0);  
   //digitalWrite(SCL, 0);
-
+  
   // keep battery switched ON
   pinMode(pinBatterySwitch, OUTPUT);
   digitalWrite(pinBatterySwitch, HIGH);
@@ -425,18 +418,18 @@ void Mower::setup(){
     attachInterrupt(pinRemoteMow, PCINT0_vect, CHANGE);   
     attachInterrupt(pinRemoteSwitch, PCINT0_vect, CHANGE);       
     
-    //attachInterrupt(pinMotorMowRpm, rpm_interrupt, CHANGE);
-    attachInterrupt(pinMotorMowRpm, PCINT2_vect, CHANGE);    
+    attachInterrupt(pinMotorMowRpm, rpm_interrupt, CHANGE);
+    //attachInterrupt(pinMotorMowRpm, PCINT2_vect, CHANGE);    
   #endif   
     
   // ADC
   ADCMan.init();
-  ADCMan.setCapture(pinChargeCurrent, 1, true);//Aktivierung des LaddeStrom Pins beim ADC-Managers      
-  ADCMan.setCapture(pinMotorMowSense, 1, true);
-  ADCMan.setCapture(pinMotorLeftSense, 1, true);
-  ADCMan.setCapture(pinMotorRightSense, 1, true);
-  ADCMan.setCapture(pinBatteryVoltage, 1, false);
-  ADCMan.setCapture(pinChargeVoltage, 1, false);  
+  ADCMan.setCapture(pinChargeCurrent, 20, true);//Aktivierung des LaddeStrom Pins beim ADC-Managers      
+  ADCMan.setCapture(pinMotorMowSense, 10, true);
+  ADCMan.setCapture(pinMotorLeftSense, 10, true);
+  ADCMan.setCapture(pinMotorRightSense, 10, true);
+  ADCMan.setCapture(pinBatteryVoltage, 10, false);
+  ADCMan.setCapture(pinChargeVoltage, 10, false);  
   ADCMan.setCapture(pinVoltageMeasurement, 1, false);    
   perimeter.setPins(pinPerimeterLeft, pinPerimeterRight);      
     
@@ -481,17 +474,17 @@ int Mower::readSensor(char type){
     //case SEN_PERIM_RIGHT: return Perimeter.getMagnitude(1); break;
     
 // battery------------------------------------------------------------------------------------------------
-    case SEN_BAT_VOLTAGE: ADCMan.read(pinVoltageMeasurement);  return ADCMan.read(pinBatteryVoltage); break;
-    case SEN_CHG_VOLTAGE: return ADCMan.read(pinChargeVoltage); break;
+    case SEN_BAT_VOLTAGE: return ADCMan.readMedian(pinBatteryVoltage); break;
+    case SEN_CHG_VOLTAGE: return ADCMan.readMedian(pinChargeVoltage); break;
     //case SEN_CHG_VOLTAGE: return((int)(((double)analogRead(pinChargeVoltage)) * batFactor)); break;
-    case SEN_CHG_CURRENT: return ADCMan.read(pinChargeCurrent); break;
+    case SEN_CHG_CURRENT: return ADCMan.readMedian(pinChargeCurrent); break;
     
 // buttons------------------------------------------------------------------------------------------------
     case SEN_BUTTON: return(digitalRead(pinButton)); break; 
     
 //bumper----------------------------------------------------------------------------------------------------
-    case SEN_BUMPER_RIGHT: return(digitalRead(pinBumperRight)); break;
-    case SEN_BUMPER_LEFT: return(digitalRead(pinBumperLeft)); break;      
+    case SEN_BUMPER_RIGHT: return(!digitalRead(pinBumperRight)); break;
+    case SEN_BUMPER_LEFT: return(!digitalRead(pinBumperLeft)); break;      
     
 //drop----------------------------------------------------------------------------------------------------
     case SEN_DROP_RIGHT: return(digitalRead(pinDropRight)); break;                                                                                      // Dropsensor - Absturzsensor
@@ -499,9 +492,9 @@ int Mower::readSensor(char type){
 
 // sonar---------------------------------------------------------------------------------------------------
     //case SEN_SONAR_CENTER: return(readURM37(pinSonarCenterTrigger, pinSonarCenterEcho)); break;  
-    case SEN_SONAR_CENTER: return(readHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho)); break;
-    case SEN_SONAR_LEFT: return(readHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho)); break;
-    case SEN_SONAR_RIGHT: return(readHCSR04(pinSonarRightTrigger, pinSonarRightEcho)); break;
+    case SEN_SONAR_CENTER: return(readHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho)); break;  
+    //case SEN_SONAR_LEFT: return(readHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho)); break;
+    //case SEN_SONAR_RIGHT: return(readHCSR04(pinSonarRightTrigger, pinSonarRightEcho)); break;
    // case SEN_LAWN_FRONT: return(measureLawnCapacity(pinLawnFrontSend, pinLawnFrontRecv)); break;    
     //case SEN_LAWN_BACK: return(measureLawnCapacity(pinLawnBackSend, pinLawnBackRecv)); break;    
     
@@ -524,9 +517,11 @@ int Mower::readSensor(char type){
 
 void Mower::setActuator(char type, int value){
   switch (type){
-    case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;
+
+    case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;
+    case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, -value); break;    
+
     case ACT_BUZZER: if (value == 0) noTone(pinBuzzer); else tone(pinBuzzer, value); break;
     case ACT_LED: digitalWrite(pinLED, value); break;    
     case ACT_USER_SW1: digitalWrite(pinUserSwitch1, value); break;     

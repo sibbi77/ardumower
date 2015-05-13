@@ -141,6 +141,36 @@ void I2CwriteTo(uint8_t device, uint8_t address, int num, uint8_t buff[]) {
    Wire.endTransmission(); //end transmission
 }
 
+void i2c_eeprom_write_byte(int device, unsigned int address, uint8_t val) {
+  Wire.beginTransmission(device); //start transmission to device 
+  Wire.write((int)(address >> 8)); // MSB
+  Wire.write((int)(address & 0xFF)); // LSB   
+  Wire.write(val);
+    delay(10);
+    Console.print(F("i2c_eeprom_write_byte addr "));
+    Console.print(address);
+    Console.print(F("   val "));
+    Console.println(val);        // send value to write
+  Wire.endTransmission(); //end transmission
+}
+
+
+int i2c_eeprom_read_byte(int device, unsigned int address) {
+  uint8_t retval = 0;
+  Wire.beginTransmission(device); //start transmission to device 
+  Wire.write((int)(address >> 8)); // MSB
+  Wire.write((int)(address & 0xFF)); // LSB
+  Wire.endTransmission(); //end transmission
+  Wire.requestFrom(device, 1);    // request 1 bytes from device
+  if (Wire.available()) retval = Wire.read(); // receive a byte
+  delay(10);
+      Console.print(F("i2c_eeprom_read_byte addr "));
+  Console.print(address);
+    Console.print(F("   val "));
+  Console.println(retval);        // send value to write
+  return retval;
+}
+
 int I2CreadFrom(uint8_t device, uint8_t address, uint8_t num, uint8_t buff[], int retryCount) {
   int i = 0;
   for (int j=0; j < retryCount+1; j++){
