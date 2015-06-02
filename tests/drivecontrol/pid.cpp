@@ -27,8 +27,8 @@
 
 */
 
+#include "common.h"
 #include "pid.h"
-#include "types.h"
 
 
 PID::PID()

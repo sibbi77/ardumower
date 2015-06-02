@@ -1,6 +1,5 @@
+#include "common.h"
 #include "perimeter.h"
-#include <limits.h>
-#include "types.h"
 
 
 PerimeterControl::PerimeterControl(){
