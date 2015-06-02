@@ -36,7 +36,7 @@
 #define WORLD_SIZE_Y 350
 
 
-// world (perimeter wire etc.)
+// simulated world (garden, perimeter wire etc.)
 class SimWorld
 {
     // magnetic field

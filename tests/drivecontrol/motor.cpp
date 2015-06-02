@@ -1,8 +1,5 @@
-#include "motorcontrol.h"
+#include "motor.h"
 #include "common.h"
-#include <stdlib.h>
-#include <math.h>
-#include "config.h"
 
 
 MotorControl::MotorControl(){

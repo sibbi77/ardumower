@@ -1,14 +1,4 @@
 
-#include <iostream>
-#include <vector>
-#include <stdio.h>
-#include "sim.h"
-#include "simrobot.h"
-#include "world.h"
-#include "../config.h"
-
-
-
 // Sim     -- simulator environment (simulation time step, speed etc.)
 // World   -- simulator world (garden with perimeter loop etc.)
 // Robot   -- simulator robot
@@ -17,8 +7,10 @@
 
 int main()
 {
+    int a = max(4,5);
 	//MotorCtrl.setup();
 	//Console.println("START");
+	/*
 
 	printf("press...\n");
 	printf("l   - toggle mowed lawn drawing\n");
@@ -54,6 +46,6 @@ int main()
         Sim.draw();
 	}
 
-	return 0;
+	return 0;*/
 }
 

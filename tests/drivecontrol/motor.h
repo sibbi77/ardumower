@@ -1,5 +1,5 @@
-#ifndef MOTORCONTROL_H
-#define MOTORCONTROL_H
+#ifndef MOTOR_H
+#define MOTOR_H
 
 // differential drive motor controller - requires motors with 1-way encoder (odometry)
 // how to use:

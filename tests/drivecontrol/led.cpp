@@ -1,5 +1,5 @@
 #include "led.h"
-#include "config.h"
+#include "common.h"
 
 
 LEDControl::LEDControl(){

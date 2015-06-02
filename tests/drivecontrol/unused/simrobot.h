@@ -23,18 +23,6 @@
 //#include "common.h"
 
 
-
-// states
-enum {
-  STATE_OFF,
-  STATE_TRACK,
-  STATE_LANE_FORW,
-  STATE_LANE_REV,
-  STATE_LANE_ROLL,
-  STATE_GOAL,
-};
-
-
 // simulated robot
 class SimRobot
 {

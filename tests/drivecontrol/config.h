@@ -1,23 +1,30 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
 #ifdef __AVR__
   // Arduino
-  #include "mower.h"
+
 #else
   // simulator
-  #include "sim/simarduino.h"
-  #include "led.h"
-  #include "motorcontrol.h"
-  #include "sim/simmower.h"
+  class SimLED;
+  class SimMotor;
+  class SimSettings;
+  class SimPerimeter;
+  class SimRobot;
 
-  #include <opencv2/core/core.hpp>
-  #include <opencv/cv.h>
-  #include <opencv2/legacy/legacy.hpp>
-  #include <opencv2/legacy/compat.hpp>
-  #include <opencv2/highgui/highgui.hpp>
-  #include <opencv2/imgproc/imgproc.hpp>
-  #include <opencv2/features2d/features2d.hpp>
+  extern SimLED LED;
+  extern SimMotor Motor;
+  extern SimSettings Settings;
+  extern SimPerimeter Perimeter;
+  extern SimRobot Robot;
+
+  #include "led.h"
+  #include "motor.h"
+  #include "perimeter.h"
+  #include "settings.h"
+  #include "robot.h"
+  #include "sim/simmower.h"
 
 #endif // __AVR__
 

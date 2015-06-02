@@ -2,5 +2,8 @@
 
 
 SimLED LED;
-SimMotor MotorCtrl;
+SimMotor Motor;
+SimSettings Settings;
+SimPerimeter Perimeter;
+SimRobot Robot;
 

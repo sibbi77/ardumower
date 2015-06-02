@@ -1,7 +1,7 @@
 #include "sim.h"
 #include <ctime>
 #include "simrobot.h"
-#include "world.h"
+#include "simworld.h"
 
 
 Simulator Sim;
