@@ -39,11 +39,11 @@
 		<Unit filename="../behavior.h" />
 		<Unit filename="../common.cpp" />
 		<Unit filename="../common.h" />
-		<Unit filename="../config.h" />
 		<Unit filename="../led.cpp" />
 		<Unit filename="../led.h" />
 		<Unit filename="../motor.cpp" />
 		<Unit filename="../motor.h" />
+		<Unit filename="../objects.h" />
 		<Unit filename="../perimeter.cpp" />
 		<Unit filename="../perimeter.h" />
 		<Unit filename="../pid.cpp" />
@@ -75,8 +75,6 @@
 		<Unit filename="simarduino.h" />
 		<Unit filename="simmower.cpp" />
 		<Unit filename="simmower.h" />
-		<Unit filename="simworld.cpp" />
-		<Unit filename="simworld.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

@@ -36,6 +36,7 @@ class SimMotor : public MotorControl
 {
   private:
     virtual void setDriverPWM(int leftMotorPWM, int rightMotorPWM);
+    virtual void readOdometry();
 };
 
 class SimPerimeter : public PerimeterControl
@@ -46,6 +47,7 @@ class SimPerimeter : public PerimeterControl
     int chgStationX, chgStationY; // cm
     SimPerimeter();
     virtual void run();
+    virtual bool isInside(char coilIdx);
     // return world size (cm)
     int sizeX();
     int sizeY();
@@ -68,18 +70,18 @@ class SimRobot : public RobotControl
 {
   public:
     float distanceToChgStation;
-    //float leftMotorSpeed; // meter/sec
-    //float rightMotorSpeed;
     float totalDistance; // meters
-    float lastTotalDistance;
+    //float lastTotalDistance;
     float x; // cm
     float y;
     float orientation; // rad
     float motor_noise; // motor speed 'noise'
-    float steering_noise;
-    float distance_noise;
-    float measurement_noise;
+    //float steering_noise;
+    //float distance_noise;
+    //float measurement_noise;
     float timeStep; // sec
+    float timeTotal; // sec
+    unsigned long millis(); // simulation time
     // initializes robot
     SimRobot();
     virtual void run();

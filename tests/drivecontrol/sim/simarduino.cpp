@@ -1,3 +1,4 @@
+#include "../objects.h"
 #include "simarduino.h"
 
 
@@ -6,11 +7,11 @@ AConsole Console;
 
 
 unsigned long millis(void){
-    return 1;
+  return Robot.millis();
 }
 
 unsigned long micros(void){
-    return 1;
+  return 1;
 }
 
 void delay(unsigned long){

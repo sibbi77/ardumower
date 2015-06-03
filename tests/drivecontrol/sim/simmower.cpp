@@ -30,6 +30,8 @@ void SimSettings::setup(){
 void SimMotor::setDriverPWM(int leftMotorPWM, int rightMotorPWM){
 }
 
+void SimMotor::readOdometry(){
+}
 // ------------------------------------------
 
 SimPerimeter::SimPerimeter(){
@@ -196,6 +198,11 @@ int SimPerimeter::pnpoly(std::vector<point_t> &vertices, float testx, float test
   return c;
 }
 
+bool SimPerimeter::isInside(char coilIdx){
+  float bfield = getBfield(Robot.x, Robot.y, 1);
+  // printf("bfield=%3.2f\n", bfield);
+  return (bfield > 0);
+}
 
 // ------------------------------------------
 
@@ -204,18 +211,24 @@ SimRobot::SimRobot(){
   distanceToChgStation = 0;
   totalDistance = 0;
 
-  x = 50;
-  y = 50;
+  x = 100;
+  y = 100;
   orientation = 0;
   //leftMotorSpeed = 30;
   //rightMotorSpeed = 5;
 
-  steering_noise    = 0.0;
-  distance_noise    = 0.0;
-  measurement_noise = 0.0;
+// steering_noise    = 0.0;
+//  distance_noise    = 0.0;
+//  measurement_noise = 0.0;
   motor_noise = 10;
 
-  timeStep = 0.1; // one simulation step (seconds)
+  timeStep = 0.05; // one simulation step (seconds)
+  timeTotal = 0; // simulation time
+}
+
+unsigned long SimRobot::millis(){
+  //printf("%.1f\n", timeTotal);
+  return timeTotal * 1000.0;
 }
 
 void SimRobot::move(){
@@ -223,11 +236,13 @@ void SimRobot::move(){
 
   // apply noise
   // gauss(mean, std)
-  float leftSpeedNoise  = gauss(Motor.motorLeftSpeedRpmSet, motor_noise);
-  float rightSpeedNoise = gauss(Motor.motorRightSpeedRpmSet, motor_noise);
+  //Motor.motorLeftRpmCurr  = gauss(Motor.motorLeftSpeedRpmSet, motor_noise);
+  //Motor.motorRightRpmCurr = gauss(Motor.motorRightSpeedRpmSet, motor_noise);
+  Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
+  Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
 
-  float left_cm = leftSpeedNoise * cmPerRound/60.0 * timeStep;
-  float right_cm = rightSpeedNoise * cmPerRound/60.0 * timeStep;
+  float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * timeStep;
+  float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * timeStep;
 
   double avg_cm  = (left_cm + right_cm) / 2.0;
   double wheel_theta = (left_cm - right_cm) / Motor.odometryWheelBaseCm;
@@ -236,6 +251,11 @@ void SimRobot::move(){
   y = y + (avg_cm * sin(orientation)) ;
 
   totalDistance += fabs(avg_cm/100.0);
+
+  Motor.odometryDistanceCmCurr += avg_cm;
+  Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
+
+  timeTotal += timeStep;
 }
 
 void SimRobot::run(){

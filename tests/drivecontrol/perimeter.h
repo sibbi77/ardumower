@@ -19,7 +19,7 @@ class PerimeterControl
     int getMagnitude(char coilIdx);
     int getSmoothMagnitude(char coilIdx);
     // inside perimeter (true) or outside (false)?
-    bool isInside(char coilIdx);
+    virtual bool isInside(char coilIdx);
     // perimeter signal timed out? (e.g. due to broken wire)
     bool signalTimedOut(char coilIdx);
     int getSignalMin(char coilIdx);

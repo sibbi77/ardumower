@@ -565,7 +565,8 @@
 	"WMath.h"
 	"Stream.h"
 
-1433241161 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.cpp
+1433327239 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.cpp
+	"../objects.h"
 	"simarduino.h"
 
 1433196346 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wstring.cpp
@@ -647,10 +648,10 @@
 	"common.h"
 	"pid.h"
 
-1433324567 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
+1433360679 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
 	"simmower.h"
 
-1433325281 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
+1433327130 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
 	"../led.h"
 	"../motor.h"
 	"../perimeter.h"
@@ -663,7 +664,7 @@
 	"common.h"
 	"perimeter.h"
 
-1433238669 d:\projects\robomower\ardumower\github\tests\drivecontrol\perimeter.h
+1433325862 d:\projects\robomower\ardumower\github\tests\drivecontrol\perimeter.h
 
 1433230657 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simworld.h
 	"../common.h"
@@ -684,7 +685,7 @@
 1433241390 d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.h
 	"pid.h"
 
-1433277694 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
+1433364510 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
 	"common.h"
 	"motor.h"
 
@@ -694,10 +695,10 @@
 1433236858 d:\projects\robomower\ardumower\github\tests\drivecontrol\arbitrator.h
 	"behavior.h"
 
-1433273601 d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.h
+1433325686 d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.h
 	"common.h"
 
-1433237254 d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.h
+1433325721 d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.h
 	"arbitrator.h"
 	"behavior.h"
 
@@ -711,8 +712,7 @@
 	<opencv2/imgproc/imgproc.hpp>
 	<opencv2/features2d/features2d.hpp>
 
-1433323734 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
-	"led.h"
+1433326368 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
 	"behavior.h"
 	"objects.h"
 
@@ -720,7 +720,7 @@
 
 1429806636 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wmath.h
 
-1433322725 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.cpp
+1433325707 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.cpp
 	"common.h"
 	"objects.h"
 	"robot.h"

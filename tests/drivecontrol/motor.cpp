@@ -109,7 +109,7 @@ void MotorControl::run(){
       Console.println("");
     }
   }
-  printCSV(false);
+  //printCSV(false);
 }
 
 
@@ -438,7 +438,6 @@ void MotorControl::printCSV(bool includeHeader){
 
 
 void MotorControl::print(){
-    return;
     Console.print(F(" ticks:"));
     Console.print(odometryLeftTicks);
     Console.print(",");
