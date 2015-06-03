@@ -7,8 +7,6 @@
   #include <Arduino.h>
 #else
   // simulator
-  #include "sim/simarduino.h"
-
   #include <opencv2/core/core.hpp>
   #include <opencv/cv.h>
   #include <opencv2/legacy/legacy.hpp>
@@ -17,6 +15,7 @@
   #include <opencv2/imgproc/imgproc.hpp>
   #include <opencv2/features2d/features2d.hpp>
 
+  #include "sim/simarduino.h"
 
 #endif // __AVR__
 

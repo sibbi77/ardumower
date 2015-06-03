@@ -3,49 +3,26 @@
 // World   -- simulator world (garden with perimeter loop etc.)
 // Robot   -- simulator robot
 
+//#include <stdio.h>
+#include "../objects.h"
 
+
+void setup(){
+  Robot.setup();
+}
+
+void loop(){
+  Robot.loop();
+}
 
 int main()
 {
-    int a = max(4,5);
-	//MotorCtrl.setup();
-	//Console.println("START");
-	/*
-
-	printf("press...\n");
-	printf("l   - toggle mowed lawn drawing\n");
-	printf("+   - increase step wait\n");
-	printf("-   - decrease step wait\n");
-	printf("s   - skip tracking\n");
-	printf("ESC - exit\n");
-
-    int stepWait = 10;
-	while( 1 ){
-		// Exit on esc key
-		char key = cvWaitKey( stepWait );
-		switch (key){
-		  case 27:
-            return 0;
-		  case '+':
-            stepWait = min(20, stepWait +1);
-            printf("stepWait=%d\n", stepWait);
-		    break;
-		  case '-':
-            stepWait = max(5, stepWait -1);
-            printf("stepWait=%d\n", stepWait);
-		    break;
-		  case 'l':
-            World.drawMowedLawn = !World.drawMowedLawn;
-            printf("toggled draw mowed lawn\n");
-		    break;
-          case 's':
-            Robot.x = Robot.y = 100;
-            break;
-		}
-		Sim.step();
-        Sim.draw();
-	}
-
-	return 0;*/
+  setup();
+  while (true){
+    //char key = cvWaitKey( 10 );
+    //if (key == 27) return 0;
+    loop();
+  }
 }
+
 

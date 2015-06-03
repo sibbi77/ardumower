@@ -1,4 +1,5 @@
 #include "common.h"
+#include "objects.h"
 #include "robot.h"
 
 

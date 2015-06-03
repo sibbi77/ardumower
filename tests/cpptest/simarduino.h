@@ -17,7 +17,7 @@
 //#include "avr/interrupt.h"
 
 //#include "binary.h"
-#include "itoa.h"
+//#include "itoa.h"
 
 
 #ifdef __cplusplus
@@ -74,40 +74,10 @@ typedef uint8_t byte;
 
 
 
-unsigned long millis(void);
-unsigned long micros(void);
-void delay(unsigned long);
-void delayMicroseconds(unsigned int us);
-void pinMode(uint8_t, uint8_t);
-void digitalWrite(uint8_t, uint8_t);
 
 
 #ifdef __cplusplus
 } // extern "C"
-
-
-#include "WString.h"
-#include "WMath.h"
-//#include <iostream>
-#include "Stream.h"
-
-
-class AConsole : public Stream
-{
-  public:
-    virtual int available(){ return 0; }
-    virtual int read(){ return 0; }
-    virtual int peek(){ return 0; }
-    virtual void flush(){}
-    virtual size_t write(const uint8_t c){
-      printf("%c", ((char)c));
-      return 0;
-    }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
-};
-
-extern AConsole Console;
-
 #endif // __cplusplus
 
 

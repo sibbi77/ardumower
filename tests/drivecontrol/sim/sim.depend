@@ -488,14 +488,8 @@
 1430684778 source:d:\projects\robomower\ardumower\github\sim\world.cpp
 	"world.h"
 
-1433232792 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\main.cpp
-	<iostream>
-	<vector>
-	<stdio.h>
-	"sim.h"
-	"simrobot.h"
-	"simworld.h"
-	"../config.h"
+1433325342 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\main.cpp
+	"../objects.h"
 
 1430684778 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\common.cpp
 	"common.h"
@@ -542,9 +536,9 @@
 1433188700 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\world.cpp
 	"world.h"
 
-1433273604 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\led.cpp
-	"led.h"
+1433277793 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\led.cpp
 	"common.h"
+	"led.h"
 
 1433196346 d:\projects\robomower\ardumower\github\tests\drivecontrol\led.h
 
@@ -561,7 +555,7 @@
 	<EEPROM.h>
 	"due.h"
 
-1433276033 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.h
+1433279512 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.h
 	<stdint.h>
 	<stdlib.h>
 	<string.h>
@@ -571,7 +565,7 @@
 	"WMath.h"
 	"Stream.h"
 
-1433196346 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.cpp
+1433241161 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.cpp
 	"simarduino.h"
 
 1433196346 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wstring.cpp
@@ -602,9 +596,8 @@
 1433275632 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\common.cpp
 	"common.h"
 
-1433275627 d:\projects\robomower\ardumower\github\tests\drivecontrol\common.h
+1433280461 d:\projects\robomower\ardumower\github\tests\drivecontrol\common.h
 	<Arduino.h>
-	"sim/simarduino.h"
 	<opencv2/core/core.hpp>
 	<opencv/cv.h>
 	<opencv2/legacy/legacy.hpp>
@@ -612,6 +605,7 @@
 	<opencv2/highgui/highgui.hpp>
 	<opencv2/imgproc/imgproc.hpp>
 	<opencv2/features2d/features2d.hpp>
+	"sim/simarduino.h"
 
 1433196346 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\stream.h
 	<inttypes.h>
@@ -649,25 +643,25 @@
 	"simarduino.h"
 	"Stream.h"
 
-1433196346 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\pid.cpp
+1433277820 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\pid.cpp
+	"common.h"
 	"pid.h"
-	"config.h"
 
-1433235491 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
+1433324567 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
 	"simmower.h"
 
-1433276375 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
+1433325281 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
 	"../led.h"
 	"../motor.h"
 	"../perimeter.h"
 	"../settings.h"
 	"../robot.h"
 	"../common.h"
+	"../objects.h"
 
-1433235936 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\perimeter.cpp
+1433277809 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\perimeter.cpp
+	"common.h"
 	"perimeter.h"
-	<limits.h>
-	"config.h"
 
 1433238669 d:\projects\robomower\ardumower\github\tests\drivecontrol\perimeter.h
 
@@ -690,12 +684,9 @@
 1433241390 d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.h
 	"pid.h"
 
-1433236365 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
-	"motor.h"
+1433277694 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
 	"common.h"
-	<stdlib.h>
-	<math.h>
-	"config.h"
+	"motor.h"
 
 1433236865 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\arbitrator.cpp
 	"arbitrator.h"
@@ -720,12 +711,30 @@
 	<opencv2/imgproc/imgproc.hpp>
 	<opencv2/features2d/features2d.hpp>
 
-1433238773 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
+1433323734 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
 	"led.h"
 	"behavior.h"
-	"config.h"
+	"objects.h"
 
 1433196346 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\avr\interrupt.h
 
 1429806636 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wmath.h
+
+1433322725 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.cpp
+	"common.h"
+	"objects.h"
+	"robot.h"
+
+1433322664 d:\projects\robomower\ardumower\github\tests\drivecontrol\objects.h
+	"led.h"
+	"motor.h"
+	"perimeter.h"
+	"settings.h"
+	"robot.h"
+	"sim/simmower.h"
+
+1429806636 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wmath.cpp
+	"stdlib.h"
+	"stdint.h"
+	"WMath.h"
 

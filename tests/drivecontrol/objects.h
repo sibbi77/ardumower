@@ -1,5 +1,7 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+// Ardumower objects
+
+#ifndef OBJECTS_H
+#define OBJECTS_H
 
 
 #ifdef __AVR__
