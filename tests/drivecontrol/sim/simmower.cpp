@@ -191,7 +191,7 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv", Robot.simTimeTotal/60.0, Battery.batVoltage);
+  sprintf(buf, "time %.0fmin bat %.1fv", Timer.simTimeTotal/60.0, Battery.batVoltage);
   putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,255,255) );
 
 }
@@ -253,6 +253,24 @@ bool SimPerimeter::isInside(char coilIdx){
 
 // ------------------------------------------
 
+SimTimer::SimTimer(){
+  simTimeStep = 0.01; // one simulation step (seconds)
+  simTimeTotal = 0; // simulation time
+  simStopped = false;
+}
+
+unsigned long SimTimer::millis(){
+  //printf("%.1f\n", timeTotal);
+  return simTimeTotal * 1000.0;
+}
+
+void SimTimer::run(){
+  TimerControl::run();
+  simTimeTotal += simTimeStep;
+}
+
+// ------------------------------------------
+
 void SimBattery::read(){
   batVoltage -= 0.001;
 }
@@ -261,7 +279,6 @@ void SimBattery::read(){
 
 // initializes robot
 SimRobot::SimRobot(){
-  simStopped = false;
   distanceToChgStation = 0;
   totalDistance = 0;
 
@@ -273,14 +290,6 @@ SimRobot::SimRobot(){
 
   motor_noise = 90;
   slope_noise = 5;
-
-  simTimeStep = 0.01; // one simulation step (seconds)
-  simTimeTotal = 0; // simulation time
-}
-
-unsigned long SimRobot::millis(){
-  //printf("%.1f\n", timeTotal);
-  return simTimeTotal * 1000.0;
 }
 
 void SimRobot::move(){
@@ -312,8 +321,8 @@ void SimRobot::move(){
   leftrpm  = gauss(Motor.motorLeftRpmCurr, leftnoise);
   rightrpm = gauss(Motor.motorRightRpmCurr, rightnoise);
 
-  float left_cm  = leftrpm  * cmPerRound/60.0 * simTimeStep;
-  float right_cm = rightrpm * cmPerRound/60.0 * simTimeStep;
+  float left_cm  = leftrpm  * cmPerRound/60.0 * Timer.simTimeStep;
+  float right_cm = rightrpm * cmPerRound/60.0 * Timer.simTimeStep;
 
   double avg_cm  = (left_cm + right_cm) / 2.0;
   double wheel_theta = (left_cm - right_cm) / Motor.odometryWheelBaseCm;
@@ -325,12 +334,10 @@ void SimRobot::move(){
 
   Motor.odometryDistanceCmCurr += avg_cm;
   Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
-
-  simTimeTotal += simTimeStep;
 }
 
 void SimRobot::run(){
-  if (!simStopped){
+  if (!Timer.simStopped){
     RobotControl::run();
     move();
     Perimeter.setLawnMowed(Robot.simX, Robot.simY);
@@ -344,7 +351,7 @@ void SimRobot::run(){
         exit(0);
         break;
       case ' ':
-        simStopped=!simStopped;
+        Timer.simStopped=!Timer.simStopped;
         break;
     }
   }

@@ -7,11 +7,11 @@ AConsole Console;
 
 
 unsigned long millis(void){
-  return Robot.millis();
+  return Timer.millis();
 }
 
 unsigned long micros(void){
-  return Robot.millis() * 1000;
+  return Timer.millis() * 1000;
 }
 
 void delay(unsigned long){

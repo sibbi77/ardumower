@@ -70,6 +70,13 @@ class SimPerimeter : public PerimeterControl
 // simulated timer
 class SimTimer : public TimerControl
 {
+  public:
+    bool simStopped;
+    float simTimeStep; // simulation step (sec)
+    float simTimeTotal; // simulation time (sec)
+    SimTimer();
+    virtual void run();
+    unsigned long millis(); // simulation time
 };
 
 // simulated battery
@@ -89,12 +96,8 @@ class SimRobot : public RobotControl
     float simX; // real position (cm)
     float simY;
     float simOrientation; // real orientation (rad)
-    bool simStopped;
     float motor_noise; // motor speed 'noise'
     float slope_noise;
-    float simTimeStep; // simulation step (sec)
-    float simTimeTotal; // simulation time (sec)
-    unsigned long millis(); // simulation time
     // initializes robot
     SimRobot();
     virtual void run();
