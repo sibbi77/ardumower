@@ -13,17 +13,23 @@
   class SimMotor;
   class SimSettings;
   class SimPerimeter;
+  class SimTimer;
+  class SimBattery;
   class SimRobot;
 
   extern SimLED LED;
   extern SimMotor Motor;
   extern SimSettings Settings;
   extern SimPerimeter Perimeter;
+  extern SimTimer Timer;
+  extern SimBattery Battery;
   extern SimRobot Robot;
 
   #include "led.h"
   #include "motor.h"
   #include "perimeter.h"
+  #include "timer.h"
+  #include "battery.h"
   #include "settings.h"
   #include "robot.h"
   #include "sim/simmower.h"

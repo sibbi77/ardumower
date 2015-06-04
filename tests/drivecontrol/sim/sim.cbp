@@ -35,6 +35,8 @@
 		</Compiler>
 		<Unit filename="../arbitrator.cpp" />
 		<Unit filename="../arbitrator.h" />
+		<Unit filename="../battery.cpp" />
+		<Unit filename="../battery.h" />
 		<Unit filename="../behavior.cpp" />
 		<Unit filename="../behavior.h" />
 		<Unit filename="../common.cpp" />

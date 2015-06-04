@@ -67,6 +67,18 @@ class SimPerimeter : public PerimeterControl
     int pnpoly(std::vector<point_t> &vertices, float testx, float testy);
 };
 
+// simulated timer
+class SimTimer : public TimerControl
+{
+};
+
+// simulated battery
+class SimBattery : public BatteryControl
+{
+  public:
+    virtual void read();
+};
+
 
 // simulated robot
 class SimRobot : public RobotControl
@@ -77,10 +89,9 @@ class SimRobot : public RobotControl
     float simX; // real position (cm)
     float simY;
     float simOrientation; // real orientation (rad)
+    bool simStopped;
     float motor_noise; // motor speed 'noise'
-    //float steering_noise;
-    //float distance_noise;
-    //float measurement_noise;
+    float slope_noise;
     float simTimeStep; // simulation step (sec)
     float simTimeTotal; // simulation time (sec)
     unsigned long millis(); // simulation time

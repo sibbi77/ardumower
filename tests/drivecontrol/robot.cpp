@@ -12,6 +12,8 @@ RobotControl::RobotControl(){
 void RobotControl::setup(){
   Console.println(F("-----SETUP-----"));
 
+  Battery.setup();
+  Timer.setup();
   LED.setup();
   Motor.setup();
   Perimeter.setup();
@@ -43,7 +45,10 @@ void RobotControl::run(){
   //Console.println(F("RobotControl::run"));
 
   arbitrator.monitor();
+  Timer.run();
+  Battery.run();
   Motor.run();
+  Perimeter.run();
   LED.run();
 
   if (millis() >= nextPrintTime){

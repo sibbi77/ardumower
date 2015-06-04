@@ -16,7 +16,7 @@
 //#include "avr/pgmspace.h"
 //#include "avr/interrupt.h"
 
-//#include "binary.h"
+#include "binary.h"
 #include "itoa.h"
 
 

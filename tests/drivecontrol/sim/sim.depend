@@ -555,11 +555,12 @@
 	<EEPROM.h>
 	"due.h"
 
-1433279512 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.h
+1433432231 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simarduino.h
 	<stdint.h>
 	<stdlib.h>
 	<string.h>
 	<math.h>
+	"binary.h"
 	"itoa.h"
 	"WString.h"
 	"WMath.h"
@@ -648,10 +649,10 @@
 	"common.h"
 	"pid.h"
 
-1433419184 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
+1433432095 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
 	"simmower.h"
 
-1433419166 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
+1433432559 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
 	"../led.h"
 	"../motor.h"
 	"../perimeter.h"
@@ -712,7 +713,7 @@
 	<opencv2/imgproc/imgproc.hpp>
 	<opencv2/features2d/features2d.hpp>
 
-1433419499 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
+1433429879 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\behavior.cpp
 	"behavior.h"
 	"objects.h"
 
@@ -720,15 +721,17 @@
 
 1429806636 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\wmath.h
 
-1433418849 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.cpp
+1433432305 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\robot.cpp
 	"common.h"
 	"objects.h"
 	"robot.h"
 
-1433322664 d:\projects\robomower\ardumower\github\tests\drivecontrol\objects.h
+1433432177 d:\projects\robomower\ardumower\github\tests\drivecontrol\objects.h
 	"led.h"
 	"motor.h"
 	"perimeter.h"
+	"timer.h"
+	"battery.h"
 	"settings.h"
 	"robot.h"
 	"sim/simmower.h"
@@ -737,4 +740,21 @@
 	"stdlib.h"
 	"stdint.h"
 	"WMath.h"
+
+1427971408 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\binary.h
+
+1433432110 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\battery.cpp
+	"common.h"
+	"objects.h"
+	"battery.h"
+
+1433431892 d:\projects\robomower\ardumower\github\tests\drivecontrol\timer.h
+	"common.h"
+
+1433432460 d:\projects\robomower\ardumower\github\tests\drivecontrol\battery.h
+	"common.h"
+
+1433431957 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\timer.cpp
+	"common.h"
+	"timer.h"
 

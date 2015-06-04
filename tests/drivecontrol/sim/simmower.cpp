@@ -5,6 +5,8 @@ SimLED LED;
 SimMotor Motor;
 SimSettings Settings;
 SimPerimeter Perimeter;
+SimBattery Battery;
+SimTimer Timer;
 SimRobot Robot;
 
 
@@ -25,6 +27,8 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Ki       = 0.0;
   Motor.motorLeftPID.Kd       = 0.0;
   Perimeter.enable = true;
+  Battery.batFull = 29.4;
+  Battery.batVoltage = Battery.batFull;
 }
 
 // ------------------------------------------
@@ -179,16 +183,17 @@ void SimPerimeter::draw(){
     }
   }
   // draw charging station
-  circle( imgWorld, cv::Point( chgStationX, chgStationY), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
+  circle( imgWorld, cv::Point( chgStationX, chgStationY), 10, cv::Scalar( 0, 0, 0 ), -1, 8 );
   // draw obstacles
   for (int i=0; i < obstacles.size(); i++){
     int x = obstacles[i].x;
     int y = obstacles[i].y;
-    circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 255, 120, 120 ), -1, 8 );
+    circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
   }
   // draw information
-  sprintf(buf, "time %.0f min", Robot.simTimeTotal/60.0);
+  sprintf(buf, "time %.0fmin bat %.1fv", Robot.simTimeTotal/60.0, Battery.batVoltage);
   putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,255,255) );
+
 }
 
 // approximate circle pattern
@@ -238,15 +243,25 @@ bool SimPerimeter::hitObstacle(int x, int y, int distance){
 }
 
 bool SimPerimeter::isInside(char coilIdx){
-  float bfield = getBfield(Robot.simX, Robot.simY, 1);
+  float r = Motor.odometryWheelBaseCm/2;
+  int receiverX = Robot.simX + r * cos(Robot.simOrientation);
+  int receiverY = Robot.simY + r * sin(Robot.simOrientation);
+  float bfield = getBfield(receiverX, receiverY, 1);
   // printf("bfield=%3.2f\n", bfield);
   return (bfield > 0);
 }
 
 // ------------------------------------------
 
+void SimBattery::read(){
+  batVoltage -= 0.001;
+}
+
+// ------------------------------------------
+
 // initializes robot
 SimRobot::SimRobot(){
+  simStopped = false;
   distanceToChgStation = 0;
   totalDistance = 0;
 
@@ -256,10 +271,8 @@ SimRobot::SimRobot(){
   //leftMotorSpeed = 30;
   //rightMotorSpeed = 5;
 
-// steering_noise    = 0.0;
-//  distance_noise    = 0.0;
-//  measurement_noise = 0.0;
   motor_noise = 90;
+  slope_noise = 5;
 
   simTimeStep = 0.01; // one simulation step (seconds)
   simTimeTotal = 0; // simulation time
@@ -280,6 +293,8 @@ void SimRobot::move(){
   //Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
   //Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
   //printf("%.2f\n", Motor.motorLeftPWMCurr);
+
+  // motor pwm-to-rpm
   float leftnoise = 0;
   float rightnoise = 0;
   if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = motor_noise;
@@ -287,8 +302,18 @@ void SimRobot::move(){
   Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise);
   Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise);
 
-  float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * simTimeStep;
-  float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * simTimeStep;
+  // slope
+  float leftrpm;
+  float rightrpm;
+  leftnoise = 0;
+  rightnoise = 0;
+  if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = slope_noise;
+  if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = slope_noise;
+  leftrpm  = gauss(Motor.motorLeftRpmCurr, leftnoise);
+  rightrpm = gauss(Motor.motorRightRpmCurr, rightnoise);
+
+  float left_cm  = leftrpm  * cmPerRound/60.0 * simTimeStep;
+  float right_cm = rightrpm * cmPerRound/60.0 * simTimeStep;
 
   double avg_cm  = (left_cm + right_cm) / 2.0;
   double wheel_theta = (left_cm - right_cm) / Motor.odometryWheelBaseCm;
@@ -305,14 +330,23 @@ void SimRobot::move(){
 }
 
 void SimRobot::run(){
-  RobotControl::run();
-  move();
-  Perimeter.setLawnMowed(Robot.simX, Robot.simY);
-  Perimeter.draw();
-  Robot.draw(Perimeter.imgWorld);
+  if (!simStopped){
+    RobotControl::run();
+    move();
+    Perimeter.setLawnMowed(Robot.simX, Robot.simY);
+    Perimeter.draw();
+    Robot.draw(Perimeter.imgWorld);
+  }
   if (loopCounter % 100 == 0){
     char key = cvWaitKey( 10 );
-    if (key == 27) exit(0);
+    switch (key){
+      case 27:
+        exit(0);
+        break;
+      case ' ':
+        simStopped=!simStopped;
+        break;
+    }
   }
 }
 
