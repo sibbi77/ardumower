@@ -225,7 +225,7 @@ SimRobot::SimRobot(){
 // steering_noise    = 0.0;
 //  distance_noise    = 0.0;
 //  measurement_noise = 0.0;
-  motor_noise = 5;
+  motor_noise = 90;
 
   timeStep = 0.01; // one simulation step (seconds)
   timeTotal = 0; // simulation time
@@ -246,8 +246,12 @@ void SimRobot::move(){
   //Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
   //Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
   //printf("%.2f\n", Motor.motorLeftPWMCurr);
-  Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  motor_noise);
-  Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, motor_noise);
+  float leftnoise = 0;
+  float rightnoise = 0;
+  if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = motor_noise;
+  if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = motor_noise;
+  Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise);
+  Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise);
 
   float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * timeStep;
   float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * timeStep;
@@ -269,6 +273,7 @@ void SimRobot::move(){
 void SimRobot::run(){
   RobotControl::run();
   move();
+  Perimeter.setLawnMowed(Robot.x, Robot.y);
   Perimeter.draw();
   Robot.draw(Perimeter.imgWorld);
   if (loopCounter % 100 == 0){
