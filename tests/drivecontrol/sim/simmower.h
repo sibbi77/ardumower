@@ -92,7 +92,6 @@ class SimRobot : public RobotControl
 {
   public:
     float distanceToChgStation;
-    float totalDistance; // meters
     float simX; // real position (cm)
     float simY;
     float simOrientation; // real orientation (rad)

@@ -41,6 +41,7 @@ void MotorControl::setup(){
   enableSpeedControl = enableStallDetection = enableErrorDetection = true;
   motorLeftPWMCurr = motorRightPWMCurr = 0;
   lastOdometryTime = lastMotorControlTime = lastMotorCurrentTime = lastMotorRunTime = nextMotorPrintTime = 0;
+  totalDistanceTraveled = 0;
   odometryLeftTicksZeroCounter = odometryRightTicksZeroCounter = 0;
   motorLeftError = motorRightError = false;
   motorLeftStalled = motorRightStalled = false;

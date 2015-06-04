@@ -52,7 +52,6 @@ SimPerimeter::SimPerimeter(){
   imgWorld = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
 
   // obstacles (cm)
-// perimeter lines coordinates (cm)
   obstacles.push_back( (point_t) {50, 55 } );
   obstacles.push_back( (point_t) {70, 35 } );
   obstacles.push_back( (point_t) {300, 90 } );
@@ -63,7 +62,7 @@ SimPerimeter::SimPerimeter(){
   obstacles.push_back( (point_t) {110, 200 } );
   obstacles.push_back( (point_t) {90, 90 } );
   obstacles.push_back( (point_t) {90, 190 } );
-  obstacles.push_back( (point_t) {30, 130 } );
+  obstacles.push_back( (point_t) {90, 130 } );
 
   // perimeter lines coordinates (cm)
   std::vector<point_t> list;
@@ -191,8 +190,11 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv", Timer.simTimeTotal/60.0, Battery.batVoltage);
-  putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,255,255) );
+  sprintf(buf, "time %.0fmin bat %.1fv dist %.0fm",
+          Timer.simTimeTotal/60.0,
+          Battery.batVoltage,
+          Motor.totalDistanceTraveled);
+  putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
 }
 
@@ -280,7 +282,6 @@ void SimBattery::read(){
 // initializes robot
 SimRobot::SimRobot(){
   distanceToChgStation = 0;
-  totalDistance = 0;
 
   simX = 330;
   simY = 100;
@@ -294,14 +295,6 @@ SimRobot::SimRobot(){
 
 void SimRobot::move(){
   float cmPerRound = Motor.odometryTicksPerRevolution / Motor.odometryTicksPerCm;
-
-  // apply noise
-  // gauss(mean, std)
-  //Motor.motorLeftRpmCurr  = gauss(Motor.motorLeftSpeedRpmSet, motor_noise);
-  //Motor.motorRightRpmCurr = gauss(Motor.motorRightSpeedRpmSet, motor_noise);
-  //Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
-  //Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
-  //printf("%.2f\n", Motor.motorLeftPWMCurr);
 
   // motor pwm-to-rpm
   float leftnoise = 0;
@@ -330,7 +323,7 @@ void SimRobot::move(){
   simX = simX + (avg_cm * cos(simOrientation)) ;
   simY = simY + (avg_cm * sin(simOrientation)) ;
 
-  totalDistance += fabs(avg_cm/100.0);
+  Motor.totalDistanceTraveled += fabs(avg_cm/100.0);
 
   Motor.odometryDistanceCmCurr += avg_cm;
   Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );

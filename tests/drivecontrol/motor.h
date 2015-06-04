@@ -78,6 +78,7 @@ class MotorControl
     float odometryDistanceCmCurr; // distance traveled (cm)
     float odometryThetaRadSet; // set angle (radiant)
     int odometryDistanceCmSet;  // set distance (cm)
+    float totalDistanceTraveled; // total distance traveld (m)
     float distanceToTargetCm; // distance to target (cm)
     float angleToTargetRad; // angle to target (rad)
 

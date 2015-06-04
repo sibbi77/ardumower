@@ -53,6 +53,8 @@
 		<Unit filename="../robot.cpp" />
 		<Unit filename="../robot.h" />
 		<Unit filename="../settings.h" />
+		<Unit filename="../timer.cpp" />
+		<Unit filename="../timer.h" />
 		<Unit filename="Print.cpp" />
 		<Unit filename="Print.h" />
 		<Unit filename="Printable.h" />
@@ -68,6 +70,7 @@
 		<Unit filename="avr/dtostrf.h" />
 		<Unit filename="avr/interrupt.h" />
 		<Unit filename="avr/pgmspace.h" />
+		<Unit filename="binary.h" />
 		<Unit filename="itoa.c">
 			<Option compilerVar="CC" />
 		</Unit>

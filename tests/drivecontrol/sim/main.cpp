@@ -1,4 +1,9 @@
 
+// Ardumower simulator
+// Requires: CodeBlocks and OpenCV  
+// (IDE package can be downloaded here: 
+//  http://wiki.ardumower.de/index.php?title=Sensor_fusion#SLAM_simulation )
+
 // Sim     -- simulator environment (simulation time step, speed etc.)
 // World   -- simulator world (garden with perimeter loop etc.)
 // Robot   -- simulator robot
