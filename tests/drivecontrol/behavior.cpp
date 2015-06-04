@@ -26,36 +26,41 @@ void DriveForwardBehavior::action(){
 
 // ---------------------------------
 
-HitObstacleBehavior::HitObstacleBehavior()  : Behavior(){
-  name = "HitObstacleBehavior";
+HitPerimeterBehavior::HitPerimeterBehavior()  : Behavior(){
+  name = "HitPerimeterBehavior";
 }
 
-bool HitObstacleBehavior::takeControl(){
-  return (  //(MotorCtrl.motion != MOTION_STOP) &&
-         (Motor.motorRightStalled) || (Motor.motorLeftStalled) || (!Perimeter.isInside(0)) );
+bool HitPerimeterBehavior::takeControl(){
+  return ( (Perimeter.enable) && (!Perimeter.isInside(0)) );
 }
 
-void HitObstacleBehavior::action(){
+void HitPerimeterBehavior::action(){
   suppressed = false;
-  Motor.resetStalled();
-  bool rotateRight = Motor.motorLeftStalled;
-  //if (!Buzzer.isPlaying()) Buzzer.play(BC_LONG_SHORT_SHORT);
+  Motor.stopImmediately();
+  bool rotateLeft = ((rand() % 2) == 0);
+  float angle = ((float)random(45, 180)) / 180.0 * PI;
+  if (rotateLeft) angle *= -1;
+  //float angle = PI;
+  //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
 
   // reverse
+  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
+    /*if (Perimeter.isInside(0)) {
+      Motor.stopImmediately();
+      break;
+    }*/
     Robot.run();
   }
 
   // rotate
-  if (rotateRight){
-    Motor.rotate(-PI/2, Motor.motorSpeedMaxRpm);
-  } else {
-    Motor.rotate(+PI/2, Motor.motorSpeedMaxRpm);
-  }
+  Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
+
   // wait until motion stop
   while ( (!suppressed) && (!Motor.hasStopped()) ){
     Robot.run();
   }
 }
+
 

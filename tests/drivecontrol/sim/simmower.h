@@ -37,6 +37,7 @@ class SimMotor : public MotorControl
   private:
     virtual void setDriverPWM(int leftMotorPWM, int rightMotorPWM);
     virtual void readOdometry();
+    virtual void readCurrent();
 };
 
 class SimPerimeter : public PerimeterControl

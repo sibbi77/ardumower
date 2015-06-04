@@ -19,7 +19,7 @@ void RobotControl::setup(){
 
   // low-to-high priority
   arbitrator.addBehavior(&driveForwardBehavior);
-  arbitrator.addBehavior(&hitObstacleBehavior);
+  arbitrator.addBehavior(&hitPerimeterBehavior);
 
   Console.println(F("-----SETUP completed-----"));
 }

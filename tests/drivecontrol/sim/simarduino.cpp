@@ -11,7 +11,7 @@ unsigned long millis(void){
 }
 
 unsigned long micros(void){
-  return 1;
+  return Robot.millis() * 1000;
 }
 
 void delay(unsigned long){

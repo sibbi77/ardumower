@@ -11,18 +11,20 @@ SimRobot Robot;
 // ------------------------------------------
 
 void SimSettings::setup(){
+  randomSeed( time(NULL) );
+  Motor.motorSpeedMaxPwm = 255;
   Motor.motorLeftSwapDir = false;
   Motor.motorRightSwapDir = false;
-  Motor.motorSpeedMaxRpm = 10;
+  Motor.motorSpeedMaxRpm = 25;
   Motor.enableStallDetection = false;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
   Motor.odometryTicksPerCm = 13.49;    // encoder ticks per cm
   Motor.odometryWheelBaseCm = 36;    // wheel-to-wheel distance (cm)
-  Motor.motorLeftPID.Kp       = 0.1;    // PID speed controller
-  Motor.motorLeftPID.Ki       = 0.01;
-  Motor.motorLeftPID.Kd       = 0.01;
-  Perimeter.enable = false;
+  Motor.motorLeftPID.Kp       = 0.4;    // PID speed controller
+  Motor.motorLeftPID.Ki       = 0.0;
+  Motor.motorLeftPID.Kd       = 0.0;
+  Perimeter.enable = true;
 }
 
 // ------------------------------------------
@@ -31,6 +33,9 @@ void SimMotor::setDriverPWM(int leftMotorPWM, int rightMotorPWM){
 }
 
 void SimMotor::readOdometry(){
+}
+
+void SimMotor::readCurrent(){
 }
 // ------------------------------------------
 
@@ -211,7 +216,7 @@ SimRobot::SimRobot(){
   distanceToChgStation = 0;
   totalDistance = 0;
 
-  x = 100;
+  x = 300;
   y = 100;
   orientation = 0;
   //leftMotorSpeed = 30;
@@ -220,9 +225,9 @@ SimRobot::SimRobot(){
 // steering_noise    = 0.0;
 //  distance_noise    = 0.0;
 //  measurement_noise = 0.0;
-  motor_noise = 10;
+  motor_noise = 5;
 
-  timeStep = 0.05; // one simulation step (seconds)
+  timeStep = 0.01; // one simulation step (seconds)
   timeTotal = 0; // simulation time
 }
 
@@ -238,8 +243,11 @@ void SimRobot::move(){
   // gauss(mean, std)
   //Motor.motorLeftRpmCurr  = gauss(Motor.motorLeftSpeedRpmSet, motor_noise);
   //Motor.motorRightRpmCurr = gauss(Motor.motorRightSpeedRpmSet, motor_noise);
-  Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
-  Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
+  //Motor.motorLeftRpmCurr  = Motor.motorLeftSpeedRpmSet;
+  //Motor.motorRightRpmCurr = Motor.motorRightSpeedRpmSet;
+  //printf("%.2f\n", Motor.motorLeftPWMCurr);
+  Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  motor_noise);
+  Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, motor_noise);
 
   float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * timeStep;
   float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * timeStep;
@@ -263,8 +271,10 @@ void SimRobot::run(){
   move();
   Perimeter.draw();
   Robot.draw(Perimeter.imgWorld);
-  char key = cvWaitKey( 10 );
-  if (key == 27) exit(0);
+  if (loopCounter % 100 == 0){
+    char key = cvWaitKey( 10 );
+    if (key == 27) exit(0);
+  }
 }
 
 // draw robot on surface

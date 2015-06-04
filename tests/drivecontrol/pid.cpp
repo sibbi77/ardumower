@@ -81,6 +81,7 @@ float PID::compute()
 
   unsigned long now = micros();
   Ta = ((now - lastControlTime) / 1000000.0);
+  //printf("%.3f\n", Ta);
   lastControlTime = now;
   if (Ta > 1.0) Ta = 1.0;   // should only happen for the very first call
 

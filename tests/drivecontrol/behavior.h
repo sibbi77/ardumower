@@ -43,14 +43,15 @@ class DriveForwardBehavior : public Behavior
 };
 
 
-// robot hit obstacle
-class HitObstacleBehavior : public Behavior
+// robot hit perimeter
+class HitPerimeterBehavior : public Behavior
 {
   public:
-    HitObstacleBehavior();
+    HitPerimeterBehavior();
     virtual bool takeControl();
     virtual void action();
 };
+
 
 #endif
 

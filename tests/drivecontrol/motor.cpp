@@ -164,13 +164,14 @@ void MotorControl::readOdometry(){
 
 void MotorControl::speedControl(){
   unsigned long TaC = millis() - lastMotorControlTime;    // sampling time in millis
+  //printf("%d\n", TaC);
   if (TaC < 50) return;
   lastMotorControlTime = millis();
   if (TaC > 500) TaC = 1;
   //double TaS = ((double)TaC) / 1000.0;
-  motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
-  motorRightPID.w = motorRightSpeedRpmSet;               // SET
-  float RLdiff = (abs(motorLeftRpmCurr) - abs(motorRightRpmCurr)) / motorLeftRpmCurr;
+  //motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
+  //motorRightPID.w = motorRightSpeedRpmSet;               // SET
+  /*float RLdiff = (abs(motorLeftRpmCurr) - abs(motorRightRpmCurr)) / motorLeftRpmCurr;
 
   switch (motion){
     case MOTION_LINE_SPEED:
@@ -186,10 +187,10 @@ void MotorControl::speedControl(){
       else if (RLdiff < -0.2 )
         motorRightPID.w = -motorLeftRpmCurr;
       break;
-  }
+  }*/
 
   motorLeftPID.x = motorLeftRpmCurr;                 // CURRENT
-//   motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
+  motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
   motorLeftPID.y_min = -motorSpeedMaxPwm;        // CONTROL-MIN
   motorLeftPID.y_max = motorSpeedMaxPwm;     // CONTROL-MAX
   motorLeftPID.max_output = motorSpeedMaxPwm;    // LIMIT
@@ -202,7 +203,7 @@ void MotorControl::speedControl(){
   motorRightPID.Ki = motorLeftPID.Ki;
   motorRightPID.Kd = motorLeftPID.Kd;
   motorRightPID.x = motorRightRpmCurr;               // IST
-//  motorRightPID.w = motorRightSpeedRpmSet;             // SOLL
+  motorRightPID.w = motorRightSpeedRpmSet;             // SOLL
   motorRightPID.y_min = -motorSpeedMaxPwm;       // Regel-MIN
   motorRightPID.y_max = motorSpeedMaxPwm;        // Regel-MAX
   motorRightPID.max_output = motorSpeedMaxPwm;   // Begrenzung
