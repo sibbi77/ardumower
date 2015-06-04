@@ -38,7 +38,7 @@ void HitPerimeterBehavior::action(){
   suppressed = false;
   Motor.stopImmediately();
   bool rotateLeft = ((rand() % 2) == 0);
-  float angle = ((float)random(45, 180)) / 180.0 * PI;
+  float angle = ((float)random(90, 180)) / 180.0 * PI;
   if (rotateLeft) angle *= -1;
   //float angle = PI;
   //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
@@ -63,4 +63,44 @@ void HitPerimeterBehavior::action(){
   }
 }
 
+
+
+// ---------------------------------
+
+HitObstacleBehavior::HitObstacleBehavior()  : Behavior(){
+  name = "HitObstacleBehavior";
+}
+
+bool HitObstacleBehavior::takeControl(){
+  return ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+8) );
+}
+
+void HitObstacleBehavior::action(){
+  suppressed = false;
+  Motor.stopImmediately();
+  bool rotateLeft = ((rand() % 2) == 0);
+  float angle = ((float)random(90, 180)) / 180.0 * PI;
+  if (rotateLeft) angle *= -1;
+  //float angle = PI;
+  //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
+
+  // reverse
+  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
+  while ( (!suppressed) && (!Motor.hasStopped()) ) {
+    /*if (Perimeter.isInside(0)) {
+      Motor.stopImmediately();
+      break;
+    }*/
+    Robot.run();
+  }
+
+  // rotate
+  Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
+
+  // wait until motion stop
+  while ( (!suppressed) && (!Motor.hasStopped()) ){
+    Robot.run();
+  }
+}
 

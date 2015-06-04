@@ -14,6 +14,7 @@ class RobotControl
     int num_collision; // collision counter
     DriveForwardBehavior driveForwardBehavior;
     HitPerimeterBehavior hitPerimeterBehavior;
+    HitObstacleBehavior hitObstacleBehavior;
     Arbitrator arbitrator;
     RobotControl();
     unsigned long nextPrintTime;

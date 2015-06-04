@@ -47,6 +47,20 @@ SimPerimeter::SimPerimeter(){
   imgBfield = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
   imgWorld = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
 
+  // obstacles (cm)
+// perimeter lines coordinates (cm)
+  obstacles.push_back( (point_t) {50, 55 } );
+  obstacles.push_back( (point_t) {70, 35 } );
+  obstacles.push_back( (point_t) {300, 90 } );
+  obstacles.push_back( (point_t) {210, 150 } );
+  obstacles.push_back( (point_t) {120, 190 } );
+  obstacles.push_back( (point_t) {250, 60 } );
+  obstacles.push_back( (point_t) {220, 110 } );
+  obstacles.push_back( (point_t) {110, 200 } );
+  obstacles.push_back( (point_t) {90, 90 } );
+  obstacles.push_back( (point_t) {90, 190 } );
+  obstacles.push_back( (point_t) {30, 130 } );
+
   // perimeter lines coordinates (cm)
   std::vector<point_t> list;
   list.push_back( (point_t) {30, 35 } );
@@ -166,6 +180,12 @@ void SimPerimeter::draw(){
   }
   // draw charging station
   circle( imgWorld, cv::Point( chgStationX, chgStationY), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
+  // draw obstacles
+  for (int i=0; i < obstacles.size(); i++){
+    int x = obstacles[i].x;
+    int y = obstacles[i].y;
+    circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 255, 120, 120 ), -1, 8 );
+  }
   // draw information
   sprintf(buf, "time %.0f min", Robot.simTimeTotal/60.0);
   putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,255,255) );
@@ -177,9 +197,10 @@ void SimPerimeter::draw(){
 // 010
 // x,y: cm
 void SimPerimeter::setLawnMowed(int x, int y){
-  if (  (x <= 5) || (x >= WORLD_SIZE_X-5 ) || (y <= 5) || (y >= WORLD_SIZE_Y-5 )  )return;
-  for (int i=-2; i <= 2; i++){
-    for (int j=-2; j <= 2; j++){
+  int r = 8;
+  if (  (x <= 2*r) || (x >= WORLD_SIZE_X-2*r ) || (y <= 2*r) || (y >= WORLD_SIZE_Y-2*r )  )return;
+  for (int i=-r; i <= r; i++){
+    for (int j=-r; j <= r; j++){
       lawnMowStatus[y+i][x+j] = 1.0;
     }
   }
@@ -206,6 +227,16 @@ int SimPerimeter::pnpoly(std::vector<point_t> &vertices, float testx, float test
   return c;
 }
 
+bool SimPerimeter::hitObstacle(int x, int y, int distance){
+  for (int i=0; i < obstacles.size(); i++){
+    int ox = obstacles[i].x;
+    int oy = obstacles[i].y;
+    float odistance = sqrt( sq(abs(ox-x)) + sq(abs(oy-y)) );
+    if (odistance <= distance) return true;
+  }
+  return false;
+}
+
 bool SimPerimeter::isInside(char coilIdx){
   float bfield = getBfield(Robot.simX, Robot.simY, 1);
   // printf("bfield=%3.2f\n", bfield);
@@ -219,7 +250,7 @@ SimRobot::SimRobot(){
   distanceToChgStation = 0;
   totalDistance = 0;
 
-  simX = 300;
+  simX = 330;
   simY = 100;
   simOrientation = 0;
   //leftMotorSpeed = 30;

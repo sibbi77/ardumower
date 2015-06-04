@@ -46,9 +46,11 @@ class SimPerimeter : public PerimeterControl
     cv::Mat imgBfield;
     cv::Mat imgWorld;
     int chgStationX, chgStationY; // cm
+    std::vector<point_t> obstacles; // obstacles
     SimPerimeter();
     virtual void run();
     virtual bool isInside(char coilIdx);
+    bool hitObstacle(int x, int y, int distance);
     // return world size (cm)
     int sizeX();
     int sizeY();
