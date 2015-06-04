@@ -166,6 +166,9 @@ void SimPerimeter::draw(){
   }
   // draw charging station
   circle( imgWorld, cv::Point( chgStationX, chgStationY), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
+  // draw information
+  sprintf(buf, "time %.0f min", Robot.simTimeTotal/60.0);
+  putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,255,255) );
 }
 
 // approximate circle pattern
@@ -204,7 +207,7 @@ int SimPerimeter::pnpoly(std::vector<point_t> &vertices, float testx, float test
 }
 
 bool SimPerimeter::isInside(char coilIdx){
-  float bfield = getBfield(Robot.x, Robot.y, 1);
+  float bfield = getBfield(Robot.simX, Robot.simY, 1);
   // printf("bfield=%3.2f\n", bfield);
   return (bfield > 0);
 }
@@ -216,9 +219,9 @@ SimRobot::SimRobot(){
   distanceToChgStation = 0;
   totalDistance = 0;
 
-  x = 300;
-  y = 100;
-  orientation = 0;
+  simX = 300;
+  simY = 100;
+  simOrientation = 0;
   //leftMotorSpeed = 30;
   //rightMotorSpeed = 5;
 
@@ -227,13 +230,13 @@ SimRobot::SimRobot(){
 //  measurement_noise = 0.0;
   motor_noise = 90;
 
-  timeStep = 0.01; // one simulation step (seconds)
-  timeTotal = 0; // simulation time
+  simTimeStep = 0.01; // one simulation step (seconds)
+  simTimeTotal = 0; // simulation time
 }
 
 unsigned long SimRobot::millis(){
   //printf("%.1f\n", timeTotal);
-  return timeTotal * 1000.0;
+  return simTimeTotal * 1000.0;
 }
 
 void SimRobot::move(){
@@ -253,27 +256,27 @@ void SimRobot::move(){
   Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise);
   Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise);
 
-  float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * timeStep;
-  float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * timeStep;
+  float left_cm = Motor.motorLeftRpmCurr * cmPerRound/60.0 * simTimeStep;
+  float right_cm = Motor.motorRightRpmCurr * cmPerRound/60.0 * simTimeStep;
 
   double avg_cm  = (left_cm + right_cm) / 2.0;
   double wheel_theta = (left_cm - right_cm) / Motor.odometryWheelBaseCm;
-  orientation = scalePI( orientation + wheel_theta );
-  x = x + (avg_cm * cos(orientation)) ;
-  y = y + (avg_cm * sin(orientation)) ;
+  simOrientation = scalePI( simOrientation + wheel_theta );
+  simX = simX + (avg_cm * cos(simOrientation)) ;
+  simY = simY + (avg_cm * sin(simOrientation)) ;
 
   totalDistance += fabs(avg_cm/100.0);
 
   Motor.odometryDistanceCmCurr += avg_cm;
   Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
 
-  timeTotal += timeStep;
+  simTimeTotal += simTimeStep;
 }
 
 void SimRobot::run(){
   RobotControl::run();
   move();
-  Perimeter.setLawnMowed(Robot.x, Robot.y);
+  Perimeter.setLawnMowed(Robot.simX, Robot.simY);
   Perimeter.draw();
   Robot.draw(Perimeter.imgWorld);
   if (loopCounter % 100 == 0){
@@ -285,8 +288,10 @@ void SimRobot::run(){
 // draw robot on surface
 void SimRobot::draw(cv::Mat &img){
   float r = Motor.odometryWheelBaseCm/2;
-  circle( img, cv::Point( x, y), r, cv::Scalar( 0, 0, 0 ), 2, 8 );
-  line( img, cv::Point(x, y), cv::Point(x + r * cos(orientation), y + r * sin(orientation)), cv::Scalar(0,0,0), 2, 8);
+  circle( img, cv::Point( simX, simY), r, cv::Scalar( 0, 0, 0 ), 2, 8 );
+  line( img, cv::Point(simX, simY),
+       cv::Point(simX + r * cos(simOrientation), simY + r * sin(simOrientation)),
+       cv::Scalar(0,0,0), 2, 8);
 }
 
 

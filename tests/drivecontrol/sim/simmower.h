@@ -72,16 +72,15 @@ class SimRobot : public RobotControl
   public:
     float distanceToChgStation;
     float totalDistance; // meters
-    //float lastTotalDistance;
-    float x; // cm
-    float y;
-    float orientation; // rad
+    float simX; // real position (cm)
+    float simY;
+    float simOrientation; // real orientation (rad)
     float motor_noise; // motor speed 'noise'
     //float steering_noise;
     //float distance_noise;
     //float measurement_noise;
-    float timeStep; // sec
-    float timeTotal; // sec
+    float simTimeStep; // simulation step (sec)
+    float simTimeTotal; // simulation time (sec)
     unsigned long millis(); // simulation time
     // initializes robot
     SimRobot();
