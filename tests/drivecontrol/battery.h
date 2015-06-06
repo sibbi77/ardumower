@@ -39,7 +39,7 @@ class BatteryControl
     BatteryControl();
     void setup();
     virtual void run();
-    virtual void read();
+    virtual void read();  // read battery/charger voltage, current
     void print();
     bool chargerConnected();
     bool isCharging();

@@ -1,5 +1,6 @@
 #include "simmower.h"
 
+#define OBSTACLE_RADIUS 8
 
 SimLED LED;
 SimMotor Motor;
@@ -18,7 +19,7 @@ void SimSettings::setup(){
   Motor.motorLeftSwapDir = false;
   Motor.motorRightSwapDir = false;
   Motor.motorSpeedMaxRpm = 25;
-  Motor.enableStallDetection = false;
+  Motor.enableStallDetection = true;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
   Motor.odometryTicksPerCm = 13.49;    // encoder ticks per cm
@@ -40,6 +41,19 @@ void SimMotor::readOdometry(){
 }
 
 void SimMotor::readCurrent(){
+  if (enableStallDetection) {
+    if (!motorLeftStalled){
+      if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+OBSTACLE_RADIUS, Robot.simOrientation )){
+        if ( (Motor.motorLeftSpeedRpmSet > 2) && (Motor.motorLeftSpeedRpmSet > 2) )  {
+          motorLeftStalled = true;
+          Console.print(F("  LEFT STALL"));
+          Console.println();
+          motorLeftStalled = true;
+          stopImmediately();
+        }
+      }
+    }
+  }
 }
 // ------------------------------------------
 
@@ -187,7 +201,7 @@ void SimPerimeter::draw(){
   for (int i=0; i < obstacles.size(); i++){
     int x = obstacles[i].x;
     int y = obstacles[i].y;
-    circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, 8 );
+    circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
   sprintf(buf, "time %.0fmin bat %.1fv dist %.0fm",
@@ -234,12 +248,16 @@ int SimPerimeter::pnpoly(std::vector<point_t> &vertices, float testx, float test
   return c;
 }
 
-bool SimPerimeter::hitObstacle(int x, int y, int distance){
+bool SimPerimeter::hitObstacle(int x, int y, int distance, float orientation){
   for (int i=0; i < obstacles.size(); i++){
     int ox = obstacles[i].x;
     int oy = obstacles[i].y;
     float odistance = sqrt( sq(abs(ox-x)) + sq(abs(oy-y)) );
-    if (odistance <= distance) return true;
+    if (odistance <= distance) {
+      //float obstacleCourse = atan2(oy-y, ox-x);
+      //if (abs(distancePI(obstacleCourse, orientation)) < PI/2) return true;
+      return true;
+    }
   }
   return false;
 }
@@ -283,7 +301,7 @@ void SimBattery::read(){
 SimRobot::SimRobot(){
   distanceToChgStation = 0;
 
-  simX = 330;
+  simX = 340;
   simY = 100;
   simOrientation = 0;
   //leftMotorSpeed = 30;

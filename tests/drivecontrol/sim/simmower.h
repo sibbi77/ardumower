@@ -50,7 +50,7 @@ class SimPerimeter : public PerimeterControl
     SimPerimeter();
     virtual void run();
     virtual bool isInside(char coilIdx);
-    bool hitObstacle(int x, int y, int distance);
+    bool hitObstacle(int x, int y, int distance, float orientation);
     // return world size (cm)
     int sizeX();
     int sizeY();

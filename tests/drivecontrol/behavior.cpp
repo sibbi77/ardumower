@@ -72,12 +72,14 @@ HitObstacleBehavior::HitObstacleBehavior()  : Behavior(){
 }
 
 bool HitObstacleBehavior::takeControl(){
-  return ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+8) );
+  return ( (Motor.motorRightStalled) || (Motor.motorLeftStalled) );
+  //return ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+8) );
 }
 
 void HitObstacleBehavior::action(){
   suppressed = false;
-  Motor.stopImmediately();
+  //Motor.stopImmediately();
+  Motor.resetStalled();
   bool rotateLeft = ((rand() % 2) == 0);
   float angle = ((float)random(90, 180)) / 180.0 * PI;
   if (rotateLeft) angle *= -1;

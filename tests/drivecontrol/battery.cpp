@@ -80,7 +80,7 @@ bool BatteryControl::robotShouldCharge(){
          );
 }
 
-// read battery
+// read battery/charger voltage, current
 void BatteryControl::read(){
   batteryReadCounter++;
 
