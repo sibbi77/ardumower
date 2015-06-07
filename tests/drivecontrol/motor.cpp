@@ -227,12 +227,11 @@ void MotorControl::setSpeedPWM(int leftPWM, int rightPWM){
   }
   if (leftPWM == 0) motorLeftSensePower = 0;
   if (rightPWM == 0) motorRightSensePower = 0;
-  motorLeftPWMCurr = leftPWM;
-  motorRightPWMCurr = rightPWM;
   if (motorLeftSwapDir) leftPWM *= -1;
   if (motorRightSwapDir) rightPWM *= -1;
-  setDriverPWM( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, leftPWM)),
-                max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, rightPWM)) );
+  motorLeftPWMCurr  = max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, leftPWM));
+  motorRightPWMCurr = max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, rightPWM));
+  setDriverPWM( leftPWM, rightPWM );
 }
 
 void MotorControl::setSpeedRpm(int leftRpm, int rightRpm){

@@ -28,7 +28,9 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Ki       = 0.0;
   Motor.motorLeftPID.Kd       = 0.0;
   Perimeter.enable = true;
+  Battery.enableMonitor = true;
   Battery.batFull = 29.4;
+  Battery.batGoHomeIfBelow = 29.39;
   Battery.batVoltage = Battery.batFull;
 }
 
@@ -120,7 +122,7 @@ SimPerimeter::SimPerimeter(){
           float b=100.0/(2.0*M_PI*r); // field strength
           int c = pnpoly(list, px, py);
           //if ((y<=0) || (bfield[py][px] < 0)){
-          if (c == 0){
+          if (c != 0){
             b=b*-1.0;
             bfield[py][px] =  min(bfield[py][px], b);
           } else bfield[py][px] = max(bfield[py][px], b);
@@ -138,7 +140,7 @@ SimPerimeter::SimPerimeter(){
       //b:=10 + bfield[y][x];
       int v = min(255, max(0, (int)b));
       cv::Vec3b intensity;
-      if (bfield[y][x] > 0){
+      if (bfield[y][x] <= 0){
         intensity.val[0]=255-v;
         intensity.val[1]=255-v;
         intensity.val[2]=255;
@@ -267,8 +269,8 @@ bool SimPerimeter::isInside(char coilIdx){
   int receiverX = Robot.simX + r * cos(Robot.simOrientation);
   int receiverY = Robot.simY + r * sin(Robot.simOrientation);
   float bfield = getBfield(receiverX, receiverY, 1);
-  // printf("bfield=%3.2f\n", bfield);
-  return (bfield > 0);
+  //printf("bfield=%3.2f\n", bfield);
+  return (bfield < 0);
 }
 
 int SimPerimeter::getMagnitude(char coilIdx){
@@ -276,7 +278,7 @@ int SimPerimeter::getMagnitude(char coilIdx){
   int receiverX = Robot.simX + r * cos(Robot.simOrientation);
   int receiverY = Robot.simY + r * sin(Robot.simOrientation);
   float bfield = getBfield(receiverX, receiverY, 1);
-  return bfield;
+  return min(4095, max(-4095, bfield * 10));
 }
 
 // ------------------------------------------

@@ -118,3 +118,58 @@ void HitObstacleBehavior::action(){
   }
 }
 
+// ---------------------------------
+
+TrackingBehavior::TrackingBehavior()  : Behavior(){
+  name = "TrackingBehavior";
+}
+
+bool TrackingBehavior::takeControl(){
+
+  return (   (Battery.robotShouldGoHome()) &&
+             (Perimeter.enable) && (!Perimeter.isInside(0))  );
+}
+
+void TrackingBehavior::action(){
+  suppressed = false;
+  //Motor.stopImmediately();
+  Motor.rotate(PI, Motor.motorSpeedMaxRpm/2);
+  while ( (!suppressed) && (!Motor.hasStopped()) ) {
+    Robot.run();
+    if (Perimeter.isInside(0)) {
+      Motor.stopImmediately();
+      break;
+    }
+  }
+  // reverse
+  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  //Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
+  PID pidTrack;
+  pidTrack.Kp    = 140;  // perimeter PID controller
+  pidTrack.Ki    = 4;
+  pidTrack.Kd    = 50;
+
+  Motor.enableSpeedControl = false;
+  unsigned long nextControlTime = 0;
+  while ( !suppressed) {
+    if (millis() >= nextControlTime){
+      nextControlTime = millis() + 50;
+      int mag = Perimeter.getMagnitude(0);
+      if (mag < 0) pidTrack.x = -1;
+        else if (mag > 0) pidTrack.x = 1;
+        else pidTrack.x = 0;
+      pidTrack.w = 0;
+      pidTrack.y_min = -Motor.motorSpeedMaxPwm;
+      pidTrack.y_max = Motor.motorSpeedMaxPwm;
+      pidTrack.max_output = Motor.motorSpeedMaxPwm;
+      pidTrack.compute();
+      //printf("%d, %.3f\n", mag, pidTrack.y);
+      Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - pidTrack.y,
+                         Motor.motorSpeedMaxPwm/2 + pidTrack.y );
+      //cvWaitKey( 50 );
+    }
+    Robot.run();
+  }
+  Motor.enableSpeedControl = true;
+}
+

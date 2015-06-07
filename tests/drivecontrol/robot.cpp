@@ -23,6 +23,7 @@ void RobotControl::setup(){
   arbitrator.addBehavior(&driveForwardBehavior);
   arbitrator.addBehavior(&hitObstacleBehavior);
   arbitrator.addBehavior(&hitPerimeterBehavior);
+  arbitrator.addBehavior(&trackingBehavior);
 
   Console.println(F("-----SETUP completed-----"));
 }

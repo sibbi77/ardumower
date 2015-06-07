@@ -39,6 +39,7 @@ PID::PID(float Kp, float Ki, float Kd){
   this->Kp = Kp;
   this->Ki = Ki;
   this->Kd = Kd;
+  lastControlTime = 0;
   reset();
 }
 
