@@ -39,7 +39,19 @@ void HitPerimeterBehavior::action(){
   Motor.stopImmediately();
   bool rotateLeft = ((rand() % 2) == 0);
   float angle = ((float)random(90, 180)) / 180.0 * PI;
+  //float angle = PI;
   if (rotateLeft) angle *= -1;
+
+  /*Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
+  while ( (!suppressed) && (!Motor.hasStopped()) ) {
+    Robot.run();
+    if (Perimeter.isInside(0)) {
+      Motor.stopImmediately();
+      break;
+    }
+  }
+  return;*/
+
   //float angle = PI;
   //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
 
@@ -47,10 +59,10 @@ void HitPerimeterBehavior::action(){
   //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
-    /*if (Perimeter.isInside(0)) {
+    if (Perimeter.isInside(0)) {
       Motor.stopImmediately();
       break;
-    }*/
+    }
     Robot.run();
   }
 

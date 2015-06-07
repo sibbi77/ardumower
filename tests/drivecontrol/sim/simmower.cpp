@@ -66,31 +66,31 @@ SimPerimeter::SimPerimeter(){
   imgWorld = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
 
   // obstacles (cm)
-  obstacles.push_back( (point_t) {50, 55 } );
-  obstacles.push_back( (point_t) {70, 35 } );
-  obstacles.push_back( (point_t) {300, 90 } );
-  obstacles.push_back( (point_t) {210, 150 } );
+  obstacles.push_back( (point_t) {120, 155 } );
+  obstacles.push_back( (point_t) {70, 165 } );
+  obstacles.push_back( (point_t) {300, 190 } );
+  obstacles.push_back( (point_t) {210, 350 } );
   obstacles.push_back( (point_t) {120, 190 } );
-  obstacles.push_back( (point_t) {250, 60 } );
+  obstacles.push_back( (point_t) {250, 160 } );
   obstacles.push_back( (point_t) {220, 110 } );
   obstacles.push_back( (point_t) {110, 200 } );
-  obstacles.push_back( (point_t) {90, 90 } );
-  obstacles.push_back( (point_t) {90, 190 } );
-  obstacles.push_back( (point_t) {90, 130 } );
+  obstacles.push_back( (point_t) {90, 390 } );
+  obstacles.push_back( (point_t) {90, 390 } );
+  obstacles.push_back( (point_t) {90, 330 } );
 
   // perimeter lines coordinates (cm)
   std::vector<point_t> list;
-  list.push_back( (point_t) {30, 35 } );
-  list.push_back( (point_t) {50, 15 } );
-  list.push_back( (point_t) {400, 40 } );
-  list.push_back( (point_t) {410, 50 } );
-  list.push_back( (point_t) {420, 90 } );
-  list.push_back( (point_t) {350, 160 } );
-  list.push_back( (point_t) {320, 190 } );
-  list.push_back( (point_t) {210, 250 } );
-  list.push_back( (point_t) {40, 300 } );
-  list.push_back( (point_t) {20, 290 } );
-  list.push_back( (point_t) {30, 230 } );
+  list.push_back( (point_t) {30, 55 } );
+  list.push_back( (point_t) {50, 45 } );
+  list.push_back( (point_t) {610, 40 } );
+  list.push_back( (point_t) {620, 50 } );
+  list.push_back( (point_t) {630, 180 } );
+  list.push_back( (point_t) {450, 200 } );
+  list.push_back( (point_t) {420, 290 } );
+  list.push_back( (point_t) {410, 450 } );
+  list.push_back( (point_t) {60, 450 } );
+  list.push_back( (point_t) {40, 450 } );
+  list.push_back( (point_t) {30, 430 } );
 
   chgStationX = 35;
   chgStationY = 150;
@@ -208,7 +208,7 @@ void SimPerimeter::draw(){
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
           Motor.totalDistanceTraveled);
-  putText(imgWorld, std::string(buf), cv::Point(10,330), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
+  putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-15), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
 }
 
@@ -269,6 +269,14 @@ bool SimPerimeter::isInside(char coilIdx){
   float bfield = getBfield(receiverX, receiverY, 1);
   // printf("bfield=%3.2f\n", bfield);
   return (bfield > 0);
+}
+
+int SimPerimeter::getMagnitude(char coilIdx){
+  float r = Motor.odometryWheelBaseCm/2;
+  int receiverX = Robot.simX + r * cos(Robot.simOrientation);
+  int receiverY = Robot.simY + r * sin(Robot.simOrientation);
+  float bfield = getBfield(receiverX, receiverY, 1);
+  return bfield;
 }
 
 // ------------------------------------------

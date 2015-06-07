@@ -16,7 +16,7 @@ class PerimeterControl
     PerimeterControl();
     bool enable; // enable ?
     // get perimeter magnitude
-    int getMagnitude(char coilIdx);
+    virtual int getMagnitude(char coilIdx);
     int getSmoothMagnitude(char coilIdx);
     // inside perimeter (true) or outside (false)?
     virtual bool isInside(char coilIdx);

@@ -15,8 +15,8 @@
 // Ardumower classes implementation for simulator
 
 // world size (cm)
-#define WORLD_SIZE_X 500
-#define WORLD_SIZE_Y 350
+#define WORLD_SIZE_X 700
+#define WORLD_SIZE_Y 500
 
 
 class SimSettings : public FactorySettings
@@ -50,6 +50,7 @@ class SimPerimeter : public PerimeterControl
     SimPerimeter();
     virtual void run();
     virtual bool isInside(char coilIdx);
+    virtual int getMagnitude(char coilIdx);
     bool hitObstacle(int x, int y, int distance, float orientation);
     // return world size (cm)
     int sizeX();
