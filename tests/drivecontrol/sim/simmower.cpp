@@ -81,6 +81,7 @@ SimPerimeter::SimPerimeter(){
   memset(bfield, 0, sizeof bfield);
   imgBfield = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
   imgWorld = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
+  plotPerimeter = cv::Mat(140, 500, CV_8UC3, cv::Scalar(0,0,0));
 
   // obstacles (cm)
   obstacles.push_back( (point_t) {120, 155 } );
@@ -111,6 +112,7 @@ SimPerimeter::SimPerimeter(){
 
   chgStationX = 30;
   chgStationY = 150;
+  chgStationOrientation = -PI/2;
 
   // compute magnetic field (compute distance to perimeter lines)
   int x1 = list[list.size()-1].x;
@@ -194,6 +196,12 @@ int SimPerimeter::sizeY(){
   return WORLD_SIZE_Y;
 }
 
+void SimPerimeter::plotXY(cv::Mat &image, int x, int y, int r, int g, int b, bool clearplot){
+  if (clearplot) for (int y=0; y < image.rows; y++) image.at<cv::Point3_<uchar> >(y, x) = cv::Point3_<uchar>(0,0,0);
+  if ( (x< 0) || (y < 0) || (x >= image.cols) || (y >= image.rows)) return;
+  image.at<cv::Point3_<uchar> >(image.rows-y-1, x) = cv::Point3_<uchar>(r,g,b);
+  //line( image, Point( x, image.rows ), Point( x, image.rows-y-1), Scalar( r, g, b),  1, 8 );
+}
 
 void SimPerimeter::draw(){
   char buf[64];
@@ -221,13 +229,19 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv dist %.0fm  orient %d",
+  sprintf(buf, "time %.0fmin bat %.1fv chg %.1fv dist %.0fm  orient %d",
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
+          Battery.chgVoltage,
           Motor.totalDistanceTraveled,
           ((int)(Robot.simOrientation / PI * 180.0))  );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-15), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
+  // plot robot bfield sensor
+  float mag = max(-2.0f, min(24.0f, Perimeter.getMagnitude(0) ));
+  plotXY(plotPerimeter, plotIdx % plotPerimeter.cols, 15+mag*5, 255,255,255, true);
+  imshow("mag", plotPerimeter);
+  plotIdx++;
 }
 
 // approximate circle pattern
@@ -319,21 +333,29 @@ void SimTimer::run(){
 // ------------------------------------------
 
 void SimBattery::read(){
-  batVoltage -= 0.001;
-}
-
-
-bool SimBattery::chargerConnected(){
   float r = Motor.odometryWheelBaseCm/2;
   int chargePinX = Robot.simX + r * cos(Robot.simOrientation);
   int chargePinY = Robot.simY + r * sin(Robot.simOrientation);
   float stationDistance = sqrt( sq(abs(Perimeter.chgStationX-chargePinX)) + sq(abs(Perimeter.chgStationY-chargePinY)) );
-  float stationOrient = abs(distancePI(Robot.simOrientation, -PI/2));
+  float stationCourse = abs(distancePI(Robot.simOrientation, Perimeter.chgStationOrientation));
   /*printf("stationDistance=%.0f orient=%.0f\n",
          stationDistance,
          stationOrient / PI * 180.0);*/
-  if ( (stationDistance < 10) && (stationOrient < PI/8)  ) return true;
-  return false;
+  if ( (stationDistance < 10) && (stationCourse < PI/8)  ) {
+    // in charging station
+    chgVoltage = batFull;
+  } else {
+    // outside charging station
+    chgVoltage = 0;
+  }
+
+  if (chargerConnected()){
+    // simulate charging
+    batVoltage = min(batFull, batVoltage + 0.01);
+  } else {
+    // simulate discharging
+    batVoltage = max(0, batVoltage - 0.001);
+  }
 }
 
 // ------------------------------------------

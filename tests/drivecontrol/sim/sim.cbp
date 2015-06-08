@@ -45,6 +45,8 @@
 		<Unit filename="../led.h" />
 		<Unit filename="../motor.cpp" />
 		<Unit filename="../motor.h" />
+		<Unit filename="../motormow.cpp" />
+		<Unit filename="../motormow.h" />
 		<Unit filename="../objects.h" />
 		<Unit filename="../perimeter.cpp" />
 		<Unit filename="../perimeter.h" />

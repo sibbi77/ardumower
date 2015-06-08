@@ -51,7 +51,9 @@ class SimPerimeter : public PerimeterControl
   public:
     cv::Mat imgBfield;
     cv::Mat imgWorld;
+    cv::Mat plotPerimeter;
     int chgStationX, chgStationY; // cm
+    float chgStationOrientation; // entrance
     std::vector<point_t> obstacles; // obstacles
     SimPerimeter();
     virtual void run();
@@ -69,9 +71,11 @@ class SimPerimeter : public PerimeterControl
     float lawnMowStatus[WORLD_SIZE_Y][WORLD_SIZE_X];
   private:
     bool drawMowedLawn;
+    int plotIdx;
     // magnetic field
     float bfield[WORLD_SIZE_Y][WORLD_SIZE_X];
     int pnpoly(std::vector<point_t> &vertices, float testx, float testy);
+    void plotXY(cv::Mat &image, int x, int y, int r, int g, int b, bool clearplot);
 };
 
 // simulated timer
@@ -92,7 +96,6 @@ class SimBattery : public BatteryControl
 {
   public:
     virtual void read();
-    virtual bool chargerConnected();
 };
 
 
