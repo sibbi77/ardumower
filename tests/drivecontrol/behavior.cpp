@@ -16,6 +16,8 @@ void DriveForwardBehavior::action(){
 
   LED.playSequence(LED_SEQ_GREEN_ON);
 
+  MotorMow.setSpeedPWM(MotorMow.motorMowSpeedMaxPwm);
+
   // forward
   Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
 
@@ -133,6 +135,7 @@ bool TrackingBehavior::takeControl(){
 void TrackingBehavior::action(){
   suppressed = false;
   //Motor.stopImmediately();
+  MotorMow.setSpeedPWM(0);
   Motor.rotate(PI, Motor.motorSpeedMaxRpm/2);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     Robot.run();
@@ -145,7 +148,7 @@ void TrackingBehavior::action(){
   //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   //Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
   PID pidTrack;
-  pidTrack.Kp    = 140;  // perimeter PID controller
+  pidTrack.Kp    = 160;  // perimeter PID controller
   pidTrack.Ki    = 4;
   pidTrack.Kd    = 50;
 
@@ -166,10 +169,31 @@ void TrackingBehavior::action(){
       //printf("%d, %.3f\n", mag, pidTrack.y);
       Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - pidTrack.y,
                          Motor.motorSpeedMaxPwm/2 + pidTrack.y );
-      //cvWaitKey( 50 );
     }
     Robot.run();
   }
   Motor.enableSpeedControl = true;
 }
 
+// ----------------------------------------
+
+ChargingBehavior::ChargingBehavior() : Behavior() {
+  name = "ChargingBehavior";
+}
+
+bool ChargingBehavior::takeControl(){
+  return ( Battery.isCharging() );
+}
+
+void ChargingBehavior::action(){
+  suppressed = false;
+
+  Motor.stopImmediately();
+  //LED.playSequence(LED_OFF);
+  //Buzzer.play(BC_SHORT_SHORT_SHORT);
+
+  // wait until some other behavior was activated
+  while ( (!suppressed ) && (Battery.isCharging()) ) {
+    Robot.run();
+  }
+}

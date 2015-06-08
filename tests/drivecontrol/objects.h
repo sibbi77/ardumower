@@ -11,6 +11,7 @@
   // simulator
   class SimLED;
   class SimMotor;
+  class SimMotorMow;
   class SimSettings;
   class SimPerimeter;
   class SimTimer;
@@ -19,6 +20,7 @@
 
   extern SimLED LED;
   extern SimMotor Motor;
+  extern SimMotorMow MotorMow;
   extern SimSettings Settings;
   extern SimPerimeter Perimeter;
   extern SimTimer Timer;
@@ -27,6 +29,7 @@
 
   #include "led.h"
   #include "motor.h"
+  #include "motormow.h"
   #include "perimeter.h"
   #include "timer.h"
   #include "battery.h"

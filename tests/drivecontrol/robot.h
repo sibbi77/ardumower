@@ -16,6 +16,7 @@ class RobotControl
     HitPerimeterBehavior hitPerimeterBehavior;
     HitObstacleBehavior hitObstacleBehavior;
     TrackingBehavior trackingBehavior;
+    ChargingBehavior chargingBehavior;
     Arbitrator arbitrator;
     RobotControl();
     unsigned long nextPrintTime;

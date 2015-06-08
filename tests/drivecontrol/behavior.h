@@ -70,5 +70,14 @@ class TrackingBehavior : public Behavior
     virtual void action();
 };
 
+// robot is charging
+class ChargingBehavior : public Behavior
+{
+  public:
+    ChargingBehavior();
+    virtual bool takeControl();
+    virtual void action();
+};
+
 #endif
 

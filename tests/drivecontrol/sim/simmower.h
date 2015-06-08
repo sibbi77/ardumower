@@ -40,6 +40,12 @@ class SimMotor : public MotorControl
     virtual void readCurrent();
 };
 
+class SimMotorMow : public MotorMowControl
+{
+  private:
+    virtual void setDriverPWM(int pwm);
+};
+
 class SimPerimeter : public PerimeterControl
 {
   public:
@@ -73,6 +79,7 @@ class SimTimer : public TimerControl
 {
   public:
     bool simStopped;
+    bool simFast;
     float simTimeStep; // simulation step (sec)
     float simTimeTotal; // simulation time (sec)
     SimTimer();
@@ -85,6 +92,7 @@ class SimBattery : public BatteryControl
 {
   public:
     virtual void read();
+    virtual bool isCharging();
 };
 
 

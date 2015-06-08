@@ -4,6 +4,7 @@
 
 SimLED LED;
 SimMotor Motor;
+SimMotorMow MotorMow;
 SimSettings Settings;
 SimPerimeter Perimeter;
 SimBattery Battery;
@@ -27,6 +28,7 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Kp       = 0.4;    // PID speed controller
   Motor.motorLeftPID.Ki       = 0.0;
   Motor.motorLeftPID.Kd       = 0.0;
+  MotorMow.motorMowSpeedMaxPwm = 255;
   Perimeter.enable = true;
   Battery.enableMonitor = true;
   Battery.batFull = 29.4;
@@ -57,6 +59,11 @@ void SimMotor::readCurrent(){
     }
   }
 }
+// ------------------------------------------
+
+void SimMotorMow::setDriverPWM(int pwm){
+}
+
 // ------------------------------------------
 
 SimPerimeter::SimPerimeter(){
@@ -287,6 +294,7 @@ SimTimer::SimTimer(){
   simTimeStep = 0.01; // one simulation step (seconds)
   simTimeTotal = 0; // simulation time
   simStopped = false;
+  simFast = false;
 }
 
 unsigned long SimTimer::millis(){
@@ -303,6 +311,16 @@ void SimTimer::run(){
 
 void SimBattery::read(){
   batVoltage -= 0.001;
+}
+
+
+bool SimBattery::isCharging(){
+  float r = Motor.odometryWheelBaseCm/2;
+  int chargePinX = Robot.simX + r * cos(Robot.simOrientation);
+  int chargePinY = Robot.simY + r * sin(Robot.simOrientation);
+  float stationDistance = sqrt( sq(abs(Perimeter.chgStationX-chargePinX)) + sq(abs(Perimeter.chgStationY-chargePinY)) );
+  if (stationDistance <= 10) return true;
+  return false;
 }
 
 // ------------------------------------------
@@ -329,8 +347,8 @@ void SimRobot::move(){
   float rightnoise = 0;
   if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = motor_noise;
   if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = motor_noise;
-  Motor.motorLeftRpmCurr  = 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise);
-  Motor.motorRightRpmCurr = 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise);
+  Motor.motorLeftRpmCurr  = min(33, max(-33, 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
+  Motor.motorRightRpmCurr = min(33, max(-33, 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise)));
 
   // slope
   float leftrpm;
@@ -361,13 +379,16 @@ void SimRobot::run(){
   if (!Timer.simStopped){
     RobotControl::run();
     move();
-    Perimeter.setLawnMowed(Robot.simX, Robot.simY);
+    if (!MotorMow.hasStopped()) Perimeter.setLawnMowed(Robot.simX, Robot.simY);
     Perimeter.draw();
     Robot.draw(Perimeter.imgWorld);
   }
-  if (loopCounter % 100 == 0){
+  if (  (!Timer.simFast) || ((Timer.simFast) && (loopCounter % 100 == 0))  ){
     char key = cvWaitKey( 10 );
     switch (key){
+      case 'f':
+        Timer.simFast = !Timer.simFast;
+        break;
       case 27:
         exit(0);
         break;

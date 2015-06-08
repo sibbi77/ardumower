@@ -42,7 +42,7 @@ class BatteryControl
     virtual void read();  // read battery/charger voltage, current
     void print();
     bool chargerConnected();
-    bool isCharging();
+    virtual bool isCharging();
     int getChargingTimeMinutes();
     bool robotShouldGoHome();
   private:
