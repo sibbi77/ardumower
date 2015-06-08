@@ -8,6 +8,9 @@ SimMotorMow MotorMow;
 SimSettings Settings;
 SimPerimeter Perimeter;
 SimBattery Battery;
+SimBuzzer Buzzer;
+SimSonar Sonar;
+SimButton Button;
 SimTimer Timer;
 SimRobot Robot;
 
@@ -438,6 +441,15 @@ void SimRobot::move(){
   Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
 }
 
+
+char SimRobot::readKey(){
+  // fast-mode: skip reading key (skip OpenCV updates)
+  if (  (!Timer.simFast) || ((Timer.simFast) && (loopCounter % 100 == 0))  ){
+    return RobotControl::readKey();
+  }
+  return 0;
+}
+
 void SimRobot::run(){
   if (!Timer.simStopped){
     RobotControl::run();
@@ -445,21 +457,25 @@ void SimRobot::run(){
     if (!MotorMow.hasStopped()) Perimeter.setLawnMowed(Robot.simX, Robot.simY);
     Perimeter.draw();
     Robot.draw(Perimeter.imgWorld);
+  } else {
+    char key = readKey();
+    processKey(key);
   }
-  if (  (!Timer.simFast) || ((Timer.simFast) && (loopCounter % 100 == 0))  ){
-    char key = cvWaitKey( 10 );
-    switch (key){
-      case 'f':
-        Timer.simFast = !Timer.simFast;
-        break;
-      case 27:
-        exit(0);
-        break;
-      case ' ':
-        Timer.simStopped=!Timer.simStopped;
-        break;
+}
+
+void SimRobot::processKey(char key){
+  RobotControl::processKey(key);
+  switch (key){
+    case 'f':
+      Timer.simFast = !Timer.simFast;
+      break;
+    case 27:
+      exit(0);
+      break;
+    case ' ':
+      Timer.simStopped=!Timer.simStopped;
+      break;
     }
-  }
 }
 
 // draw robot on surface

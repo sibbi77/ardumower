@@ -10,7 +10,6 @@ MotorMowControl::MotorMowControl(){
 
   // MC33926 current:  5V / 1024 ADC counts,  525 mV per A  => 9.3 mA per ADC step
   motorSenseScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
-  motorVoltageDC = 24.0;
 
   motorPWMCurr = 0;
   nextMotorMowTime = 0;
@@ -86,7 +85,10 @@ void MotorMowControl::readCurrent(){
 }
 
 
-
+void MotorMowControl::setState(bool state){
+  if (state) setSpeedPWM(motorMowSpeedMaxPwm);
+    else setSpeedPWM(0);
+}
 
 
 

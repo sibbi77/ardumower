@@ -26,13 +26,14 @@ class MotorMowControl
     MotorMowControl();
     virtual void setup();
     virtual void run();
-    virtual void setSpeedPWM(int pwm);
     bool hasStopped();
+    void setState(bool state);
     void resetStalled();
     void resetFault();
     void stopImmediately();
     void print();
   private:
+    virtual void setSpeedPWM(int pwm);
     unsigned long lastMotorCurrentTime;
     void setDriverPWM(int pwm);
     void checkMotorFault();

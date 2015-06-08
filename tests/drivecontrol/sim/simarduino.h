@@ -80,6 +80,8 @@ void delay(unsigned long);
 void delayMicroseconds(unsigned int us);
 void pinMode(uint8_t, uint8_t);
 void digitalWrite(uint8_t, uint8_t);
+void tone(uint8_t _pin, unsigned int frequency, unsigned long duration);
+void noTone(uint8_t _pin);
 
 
 #ifdef __cplusplus
@@ -90,14 +92,15 @@ void digitalWrite(uint8_t, uint8_t);
 #include "WMath.h"
 //#include <iostream>
 #include "Stream.h"
-
+#include <opencv2/highgui/highgui.hpp>
 
 class AConsole : public Stream
 {
+    int key;
   public:
-    virtual int available(){ return 0; }
-    virtual int read(){ return 0; }
-    virtual int peek(){ return 0; }
+    virtual int available(){ key = cvWaitKey( 1 ); return (key != 0); }
+    virtual int read(){ return key; }
+    virtual int peek(){ return key; }
     virtual void flush(){}
     virtual size_t write(const uint8_t c){
       printf("%c", ((char)c));

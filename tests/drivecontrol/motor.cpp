@@ -1,4 +1,5 @@
 #include "common.h"
+#include "objects.h"
 #include "motor.h"
 
 
@@ -28,7 +29,6 @@ MotorControl::MotorControl(){
   // MC33926 current:  5V / 1024 ADC counts,  525 mV per A  => 9.3 mA per ADC step
   motorSenseRightScale = 9.3;  // motor right sense scale (mA=(ADC-zero) * scale)
   motorSenseLeftScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
-  motorVoltageDC = 24.0;
 
   motorEfficiencyMin = 200;
 }
@@ -341,8 +341,8 @@ void MotorControl::readCurrent(){
     // compute motor output power (W) by calculating battery voltage, pwm duty cycle and motor current
     // P_output = U_Battery * pwmDuty * I_Motor
     smooth = 0.9;
-    motorRightSensePower = motorRightSensePower * smooth + (1.0-smooth) * (motorRightSenseCurrent * motorVoltageDC * ((double)abs(motorRightPWMCurr)/255.0)  /1000);
-    motorLeftSensePower  = motorLeftSensePower  * smooth + (1.0-smooth) * (motorLeftSenseCurrent  * motorVoltageDC * ((double)abs(motorLeftPWMCurr) /255.0)  /1000);
+    motorRightSensePower = motorRightSensePower * smooth + (1.0-smooth) * (motorRightSenseCurrent * Battery.batVoltage * ((double)abs(motorRightPWMCurr)/255.0)  /1000);
+    motorLeftSensePower  = motorLeftSensePower  * smooth + (1.0-smooth) * (motorLeftSenseCurrent  * Battery.batVoltage * ((double)abs(motorLeftPWMCurr) /255.0)  /1000);
 
     // Ist es nicht aussagekraeftiger ueber die Beschleunigung?
     // Mit der PWM und der Odometrie gibst du eine soll Drehzahl = Soll Geschwindigkeit vor.

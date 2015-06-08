@@ -24,6 +24,8 @@ class RobotControl
     RobotControl();
     unsigned long nextPrintTime;
     virtual void run();
+    virtual char readKey();
+    virtual void processKey(char key);
     virtual void setup();
     virtual void loop();
     virtual void print();

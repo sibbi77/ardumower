@@ -32,6 +32,22 @@ class SimLED : public LEDControl
     virtual void setDriverLED(int LEDidx, bool state){};
 };
 
+// simulated buzzer
+class SimBuzzer : public BuzzerControl
+{
+};
+
+// simulated sonar
+class SimSonar : public SonarControl
+{
+};
+
+// simulated button
+class SimButton : public ButtonControl
+{
+};
+
+
 class SimMotor : public MotorControl
 {
   private:
@@ -115,6 +131,8 @@ class SimRobot : public RobotControl
     // initializes robot
     SimRobot();
     virtual void run();
+    virtual void processKey(char key);
+    virtual char readKey();
     // draw robot on surface
     void draw(cv::Mat &img);
     void move();

@@ -16,7 +16,7 @@ void DriveForwardBehavior::action(){
 
   LED.playSequence(LED_SEQ_GREEN_ON);
 
-  MotorMow.setSpeedPWM(MotorMow.motorMowSpeedMaxPwm);
+  MotorMow.setState(true);
 
   // forward
   Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
@@ -59,7 +59,7 @@ void HitPerimeterBehavior::action(){
 
   // reverse
   //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
-  Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
+  Motor.travelLineDistance(-60, Motor.motorSpeedMaxRpm);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     if (Perimeter.isInside(0)) {
       Motor.stopImmediately();
@@ -135,7 +135,7 @@ bool TrackingBehavior::takeControl(){
 void TrackingBehavior::action(){
   suppressed = false;
   //Motor.stopImmediately();
-  //MotorMow.setSpeedPWM(0);
+  //MotorMow.setState(false);
   Motor.rotate(PI, Motor.motorSpeedMaxRpm/2);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     Robot.run();
@@ -185,6 +185,7 @@ void ChargingBehavior::action(){
   suppressed = false;
 
   Motor.stopImmediately();
+  MotorMow.setState(false);
   //LED.playSequence(LED_OFF);
   //Buzzer.play(BC_SHORT_SHORT_SHORT);
 
@@ -207,7 +208,7 @@ bool CircleBehavior::takeControl(){
 void CircleBehavior::action(){
   suppressed = false;
 
-  MotorMow.setSpeedPWM(MotorMow.motorMowSpeedMaxPwm);
+  MotorMow.setState(true);
   Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
 
   unsigned long startTime = millis();

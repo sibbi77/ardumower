@@ -34,7 +34,6 @@ class MotorControl
     bool motorRightError;          // right  motor error?
     bool motorLeftStalled;        // left motor stalled?
     bool motorRightStalled;        // right motor stalled?
-    float motorVoltageDC;  // known operating voltage (DC)
     int motorLeftSpeedRpmSet ; // set speed
     int motorRightSpeedRpmSet ;
     float motorLeftRpmCurr ; // left wheel rpm

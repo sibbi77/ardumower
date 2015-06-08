@@ -16,6 +16,9 @@
   class SimPerimeter;
   class SimTimer;
   class SimBattery;
+  class SimButton;
+  class SimSonar;
+  class SimBuzzer;
   class SimRobot;
 
   extern SimLED LED;
@@ -24,6 +27,9 @@
   extern SimSettings Settings;
   extern SimPerimeter Perimeter;
   extern SimTimer Timer;
+  extern SimSonar Sonar;
+  extern SimBuzzer Buzzer;
+  extern SimButton Button;
   extern SimBattery Battery;
   extern SimRobot Robot;
 
@@ -33,6 +39,9 @@
   #include "perimeter.h"
   #include "timer.h"
   #include "battery.h"
+  #include "buzzer.h"
+  #include "sonar.h"
+  #include "button.h"
   #include "settings.h"
   #include "robot.h"
   #include "sim/simmower.h"
