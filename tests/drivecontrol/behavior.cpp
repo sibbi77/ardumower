@@ -141,6 +141,7 @@ void TrackingBehavior::action(){
   suppressed = false;
   //Motor.stopImmediately();
   //MotorMow.setState(false);
+  Motor.resetStalled();
   Motor.rotate(PI, Motor.motorSpeedMaxRpm/2);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     Robot.run();
@@ -154,8 +155,9 @@ void TrackingBehavior::action(){
   //Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
 
   Motor.enableSpeedControl = false;
+  Motor.enableStallDetection = false;
   unsigned long nextControlTime = 0;
-  while ( !suppressed) {
+  while (  (!suppressed) && (!Motor.hasStopped())  ) {
     if (millis() >= nextControlTime){
       nextControlTime = millis() + 50;
       int mag = Perimeter.getMagnitude(0);
@@ -174,6 +176,7 @@ void TrackingBehavior::action(){
     Robot.run();
   }
   Motor.enableSpeedControl = true;
+  Motor.enableStallDetection = true;
 }
 
 // ----------------------------------------

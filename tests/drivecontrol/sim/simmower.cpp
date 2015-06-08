@@ -26,7 +26,7 @@ void SimSettings::setup(){
   Motor.motorSenseRightScale = 9.3;  // motor right sense scale (mA=(ADC-zero) * scale)
   Motor.motorSenseLeftScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
   Motor.motorSpeedMaxRpm = 25;
-  Motor.motorEfficiencyMin = 300;
+  Motor.motorEfficiencyMin = 200;
   Motor.enableStallDetection = true;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
@@ -65,18 +65,11 @@ void SimMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
 }
 
 int SimMotor::driverReadLeftCurrentADC(){
-  if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+OBSTACLE_RADIUS, Robot.simOrientation )){
-    if ( (Motor.motorLeftSpeedRpmSet > 2) && (Motor.motorRightSpeedRpmSet > 2) )  {
-      //Motor.motorLeftRpmCurr = 0; // block motors
-      //Motor.motorRightRpmCurr = 0;
-      return 15000.0 / Motor.motorSenseLeftScale;
-    }
-  }
-  return 1500.0 / Motor.motorSenseLeftScale;
+  return abs(Motor.motorLeftPWMCurr) * 10 / Motor.motorSenseLeftScale;
 }
 
 int SimMotor::driverReadRightCurrentADC(){
-  return driverReadLeftCurrentADC();
+  return abs(Motor.motorRightPWMCurr) * 10 / Motor.motorSenseRightScale;
 }
 
 
@@ -418,11 +411,9 @@ void SimBattery::read(){
 SimRobot::SimRobot(){
   distanceToChgStation = 0;
 
-  simX = 340;
-  simY = 100;
+  simX = 170;
+  simY = 170;
   simOrientation = 0;
-  //leftMotorSpeed = 30;
-  //rightMotorSpeed = 5;
 
   motor_noise = 90;
   slope_noise = 5;
@@ -438,6 +429,13 @@ void SimRobot::move(){
   if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = motor_noise;
   Motor.motorLeftRpmCurr  = min(33, max(-33, 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
   Motor.motorRightRpmCurr = min(33, max(-33, 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise)));
+
+  if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2 + 1.5*OBSTACLE_RADIUS, Robot.simOrientation )){
+    if ( (Motor.motorLeftPWMCurr > 0) || (Motor.motorRightPWMCurr > 0) )  {
+      Motor.motorLeftRpmCurr = 0;
+      Motor.motorRightRpmCurr = 0;
+    }
+  }
 
   // slope
   float leftrpm;
