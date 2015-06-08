@@ -23,6 +23,11 @@ void DriveForwardBehavior::action(){
 
   while ( (!suppressed) && (Motor.motion != MOTION_STOP) ){
     Robot.run();
+
+    if (MotorMow.motorStalled){
+      MotorMow.resetStalled();
+      MotorMow.setState(true);
+    }
   }
 }
 
@@ -86,7 +91,7 @@ HitObstacleBehavior::HitObstacleBehavior()  : Behavior(){
 }
 
 bool HitObstacleBehavior::takeControl(){
-  return ( (Motor.motorRightStalled) || (Motor.motorLeftStalled) );
+  return ( (Motor.motorRightStalled) || (Motor.motorLeftStalled)  || (Sonar.triggeredAny()) );
   //return ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+8) );
 }
 
@@ -222,6 +227,11 @@ void CircleBehavior::action(){
       else Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm*ratio);
 
     Robot.run();
+
+    if (MotorMow.motorStalled){
+      MotorMow.resetStalled();
+      MotorMow.setState(true);
+    }
   }
 }
 

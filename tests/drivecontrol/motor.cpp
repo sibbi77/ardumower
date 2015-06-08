@@ -55,14 +55,25 @@ void MotorControl::resetStalled(){
   Console.println(F("STALL RESET"));
 }
 
-// motor driver
-void MotorControl::setDriverPWM(int leftMotorPWM, int rightMotorPWM){
-}
 
 void MotorControl::checkFault(){
+  if (enableErrorDetection){
+    if ( (!motorLeftError) && (driverReadLeftFault()) ){
+      Console.println(F("ERROR: left gear motor"));
+      motorLeftError = true;
+    }
+    if ( (!motorRightError) && (driverReadRightFault()) ){
+      Console.println(F("ERROR: right gear motor"));
+      motorRightError = true;
+    }
+  }
+
 }
 
 void MotorControl::resetFault(){
+  Console.println(F("MotorControl::resetFault"));
+  driverResetFault();
+  motorRightError = motorLeftError = false;
 }
 
 void MotorControl::run(){
@@ -231,7 +242,7 @@ void MotorControl::setSpeedPWM(int leftPWM, int rightPWM){
   if (motorRightSwapDir) rightPWM *= -1;
   motorLeftPWMCurr  = max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, leftPWM));
   motorRightPWMCurr = max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, rightPWM));
-  setDriverPWM( leftPWM, rightPWM );
+  driverSetPWM( leftPWM, rightPWM );
 }
 
 void MotorControl::setSpeedRpm(int leftRpm, int rightRpm){
@@ -296,7 +307,11 @@ void MotorControl::rotate(float angleRad, int speedRpm){
 }
 
 bool MotorControl::hasStopped(){
-  return ( (motion == MOTION_STOP) && (abs(motorLeftPWMCurr) < 1) && (abs(motorRightPWMCurr) < 1) && (abs(motorRightRpmCurr) < 1) && (abs(motorLeftRpmCurr) < 1)  );
+  return ( (motion == MOTION_STOP)
+        && (abs(motorLeftPWMCurr) < 1)
+        && (abs(motorRightPWMCurr) < 1)
+        && (abs(motorRightRpmCurr) < 1)
+        && (abs(motorLeftRpmCurr) < 1)  );
 }
 
 
@@ -314,8 +329,8 @@ void MotorControl::readCurrent(){
     int lastMotorRightSenseADC = motorRightSenseADC;
 
     // read current - NOTE: MC33926 datasheets says: accuracy is better than 20% from 0.5 to 6.0 A
-    //motorLeftSenseADC = ADCMan.read(pinMotorLeftSense);
-    //motorRightSenseADC = ADCMan.read(pinMotorRightSense);
+    motorLeftSenseADC = driverReadLeftCurrentADC();
+    motorRightSenseADC = driverReadRightCurrentADC();
 
     /*Console.print(motorLeftSenseADC);
     Console.print(",");
@@ -494,4 +509,21 @@ void MotorControl::print(){
 }
 
 
+int MotorControl::driverReadLeftCurrentADC(){
+}
 
+int MotorControl::driverReadRightCurrentADC(){
+}
+
+void MotorControl::driverResetFault(){
+}
+
+// motor driver
+void MotorControl::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
+}
+
+bool MotorControl::driverReadRightFault(){
+}
+
+bool MotorControl::driverReadLeftFault(){
+}

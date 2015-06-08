@@ -36,14 +36,16 @@ bool SonarControl::triggeredCenter(){
   return ((sonarDistCenter != NO_ECHO) &&  (sonarDistCenter < sonarTriggerBelow));
 }
 
+bool SonarControl::triggeredAny(){
+  return ( (triggeredCenter()) || (triggeredLeft()) || (triggeredRight())  );
+}
+
 // call this in main loop
 void SonarControl::run(){
   if (millis() < nextSonarTime) return;
   nextSonarTime = millis() + 1000;
 
-  //if (enableRight)  sonarDistRight  = readHCSR04(pinSonarRightTrigger,  pinSonarRightEcho);
-  //if (enableLeft)   sonarDistLeft   = readHCSR04(pinSonarLeftTrigger,   pinSonarLeftEcho);
-  //if (enableCenter) sonarDistCenter = readHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho);
+  read();
 
   if ( (triggeredRight()) || (triggeredLeft()) || (triggeredCenter()) ){
     sonarDistCounter++;
@@ -62,6 +64,18 @@ void SonarControl::print(){
 
 
 void SonarControl::read(){
+  if (enableRight)  sonarDistRight  = driverReadRightDistanceCm();
+  if (enableLeft)   sonarDistLeft   = driverReadLeftDistanceCm();
+  if (enableCenter) sonarDistCenter = driverReadCenterDistanceCm();
+}
+
+int SonarControl::driverReadLeftDistanceCm(){
+}
+
+int SonarControl::driverReadRightDistanceCm(){
+}
+
+int SonarControl::driverReadCenterDistanceCm(){
 }
 
 

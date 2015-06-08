@@ -1,4 +1,4 @@
-#include "common.h"
+#include "objects.h"
 #include "motormow.h"
 
 
@@ -16,6 +16,7 @@ MotorMowControl::MotorMowControl(){
   lastMotorCurrentTime = 0;
   motorSenseCurrent = 0;
   motorSensePower = 0;
+  motorStalled = false;
   enableErrorDetection = enableStallDetection = true;
 }
 
@@ -27,9 +28,11 @@ void MotorMowControl::setup(){
 // call this in main loop
 void MotorMowControl::run(){
   if (millis() < nextMotorMowTime) return;
-  nextMotorMowTime = millis() + 1000;
+  nextMotorMowTime = millis() + 50;
   readCurrent();
   checkMotorFault();
+  //print();
+  //Console.println();
 }
 
 void MotorMowControl::setSpeedPWM(int pwm){
@@ -38,10 +41,7 @@ void MotorMowControl::setSpeedPWM(int pwm){
   }
   if (pwm == 0) motorSensePower = 0;
   motorPWMCurr = pwm;
-  setDriverPWM(pwm);
-}
-
-void MotorMowControl::setDriverPWM(int pwm){
+  driverSetPWM(pwm);
 }
 
 
@@ -62,7 +62,7 @@ void MotorMowControl::stopImmediately(){
 
 
 bool MotorMowControl::hasStopped(){
-  return (motorPWMCurr == 0);
+  return (motorPWMCurr < 1);
 }
 
 void MotorMowControl::resetStalled(){
@@ -72,16 +72,52 @@ void MotorMowControl::resetStalled(){
 
 
 void MotorMowControl::checkMotorFault(){
+  if (enableErrorDetection){
+    if ( (!motorError) && (driverReadFault()) ){
+      Console.println(F("ERROR: mower motor"));
+      motorError = true;
+    }
+  }
 }
 
 void MotorMowControl::resetFault(){
   Console.println(F("MotorMowControl::resetFault"));
+  driverResetFault();
   motorError = false;
 }
 
 
 // read motor current
 void MotorMowControl::readCurrent(){
+    unsigned long TaC = millis() - lastMotorCurrentTime;    // sampling time in millis
+    lastMotorCurrentTime = millis();
+    if (TaC > 500) TaC = 1;
+    double TaS = ((double)TaC) / 1000.0;
+
+    // read current - NOTE: MC33926 datasheets says: accuracy is better than 20% from 0.5 to 6.0 A
+    int motorSenseADC = driverReadCurrentADC();
+
+    // compute motor current (mA)
+    //double smooth = 0.0;
+    double smooth = 0.5;
+    motorSenseCurrent = motorSenseCurrent * smooth + ((double)motorSenseADC) * motorSenseScale * (1.0-smooth);
+
+    // compute motor output power (W) by calculating battery voltage, pwm duty cycle and motor current
+    // P_output = U_Battery * pwmDuty * I_Motor
+    smooth = 0.9;
+    motorSensePower = motorSensePower * smooth + (1.0-smooth) * (motorSenseCurrent * Battery.batVoltage * ((double)abs(motorPWMCurr)/255.0)  /1000);
+
+    if (enableStallDetection) {
+      if (!motorStalled){
+       if ( (abs(motorPWMCurr) > 0) && (motorSensePower > motorMowPowerMax) ) {
+         print();
+         Console.print(F("  MOW STALL"));
+         Console.println();
+         motorStalled = true;
+         stopImmediately();
+       }
+     }
+    }
 }
 
 
@@ -91,5 +127,15 @@ void MotorMowControl::setState(bool state){
 }
 
 
+int MotorMowControl::driverReadCurrentADC(){
+}
 
+void MotorMowControl::driverSetPWM(int pwm){
+}
+
+void MotorMowControl::driverResetFault(){
+}
+
+bool MotorMowControl::driverReadFault(){
+}
 

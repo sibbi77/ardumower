@@ -16,7 +16,11 @@ void RobotControl::setup(){
   Timer.setup();
   LED.setup();
   Motor.setup();
+  MotorMow.setup();
   Perimeter.setup();
+  Sonar.setup();
+  Button.setup();
+  Buzzer.setup();
   Settings.setup();
 
   // low-to-high priority
@@ -98,6 +102,9 @@ void RobotControl::run(){
   arbitrator.monitor();
   Timer.run();
   Battery.run();
+  Buzzer.run();
+  Button.run();
+  Sonar.run();
   Motor.run();
   MotorMow.run();
   Perimeter.run();

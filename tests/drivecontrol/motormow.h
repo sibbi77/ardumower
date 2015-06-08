@@ -13,7 +13,6 @@ class MotorMowControl
     float motorMowSpeedMaxPwm;    // motor mower max PWM
     float motorMowPowerMax;     // motor mower max power (Watt)
     float motorSenseScale;   // motor mower sense scale  (mA=(ADC-zero) * scale)
-    float motorVoltageDC;    // battery DC voltage
 
     float motorSenseCurrent;  // current motor current (mA)
     float motorSensePower;    // current motor power (W)
@@ -35,10 +34,14 @@ class MotorMowControl
   private:
     virtual void setSpeedPWM(int pwm);
     unsigned long lastMotorCurrentTime;
-    void setDriverPWM(int pwm);
     void checkMotorFault();
     virtual void readCurrent();
     unsigned long nextMotorMowTime;
+    // --- driver ---
+    virtual int driverReadCurrentADC();
+    virtual bool driverReadFault();
+    virtual void driverSetPWM(int pwm);
+    virtual void driverResetFault();
 };
 
 

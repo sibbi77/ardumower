@@ -37,8 +37,9 @@ class BuzzerControl
     unsigned long nextBeepTime;
     int beepCodeToneIdx;
     int beepCodeIdx;
-    virtual void setDriverNoTone();
-    virtual void setDriverTone(int frequencyHz);
+    // --- driver ---
+    virtual void driverNoTone();
+    virtual void driverTone(int frequencyHz);
 };
 
 

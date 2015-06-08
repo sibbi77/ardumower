@@ -40,6 +40,8 @@ class SimBuzzer : public BuzzerControl
 // simulated sonar
 class SimSonar : public SonarControl
 {
+  private:
+    virtual int driverReadCenterDistanceCm();
 };
 
 // simulated button
@@ -51,16 +53,17 @@ class SimButton : public ButtonControl
 class SimMotor : public MotorControl
 {
   private:
-    virtual void setDriverPWM(int leftMotorPWM, int rightMotorPWM);
+    virtual void driverSetPWM(int leftMotorPWM, int rightMotorPWM);
+    virtual int driverReadLeftCurrentADC();
+    virtual int driverReadRightCurrentADC();
     virtual void readOdometry();
-    virtual void readCurrent();
 };
 
 class SimMotorMow : public MotorMowControl
 {
   private:
-    virtual void setDriverPWM(int pwm);
-    virtual void readCurrent();
+    virtual int driverReadCurrentADC();
+    virtual void driverSetPWM(int pwm);
 };
 
 class SimPerimeter : public PerimeterControl

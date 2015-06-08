@@ -20,6 +20,7 @@ class SonarControl
     bool triggeredCenter();
     bool triggeredLeft();
     bool triggeredRight();
+    bool triggeredAny();
     SonarControl();
     void setup();
     void run();
@@ -27,6 +28,10 @@ class SonarControl
     void print();
   private:
     unsigned long nextSonarTime;
+    // ----- driver -----
+    virtual int driverReadLeftDistanceCm();
+    virtual int driverReadRightDistanceCm();
+    virtual int driverReadCenterDistanceCm();
 };
 
 

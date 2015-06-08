@@ -39,6 +39,10 @@
 		<Unit filename="../battery.h" />
 		<Unit filename="../behavior.cpp" />
 		<Unit filename="../behavior.h" />
+		<Unit filename="../button.cpp" />
+		<Unit filename="../button.h" />
+		<Unit filename="../buzzer.cpp" />
+		<Unit filename="../buzzer.h" />
 		<Unit filename="../common.cpp" />
 		<Unit filename="../common.h" />
 		<Unit filename="../led.cpp" />
@@ -55,6 +59,8 @@
 		<Unit filename="../robot.cpp" />
 		<Unit filename="../robot.h" />
 		<Unit filename="../settings.h" />
+		<Unit filename="../sonar.cpp" />
+		<Unit filename="../sonar.h" />
 		<Unit filename="../timer.cpp" />
 		<Unit filename="../timer.h" />
 		<Unit filename="Print.cpp" />

@@ -23,7 +23,10 @@ void SimSettings::setup(){
   Motor.motorSpeedMaxPwm = 255;
   Motor.motorLeftSwapDir = false;
   Motor.motorRightSwapDir = false;
+  Motor.motorSenseRightScale = 9.3;  // motor right sense scale (mA=(ADC-zero) * scale)
+  Motor.motorSenseLeftScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
   Motor.motorSpeedMaxRpm = 25;
+  Motor.motorEfficiencyMin = 300;
   Motor.enableStallDetection = true;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
@@ -34,12 +37,20 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Kd       = 0.0;
   // --- mower motors ----
   MotorMow.motorMowSpeedMaxPwm = 255;
-  Robot.motorMowCircleAbovePower = 40;
+  MotorMow.motorSenseScale = 9.3;
+  MotorMow.motorMowPowerMax = 100;
+  MotorMow.enableStallDetection = true;
+  MotorMow.enableErrorDetection = false;
+  Robot.motorMowCircleAbovePower = 70;
   // --- perimeter motors ----
   Perimeter.enable = true;
   Robot.perimeterPID.Kp    = 160;  // perimeter PID controller
   Robot.perimeterPID.Ki    = 4;
   Robot.perimeterPID.Kd    = 50;
+  // --- sonar ----
+  Sonar.enableCenter = true;
+  Sonar.enableLeft = false;
+  Sonar.enableRight = false;
   // --- battery ----
   Battery.enableMonitor = true;
   Battery.batFull = 29.4;
@@ -50,44 +61,51 @@ void SimSettings::setup(){
 
 // ------------------------------------------
 
-void SimMotor::setDriverPWM(int leftMotorPWM, int rightMotorPWM){
+void SimMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
 }
+
+int SimMotor::driverReadLeftCurrentADC(){
+  if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+OBSTACLE_RADIUS, Robot.simOrientation )){
+    if ( (Motor.motorLeftSpeedRpmSet > 2) && (Motor.motorRightSpeedRpmSet > 2) )  {
+      //Motor.motorLeftRpmCurr = 0; // block motors
+      //Motor.motorRightRpmCurr = 0;
+      return 15000.0 / Motor.motorSenseLeftScale;
+    }
+  }
+  return 1500.0 / Motor.motorSenseLeftScale;
+}
+
+int SimMotor::driverReadRightCurrentADC(){
+  return driverReadLeftCurrentADC();
+}
+
 
 void SimMotor::readOdometry(){
 }
 
-void SimMotor::readCurrent(){
-  if (enableStallDetection) {
-    if (!motorLeftStalled){
-      if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2+OBSTACLE_RADIUS, Robot.simOrientation )){
-        if ( (Motor.motorLeftSpeedRpmSet > 2) && (Motor.motorLeftSpeedRpmSet > 2) )  {
-          motorLeftStalled = true;
-          Console.print(F("  LEFT STALL"));
-          Console.println();
-          motorLeftStalled = true;
-          stopImmediately();
-        }
-      }
-    }
-  }
-}
 // ------------------------------------------
 
-void SimMotorMow::setDriverPWM(int pwm){
+void SimMotorMow::driverSetPWM(int pwm){
 }
 
-void SimMotorMow::readCurrent(){
+int SimMotorMow::driverReadCurrentADC(){
   if (hasStopped()){
-    motorSensePower = 0;
+    return 0;
   } else {
-    if (motorSensePower < 1) motorSensePower = 20;
+    if (motorSensePower < 1) return 5000 / MotorMow.motorSenseScale;
     bool mowed = Perimeter.isLawnAtRobotMowed();
-    float power;
-    if (!mowed) power = 50;
-      else power = 20;
-    //motorSensePower = 0.8 * motorSensePower + 0.2 * max(0, gauss(40.0, 30.0));
-    motorSensePower = 0.9 * motorSensePower + 0.1 * power;
+    float current;
+    if (!mowed) current = 3000;
+      else current = 1200 ;
+    //printf("curr=%3.3f", current);
+    return (0.9 * motorSenseCurrent + 0.1 * current) / MotorMow.motorSenseScale;
   }
+}
+
+// ------------------------------------------
+
+int SimSonar::driverReadCenterDistanceCm(){
+  return 1000;
 }
 
 // ------------------------------------------
@@ -247,7 +265,7 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv chg %.1fv dist %.0fm  orient %d  mow %dW  mowed %d",
+  sprintf(buf, "time=%.0fmin bat=%.1fv chg=%.1fv dist=%.0fm  orient=%d  mow=%dW  mowed=%d",
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
           Battery.chgVoltage,
@@ -255,7 +273,12 @@ void SimPerimeter::draw(){
           ((int)(Robot.simOrientation / PI * 180.0)),
           ((int)MotorMow.motorSensePower),
           ((int)isLawnAtRobotMowed()) );
-  putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-15), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
+  putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-25), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
+
+  sprintf(buf, "motor l=%dW r=%dW",
+          ((int)Motor.motorLeftSensePower),
+          ((int)Motor.motorRightSensePower)   );
+  putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-10), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
   // plot robot bfield sensor
   float mag = max(-2.0f, min(24.0f, Perimeter.getMagnitude(0) ));

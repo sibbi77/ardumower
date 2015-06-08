@@ -17,38 +17,38 @@ void LEDControl::run(){
   nextLEDTime = millis() + 500;
   switch (ledSequenceIdx){
     case LED_SEQ_OFF:
-      setDriverLED(LED_ARDUINO, LOW);
-      setDriverLED(LED_DUAL_RED, LOW);
-      setDriverLED(LED_DUAL_GREEN, LOW);
+      driverSetLED(LED_ARDUINO, LOW);
+      driverSetLED(LED_DUAL_RED, LOW);
+      driverSetLED(LED_DUAL_GREEN, LOW);
       break;
     case LED_SEQ_GREEN_ON:
-      setDriverLED(LED_ARDUINO, HIGH);
-      setDriverLED(LED_DUAL_RED, LOW);
-      setDriverLED(LED_DUAL_GREEN, HIGH);
+      driverSetLED(LED_ARDUINO, HIGH);
+      driverSetLED(LED_DUAL_RED, LOW);
+      driverSetLED(LED_DUAL_GREEN, HIGH);
       break;
     case LED_SEQ_ORANGE_ON:
-      setDriverLED(LED_DUAL_RED, HIGH);
-      setDriverLED(LED_DUAL_GREEN, HIGH);
+      driverSetLED(LED_DUAL_RED, HIGH);
+      driverSetLED(LED_DUAL_GREEN, HIGH);
       break;
     case LED_SEQ_ORANGE_BLINK:
       onState = !onState;
-      setDriverLED(LED_DUAL_RED, onState);
-      setDriverLED(LED_DUAL_GREEN, onState);
+      driverSetLED(LED_DUAL_RED, onState);
+      driverSetLED(LED_DUAL_GREEN, onState);
       break;
     case LED_SEQ_RED_BLINK:
       onState = !onState;
-      setDriverLED(LED_ARDUINO, onState);
-      setDriverLED(LED_DUAL_RED, onState);
-      setDriverLED(LED_DUAL_GREEN, LOW);
+      driverSetLED(LED_ARDUINO, onState);
+      driverSetLED(LED_DUAL_RED, onState);
+      driverSetLED(LED_DUAL_GREEN, LOW);
       break;
     case LED_SEQ_RED_ON:
-      setDriverLED(LED_DUAL_RED, HIGH);
-      setDriverLED(LED_DUAL_GREEN, LOW);
+      driverSetLED(LED_DUAL_RED, HIGH);
+      driverSetLED(LED_DUAL_GREEN, LOW);
       break;
   };
 }
 
-void LEDControl::setDriverLED(int LEDidx, bool state){
+void LEDControl::driverSetLED(int LEDidx, bool state){
 }
 
 void LEDControl::playSequence(int sequenceIdx){

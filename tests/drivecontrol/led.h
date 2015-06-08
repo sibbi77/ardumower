@@ -46,10 +46,11 @@ class LEDControl
     void run();
     void setup();
   private:
-    virtual void setDriverLED(int LEDidx, bool state);
     unsigned long nextLEDTime;
     int ledSequenceIdx;
     bool onState;
+    // ---- driver ---
+    virtual void driverSetLED(int LEDidx, bool state);
 };
 
 

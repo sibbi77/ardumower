@@ -32,16 +32,16 @@ void BuzzerControl::run(){
   if (beepCodeToneIdx >= 6) return;
   switch (beepCodesTable[beepCodeIdx][beepCodeToneIdx]){
     case BEEP_MUTE:
-      setDriverNoTone();
+      driverNoTone();
       nextBeepTime = millis() + 400;
       if (beepCodeToneIdx == 5) nextBeepTime = millis() + 1500;
       break;
     case BEEP_SHORT:
-      setDriverTone(440);
+      driverTone(440);
       nextBeepTime = millis() + 100;
       break;
     case BEEP_LONG:
-      setDriverTone(440);
+      driverTone(440);
       nextBeepTime = millis() + 700;
       break;
   }
@@ -59,9 +59,9 @@ bool BuzzerControl::isPlaying(){
   return ((millis() < nextBeepTime) || (beepCodeToneIdx < 6));
 }
 
-void BuzzerControl::setDriverNoTone(){
+void BuzzerControl::driverNoTone(){
 }
 
-void BuzzerControl::setDriverTone(int frequencyHz){
+void BuzzerControl::driverTone(int frequencyHz){
 }
 

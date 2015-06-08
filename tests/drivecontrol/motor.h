@@ -106,10 +106,16 @@ private:
     unsigned long lastOdometryTime;
     unsigned long lastMotorCurrentTime;
     virtual void readOdometry();
-    virtual void speedControl();
-    virtual void setDriverPWM(int leftMotorPWM, int rightMotorPWM);
     virtual void readCurrent();
+    virtual void speedControl();
     virtual void checkFault();
+    // --- driver ---
+    virtual void driverSetPWM(int leftMotorPWM, int rightMotorPWM);
+    virtual int driverReadLeftCurrentADC();
+    virtual int driverReadRightCurrentADC();
+    virtual bool driverReadRightFault();
+    virtual bool driverReadLeftFault();
+    virtual void driverResetFault();
 };
 
 
