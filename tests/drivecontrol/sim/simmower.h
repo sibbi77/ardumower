@@ -92,7 +92,7 @@ class SimBattery : public BatteryControl
 {
   public:
     virtual void read();
-    virtual bool isCharging();
+    virtual bool chargerConnected();
 };
 
 

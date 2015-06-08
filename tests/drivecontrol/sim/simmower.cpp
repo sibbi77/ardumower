@@ -16,6 +16,7 @@ SimRobot Robot;
 
 void SimSettings::setup(){
   randomSeed( time(NULL) );
+  // --- gear motors ----
   Motor.motorSpeedMaxPwm = 255;
   Motor.motorLeftSwapDir = false;
   Motor.motorRightSwapDir = false;
@@ -28,11 +29,18 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Kp       = 0.4;    // PID speed controller
   Motor.motorLeftPID.Ki       = 0.0;
   Motor.motorLeftPID.Kd       = 0.0;
+  // --- mower motors ----
   MotorMow.motorMowSpeedMaxPwm = 255;
+  // --- perimeter motors ----
   Perimeter.enable = true;
+  Robot.perimeterPID.Kp    = 160;  // perimeter PID controller
+  Robot.perimeterPID.Ki    = 4;
+  Robot.perimeterPID.Kd    = 50;
+  // --- battery ----
   Battery.enableMonitor = true;
   Battery.batFull = 29.4;
-  Battery.batGoHomeIfBelow = 29.39;
+  //Battery.batGoHomeIfBelow = 29.39;
+  Battery.batGoHomeIfBelow = 29.2;
   Battery.batVoltage = Battery.batFull;
 }
 
@@ -101,7 +109,7 @@ SimPerimeter::SimPerimeter(){
   list.push_back( (point_t) {40, 450 } );
   list.push_back( (point_t) {30, 430 } );
 
-  chgStationX = 35;
+  chgStationX = 30;
   chgStationY = 150;
 
   // compute magnetic field (compute distance to perimeter lines)
@@ -213,10 +221,11 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv dist %.0fm",
+  sprintf(buf, "time %.0fmin bat %.1fv dist %.0fm  orient %d",
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
-          Motor.totalDistanceTraveled);
+          Motor.totalDistanceTraveled,
+          ((int)(Robot.simOrientation / PI * 180.0))  );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-15), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
 }
@@ -314,12 +323,16 @@ void SimBattery::read(){
 }
 
 
-bool SimBattery::isCharging(){
+bool SimBattery::chargerConnected(){
   float r = Motor.odometryWheelBaseCm/2;
   int chargePinX = Robot.simX + r * cos(Robot.simOrientation);
   int chargePinY = Robot.simY + r * sin(Robot.simOrientation);
   float stationDistance = sqrt( sq(abs(Perimeter.chgStationX-chargePinX)) + sq(abs(Perimeter.chgStationY-chargePinY)) );
-  if (stationDistance <= 10) return true;
+  float stationOrient = abs(distancePI(Robot.simOrientation, -PI/2));
+  /*printf("stationDistance=%.0f orient=%.0f\n",
+         stationDistance,
+         stationOrient / PI * 180.0);*/
+  if ( (stationDistance < 10) && (stationOrient < PI/8)  ) return true;
   return false;
 }
 

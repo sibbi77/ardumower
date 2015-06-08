@@ -18,6 +18,7 @@ class RobotControl
     TrackingBehavior trackingBehavior;
     ChargingBehavior chargingBehavior;
     Arbitrator arbitrator;
+    PID perimeterPID;
     RobotControl();
     unsigned long nextPrintTime;
     virtual void run();

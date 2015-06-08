@@ -135,7 +135,7 @@ bool TrackingBehavior::takeControl(){
 void TrackingBehavior::action(){
   suppressed = false;
   //Motor.stopImmediately();
-  MotorMow.setSpeedPWM(0);
+  //MotorMow.setSpeedPWM(0);
   Motor.rotate(PI, Motor.motorSpeedMaxRpm/2);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     Robot.run();
@@ -147,10 +147,6 @@ void TrackingBehavior::action(){
   // reverse
   //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   //Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
-  PID pidTrack;
-  pidTrack.Kp    = 160;  // perimeter PID controller
-  pidTrack.Ki    = 4;
-  pidTrack.Kd    = 50;
 
   Motor.enableSpeedControl = false;
   unsigned long nextControlTime = 0;
@@ -158,17 +154,17 @@ void TrackingBehavior::action(){
     if (millis() >= nextControlTime){
       nextControlTime = millis() + 50;
       int mag = Perimeter.getMagnitude(0);
-      if (mag < 0) pidTrack.x = -1;
-        else if (mag > 0) pidTrack.x = 1;
-        else pidTrack.x = 0;
-      pidTrack.w = 0;
-      pidTrack.y_min = -Motor.motorSpeedMaxPwm;
-      pidTrack.y_max = Motor.motorSpeedMaxPwm;
-      pidTrack.max_output = Motor.motorSpeedMaxPwm;
-      pidTrack.compute();
+      if (mag < 0) Robot.perimeterPID.x = -1;
+        else if (mag > 0) Robot.perimeterPID.x = 1;
+        else Robot.perimeterPID.x = 0;
+      Robot.perimeterPID.w = 0;
+      Robot.perimeterPID.y_min = -Motor.motorSpeedMaxPwm;
+      Robot.perimeterPID.y_max = Motor.motorSpeedMaxPwm;
+      Robot.perimeterPID.max_output = Motor.motorSpeedMaxPwm;
+      Robot.perimeterPID.compute();
       //printf("%d, %.3f\n", mag, pidTrack.y);
-      Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - pidTrack.y,
-                         Motor.motorSpeedMaxPwm/2 + pidTrack.y );
+      Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - Robot.perimeterPID.y,
+                         Motor.motorSpeedMaxPwm/2 + Robot.perimeterPID.y );
     }
     Robot.run();
   }
@@ -182,7 +178,7 @@ ChargingBehavior::ChargingBehavior() : Behavior() {
 }
 
 bool ChargingBehavior::takeControl(){
-  return ( Battery.isCharging() );
+  return ( Battery.chargerConnected() );
 }
 
 void ChargingBehavior::action(){
@@ -193,7 +189,7 @@ void ChargingBehavior::action(){
   //Buzzer.play(BC_SHORT_SHORT_SHORT);
 
   // wait until some other behavior was activated
-  while ( (!suppressed ) && (Battery.isCharging()) ) {
+  while ( (!suppressed ) && (Battery.chargerConnected()) ) {
     Robot.run();
   }
 }
