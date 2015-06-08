@@ -382,7 +382,7 @@ void SimBattery::read(){
     batVoltage = min(batFull, batVoltage + 0.01);
   } else {
     // simulate discharging
-    batVoltage = max(0, batVoltage - 0.001);
+    batVoltage = max(0, batVoltage - 0.01);
   }
 }
 
