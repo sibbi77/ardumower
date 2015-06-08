@@ -44,6 +44,7 @@ class SimMotorMow : public MotorMowControl
 {
   private:
     virtual void setDriverPWM(int pwm);
+    virtual void readCurrent();
 };
 
 class SimPerimeter : public PerimeterControl
@@ -64,12 +65,14 @@ class SimPerimeter : public PerimeterControl
     int sizeX();
     int sizeY();
     void setLawnMowed(int x, int y);
+    bool isLawnMowed(int x, int y);
+    bool isLawnAtRobotMowed();
     void draw();
     // return magnetic field strength at world position
     float getBfield(int x, int y, int resolution=1);
+  private:
     // lawn mow status
     float lawnMowStatus[WORLD_SIZE_Y][WORLD_SIZE_X];
-  private:
     bool drawMowedLawn;
     int plotIdx;
     // magnetic field

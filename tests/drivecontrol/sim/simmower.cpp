@@ -31,6 +31,7 @@ void SimSettings::setup(){
   Motor.motorLeftPID.Kd       = 0.0;
   // --- mower motors ----
   MotorMow.motorMowSpeedMaxPwm = 255;
+  Robot.motorMowCircleAbovePower = 40;
   // --- perimeter motors ----
   Perimeter.enable = true;
   Robot.perimeterPID.Kp    = 160;  // perimeter PID controller
@@ -40,7 +41,7 @@ void SimSettings::setup(){
   Battery.enableMonitor = true;
   Battery.batFull = 29.4;
   //Battery.batGoHomeIfBelow = 29.39;
-  Battery.batGoHomeIfBelow = 29.2;
+  Battery.batGoHomeIfBelow = 23.7;
   Battery.batVoltage = Battery.batFull;
 }
 
@@ -70,6 +71,20 @@ void SimMotor::readCurrent(){
 // ------------------------------------------
 
 void SimMotorMow::setDriverPWM(int pwm){
+}
+
+void SimMotorMow::readCurrent(){
+  if (hasStopped()){
+    motorSensePower = 0;
+  } else {
+    if (motorSensePower < 1) motorSensePower = 20;
+    bool mowed = Perimeter.isLawnAtRobotMowed();
+    float power;
+    if (!mowed) power = 50;
+      else power = 20;
+    //motorSensePower = 0.8 * motorSensePower + 0.2 * max(0, gauss(40.0, 30.0));
+    motorSensePower = 0.9 * motorSensePower + 0.1 * power;
+  }
 }
 
 // ------------------------------------------
@@ -229,12 +244,14 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
-  sprintf(buf, "time %.0fmin bat %.1fv chg %.1fv dist %.0fm  orient %d",
+  sprintf(buf, "time %.0fmin bat %.1fv chg %.1fv dist %.0fm  orient %d  mow %dW  mowed %d",
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
           Battery.chgVoltage,
           Motor.totalDistanceTraveled,
-          ((int)(Robot.simOrientation / PI * 180.0))  );
+          ((int)(Robot.simOrientation / PI * 180.0)),
+          ((int)MotorMow.motorSensePower),
+          ((int)isLawnAtRobotMowed()) );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-15), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
   // plot robot bfield sensor
@@ -257,6 +274,17 @@ void SimPerimeter::setLawnMowed(int x, int y){
       lawnMowStatus[y+i][x+j] = 1.0;
     }
   }
+}
+
+bool SimPerimeter::isLawnMowed(int x, int y){
+  return (lawnMowStatus[y][x] != 0);
+}
+
+bool SimPerimeter::isLawnAtRobotMowed(){
+  float r = Motor.odometryWheelBaseCm/2;
+  int frontRobotX = Robot.simX + r * cos(Robot.simOrientation);
+  int frontRobotY = Robot.simY + r * sin(Robot.simOrientation);
+  return isLawnMowed(frontRobotX, frontRobotY);
 }
 
 

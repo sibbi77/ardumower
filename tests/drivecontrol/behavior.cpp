@@ -193,3 +193,35 @@ void ChargingBehavior::action(){
     Robot.run();
   }
 }
+
+// ---------------------------------
+
+CircleBehavior::CircleBehavior() : Behavior() {
+  name = "CircleBehavior";
+}
+
+bool CircleBehavior::takeControl(){
+  return (MotorMow.motorSensePower > Robot.motorMowCircleAbovePower);
+}
+
+void CircleBehavior::action(){
+  suppressed = false;
+
+  MotorMow.setSpeedPWM(MotorMow.motorMowSpeedMaxPwm);
+  Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
+
+  unsigned long startTime = millis();
+  float ratio = 0.0;
+  bool circleLeft = ((rand() % 2) == 0);
+
+  while ( (!suppressed) && (Motor.motion != MOTION_STOP) && (ratio < 1.0) ){
+    unsigned long duration (millis() - startTime);
+    ratio = ((float)duration) / 30000.0;
+    if (circleLeft) Motor.setSpeedRpm(Motor.motorSpeedMaxRpm*ratio, Motor.motorSpeedMaxRpm);
+      else Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm*ratio);
+
+    Robot.run();
+  }
+}
+
+// ---------------------------------

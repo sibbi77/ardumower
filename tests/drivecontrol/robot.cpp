@@ -21,6 +21,7 @@ void RobotControl::setup(){
 
   // low-to-high priority
   arbitrator.addBehavior(&driveForwardBehavior);
+  arbitrator.addBehavior(&circleBehavior);
   arbitrator.addBehavior(&hitObstacleBehavior);
   arbitrator.addBehavior(&hitPerimeterBehavior);
   arbitrator.addBehavior(&trackingBehavior);
@@ -50,6 +51,7 @@ void RobotControl::run(){
   Timer.run();
   Battery.run();
   Motor.run();
+  MotorMow.run();
   Perimeter.run();
   LED.run();
 

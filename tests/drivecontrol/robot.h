@@ -12,11 +12,13 @@ class RobotControl
   public:
     unsigned long loopCounter;   // loop counter
     int num_collision; // collision counter
+    float motorMowCircleAbovePower;
     DriveForwardBehavior driveForwardBehavior;
     HitPerimeterBehavior hitPerimeterBehavior;
     HitObstacleBehavior hitObstacleBehavior;
     TrackingBehavior trackingBehavior;
     ChargingBehavior chargingBehavior;
+    CircleBehavior circleBehavior;
     Arbitrator arbitrator;
     PID perimeterPID;
     RobotControl();

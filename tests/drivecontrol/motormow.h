@@ -36,7 +36,7 @@ class MotorMowControl
     unsigned long lastMotorCurrentTime;
     void setDriverPWM(int pwm);
     void checkMotorFault();
-    void readCurrent();
+    virtual void readCurrent();
     unsigned long nextMotorMowTime;
 };
 

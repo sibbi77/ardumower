@@ -79,5 +79,16 @@ class ChargingBehavior : public Behavior
     virtual void action();
 };
 
+// robot is mowing in circles
+class CircleBehavior : public Behavior
+{
+  public:
+    CircleBehavior();
+    virtual bool takeControl();
+    virtual void action();
+};
+
+
+
 #endif
 

@@ -16,6 +16,7 @@ MotorMowControl::MotorMowControl(){
   nextMotorMowTime = 0;
   lastMotorCurrentTime = 0;
   motorSenseCurrent = 0;
+  motorSensePower = 0;
   enableErrorDetection = enableStallDetection = true;
 }
 
