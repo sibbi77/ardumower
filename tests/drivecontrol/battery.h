@@ -21,17 +21,12 @@ class BatteryControl
     float startChargingIfBelow; // start charging if battery Voltage is below
     unsigned long chargingTimeoutMinutes; // safety timer for charging (minutes)
     int batADC;
-    float chgSenseZero    ;       // charge current sense zero point
     float chgFactor       ;     // charge current conversion factor
-    float chgSense        ;       // mV/A empfindlichkeit des Ladestromsensors in mV/A (Für ACS712 5A = 185)
-    char chgChange        ;       // messwertumkehr von - nach +         1oder 0
     float batVoltage ;  // battery voltage (Volt)
-    byte chgSelection     ;       // Senor Auswahl
     float batRefFactor ;
     float batCapacity ; // battery capacity (mAh)
     float chgVoltage ;  // charge voltage (Volt)
     float chgCurrent ;  // charge current  (Ampere)
-    int chgNull;        // Nulldurchgang Ladestromsensor
     int batteryReadCounter;
     bool chargeRelayEnabled;
     int idleTimeSec;    // number of seconds robot is idle (no user-interaction and no mowing)
@@ -51,6 +46,13 @@ class BatteryControl
     bool robotShouldSwitchOff();
     bool robotShouldCharge();
     unsigned long nextBatteryTime;
+    // ----- driver -----
+    virtual void driverSetBatterySwitch(bool state);
+    virtual void driverSetChargeRelay(bool state);
+    virtual int driverReadBatteryVoltageADC();
+    virtual int driverReadChargeVoltageADC();
+    virtual int driverReadChargeCurrentADC();
+    virtual int driverReadVoltageMeasurementADC();
 };
 
 

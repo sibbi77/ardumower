@@ -6,6 +6,44 @@
 
 #ifdef __AVR__
   // Arduino
+  class MowerLED;
+  class MowerMotor;
+  class MowerMotorMow;
+  class MowerSettings;
+  class MowerPerimeter;
+  class MowerTimer;
+  class MowerBattery;
+  class MowerButton;
+  class MowerSonar;
+  class MowerBuzzer;
+  class MowerRobot;
+
+  extern MowerLED LED;
+  extern MowerMotor Motor;
+  extern MowerMotorMow MotorMow;
+  extern MowerSettings Settings;
+  extern MowerPerimeter Perimeter;
+  extern MowerTimer Timer;
+  extern MowerSonar Sonar;
+  extern MowerBuzzer Buzzer;
+  extern MowerButton Button;
+  extern MowerBattery Battery;
+  extern MowerRobot Robot;
+
+
+  #include "led.h"
+  #include "motor.h"
+  #include "motormow.h"
+  #include "perimeter.h"
+  #include "timer.h"
+  #include "battery.h"
+  #include "buzzer.h"
+  #include "sonar.h"
+  #include "button.h"
+  #include "settings.h"
+  #include "robot.h"
+
+  #include "mower.h"
 
 #else
   // simulator
@@ -33,6 +71,7 @@
   extern SimBattery Battery;
   extern SimRobot Robot;
 
+
   #include "led.h"
   #include "motor.h"
   #include "motormow.h"
@@ -44,6 +83,7 @@
   #include "button.h"
   #include "settings.h"
   #include "robot.h"
+
   #include "sim/simmower.h"
 
 #endif // __AVR__

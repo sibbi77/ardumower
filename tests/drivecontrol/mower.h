@@ -1,16 +1,9 @@
-#include <Arduino.h>
-#ifdef __AVR__
-  // Arduino Mega
-  #include <EEPROM.h>  
-  #define Console Serial
-  #define Bluetooth Serial2
-#else 
-  // Arduino Due
-  #include "due.h"
-   // Due has two serial ports: Native (SerialUSB) and Programming (Serial) - we want to use 'SerialUSB' for 'Console'
-  #define Console SerialUSB
-  #define Bluetooth Serial2  
-#endif
+#ifndef MOWER_H
+#define MOWER_H
+
+
+#include "common.h"
+#include "objects.h"
 
 
 // ------ pins---------------------------------------
@@ -90,4 +83,87 @@
 // WLAN: Serial1 (TX1, RX1) 
 
 
+
+class MowerSettings : public FactorySettings
+{
+  public:
+    virtual void setup();
+};
+
+
+class MowerLED : public LEDControl
+{
+  private:
+    virtual void setDriverLED(int LEDidx, bool state){};
+};
+
+
+class MowerBuzzer : public BuzzerControl
+{
+};
+
+
+class MowerSonar : public SonarControl
+{
+  private:
+    virtual int driverReadCenterDistanceCm();
+};
+
+
+class MowerButton : public ButtonControl
+{
+};
+
+
+class MowerMotor : public MotorControl
+{
+  private:
+    virtual void driverSetPWM(int leftMotorPWM, int rightMotorPWM);
+    virtual int driverReadLeftCurrentADC();
+    virtual int driverReadRightCurrentADC();
+    virtual void readOdometry();
+};
+
+class MowerMotorMow : public MotorMowControl
+{
+  private:
+    virtual int driverReadCurrentADC();
+    virtual void driverSetPWM(int pwm);
+};
+
+class MowerPerimeter : public PerimeterControl
+{
+  public:
+    MowerPerimeter();
+    virtual void run();
+    virtual bool isInside(char coilIdx);
+    virtual int getMagnitude(char coilIdx);
+};
+
+class MowerTimer : public TimerControl
+{
+  public:
+    MowerTimer();
+    virtual void run();    
+};
+
+class MowerBattery : public BatteryControl
+{
+  public:
+    virtual void read();
+};
+
+
+class MowerRobot : public RobotControl
+{
+  public:
+    MowerRobot();
+    virtual void run();
+    virtual void processKey(char key);
+    virtual char readKey();
+};
+
+
+
+#endif
 

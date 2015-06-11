@@ -5,7 +5,7 @@ float distance(float x1, float y1, float x2, float y2){
   return sqrtf( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
 }
 
-float random(){
+float random1(){
   return (float)rand()/(float)(RAND_MAX);
 }
 
@@ -15,8 +15,8 @@ float random(){
  */
 float gaussRandom() {
     //printf("random=%3.3f\n", random());
-    float u = 2*random()-1;
-    float v = 2*random()-1;
+    float u = 2*random1()-1;
+    float v = 2*random1()-1;
     float r = u*u + v*v;
     /*if outside interval [0,1] start over*/
     if ((r == 0) || (r > 1)) return gaussRandom();

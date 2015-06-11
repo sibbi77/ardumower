@@ -5,6 +5,9 @@
 #ifdef __AVR__
   // Arduino
   #include <Arduino.h>
+  // #include <EEPROM.h>  
+  #define Console Serial
+  #define Bluetooth Serial2  
 #else
   // simulator
   #include <opencv2/core/core.hpp>
@@ -29,7 +32,7 @@ struct point_t {
 typedef struct point_t point_t;
 
 
-float random();
+float random1();
 float gaussRandom();
 float gauss(float mean, float std_dev);
 float gaussian(float mu, float sigma, float x);

@@ -4,7 +4,6 @@
 
 
 
-
 BatteryControl::BatteryControl(){
   nextBatteryTime = batteryReadCounter = 0;
   chargingStartTimeMinutes = 0;
@@ -21,15 +20,7 @@ BatteryControl::BatteryControl(){
   batGoHomeIfBelow = 23.7;     // drive home voltage (Volt)
   startChargingIfBelow = 27.0; // start charging if battery Voltage is below
   chargingTimeoutMinutes = 210; // safety timer for charging (minutes)
-  // Sensorausgabe Konsole      (chgSelection =0)
-  // Einstellungen ACS712 5A    (chgSelection =1   /   chgSenseZero ~ 511    /    chgFactor = 39    /    chgSense =185.0    /    chgChange = 0 oder 1    (je nach  Stromrichtung)   /   chgNull  = 2)
-  // Einstellungen INA169 board (chgSelection =2)
-  chgSelection    = 2;
-  chgSenseZero    = 511;        // charge current sense zero point
   chgFactor       = 39;         // charge current conversion factor   - Empfindlichkeit nimmt mit ca. 39/V Vcc ab
-  chgSense        = 185.0;      // mV/A empfindlichkeit des Ladestromsensors in mV/A (Für ACS712 5A = 185)
-  chgChange       = 0;          // Messwertumkehr von - nach +         1 oder 0
-  chgNull         = 2;          // Nullduchgang abziehen (1 oder 2)
 }
 
 void BatteryControl::setup(){
@@ -41,6 +32,7 @@ void BatteryControl::setup(){
 void BatteryControl::setBatterySwitch(bool state){
   Console.print(F("BatteryControl::setBatterySwitch "));
   Console.println(state);
+  driverSetBatterySwitch(state);
 }
 
 // call this in main loop
@@ -87,6 +79,19 @@ void BatteryControl::read(){
   if ((abs(chgCurrent) > 0.04) && (chgVoltage > 5)){
     // charging
     batCapacity += (chgCurrent / 36.0);
+    // convert to double
+    batADC = driverReadBatteryVoltageADC();
+    double batvolt = (double)batADC * batFactor / 10;  // / 10 due to arduremote bug, can be removed after fixing
+    int chgADC = driverReadChargeVoltageADC();
+    double chgvolt = (double)chgADC * batChgFactor / 10;  // / 10 due to arduremote bug, can be removed after fixing
+    // low-pass filter
+    double accel = 0.01;
+    if (abs(batVoltage-batvolt)>5)   batVoltage = batvolt; else batVoltage = (1.0-accel) * batVoltage + accel * batvolt;
+    if (abs(chgVoltage-chgvolt)>5)   chgVoltage = chgvolt; else chgVoltage = (1.0-accel) * chgVoltage + accel * chgvolt;
+
+    // Berechnung fÃ¼r Ladestromsensor INA169 board              wenn chgSelection =2
+    double current = ((double)((int)(driverReadChargeCurrentADC())));
+    chgCurrent = max(0, (current * 5) / 1023 / (10 * 0.1)  );                               // Ampere berechnen RL = 10k    Is = (Vout x 1k) / (RS x RL)
   }
 }
 
@@ -104,6 +109,7 @@ void BatteryControl::enableChargingRelay(bool state){
   Console.print(F("BatteryControll::enableChargingRelay "));
   Console.println(state);
   chargeRelayEnabled = state;
+  driverSetChargeRelay(state);
   if (state) chargingStartTimeMinutes = Timer.powerTimeMinutes;
 }
 
@@ -124,5 +130,23 @@ void BatteryControl::print(){
   Console.println();
 }
 
+
+void BatteryControl::driverSetBatterySwitch(bool state){
+}
+
+void BatteryControl::driverSetChargeRelay(bool state){
+}
+
+int BatteryControl::driverReadBatteryVoltageADC(){
+}
+
+int BatteryControl::driverReadChargeVoltageADC(){
+}
+
+int BatteryControl::driverReadChargeCurrentADC(){
+}
+
+int BatteryControl::driverReadVoltageMeasurementADC(){
+}
 
 
