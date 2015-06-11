@@ -17,7 +17,7 @@ class PerimeterControl
     bool enable; // enable ?
     // get perimeter magnitude
     virtual int getMagnitude(char coilIdx);
-    int getSmoothMagnitude(char coilIdx);
+    virtual int getSmoothMagnitude(char coilIdx);
     // inside perimeter (true) or outside (false)?
     virtual bool isInside(char coilIdx);
     // perimeter signal timed out? (e.g. due to broken wire)
@@ -26,7 +26,6 @@ class PerimeterControl
     int getSignalMax(char coilIdx);
     int getSignalAvg(char coilIdx);
     float getFilterQuality(char coilIdx);
-    int timedOutIfBelowSmag;
     int timeOutSecIfNotInside;
     virtual void setup();
     virtual void run();

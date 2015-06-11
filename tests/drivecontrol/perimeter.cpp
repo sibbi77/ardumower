@@ -4,7 +4,7 @@
 
 PerimeterControl::PerimeterControl(){
   nextPerimeterTime = 0;
-  timedOutIfBelowSmag = 300;
+  //timedOutIfBelowSmag = 300;
   timeOutSecIfNotInside = 8;
   callCounter = 0;
   mag[0] = mag[1] = 0;
@@ -53,8 +53,8 @@ bool PerimeterControl::isInside(char coilIdx){
 
 
 bool PerimeterControl::signalTimedOut(char coilIdx){
-  if (getSmoothMagnitude(coilIdx) < timedOutIfBelowSmag) return true;
-  if (millis() - lastInsideTime[coilIdx] > timeOutSecIfNotInside * 1000) return true;
+  /*if (getSmoothMagnitude(coilIdx) < timedOutIfBelowSmag) return true;
+  if (millis() - lastInsideTime[coilIdx] > timeOutSecIfNotInside * 1000) return true;*/
   return false;
 }
 

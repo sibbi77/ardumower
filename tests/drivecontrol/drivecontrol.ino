@@ -3,6 +3,9 @@
 // Requires: Ardumower Mini, Arduino Mega
 
 
+#include <EEPROM.h>  
+#include <Wire.h>  
+
 #include "objects.h"
 
 

@@ -16,6 +16,7 @@
   class MowerButton;
   class MowerSonar;
   class MowerBuzzer;
+  class MowerPerimeter;
   class MowerRobot;
 
   extern MowerLED LED;
@@ -28,6 +29,7 @@
   extern MowerBuzzer Buzzer;
   extern MowerButton Button;
   extern MowerBattery Battery;
+  extern MowerPerimeter Perimeter;  
   extern MowerRobot Robot;
 
 
@@ -42,6 +44,9 @@
   #include "button.h"
   #include "settings.h"
   #include "robot.h"
+  
+  #include "adcman.h"  
+  #include "mowerperimeter.h"
 
   #include "mower.h"
 
