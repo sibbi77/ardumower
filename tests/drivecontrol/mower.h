@@ -16,7 +16,7 @@ class MowerSettings : public FactorySettings
 class MowerLED : public LEDControl
 {
   private:
-    virtual void setDriverLED(int LEDidx, bool state){};
+    virtual void setDriverLED(int LEDidx, bool state);
 };
 
 

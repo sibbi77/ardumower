@@ -238,13 +238,35 @@ void MowerSettings::setup(){
 
 // ------------------------------------------
 
+// MC33926 motor driver
+// Check http://forum.pololu.com/viewtopic.php?f=15&t=5272#p25031 for explanations.
+//(8-bit PWM=255, 10-bit PWM=1023)
+// IN1 PinPWM         IN2 PinDir
+// PWM                L     Forward
+// nPWM               H     Reverse
+void setMC33926(int pinDir, int pinPWM, int speed){
+  if (speed < 0){
+    digitalWrite(pinDir, HIGH) ;
+    analogWrite(pinPWM, 255-((byte)abs(speed)));
+  } else {
+    digitalWrite(pinDir, LOW) ;
+    analogWrite(pinPWM, ((byte)speed));
+  }
+}
+
+
+
 void MowerMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
+  setMC33926(pinMotorLeftDir, pinMotorLeftPWM, leftMotorPWM);
+  setMC33926(pinMotorRightDir, pinMotorRightPWM, rightMotorPWM);
 }
 
 int MowerMotor::driverReadLeftCurrentADC(){
+  return ADCMan.read(pinMotorLeftSense);
 }
 
 int MowerMotor::driverReadRightCurrentADC(){
+  return ADCMan.read(pinMotorRightSense);
 }
 
 
@@ -254,9 +276,11 @@ void MowerMotor::readOdometry(){
 // ------------------------------------------
 
 void MowerMotorMow::driverSetPWM(int pwm){
+  setMC33926(pinMotorMowDir, pinMotorMowPWM, pwm);
 }
 
 int MowerMotorMow::driverReadCurrentADC(){
+  return ADCMan.read(pinMotorMowSense);
 }
 
 // ------------------------------------------
@@ -299,9 +323,15 @@ void MowerRobot::processKey(char key){
 }
 
 
-
 // ------------------------------------------
 
+void MowerLED::setDriverLED(int LEDidx, bool state){
+  switch (LEDidx){
+    case LED_ARDUINO:    digitalWrite(pinLED, state); break;
+    case LED_DUAL_RED:   digitalWrite(pinLEDDuoRed, state); break;
+    case LED_DUAL_GREEN: digitalWrite(pinLEDDuoGreen, state); break;
+  }
+}
 
 
 
