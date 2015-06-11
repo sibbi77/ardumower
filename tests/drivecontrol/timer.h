@@ -68,8 +68,9 @@ class TimerControl
     void checkTimer();
     void setDefaultTime();
     unsigned long nextTimerTime;
-    bool readRTC(datetime_t &dt);
-    bool setRTC(datetime_t &dt);
+    // ------ driver ----------------
+    bool driverReadRTC(datetime_t &dt);
+    bool driverSetRTC(datetime_t &dt);
 };
 
 

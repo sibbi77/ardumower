@@ -18,6 +18,8 @@ class ButtonControl
   private:
     int tempBeepCounter;
     unsigned long nextButtonTime;
+    // --- driver ---
+    virtual bool driverButtonPressed();
 };
 
 

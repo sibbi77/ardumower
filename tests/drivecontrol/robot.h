@@ -11,6 +11,7 @@ class RobotControl
 {
   public:
     unsigned long loopCounter;   // loop counter
+    int loopsPerSec; // loops per second
     int num_collision; // collision counter
     float motorMowCircleAbovePower;
     DriveForwardBehavior driveForwardBehavior;

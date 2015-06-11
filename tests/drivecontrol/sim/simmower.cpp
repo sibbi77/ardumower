@@ -268,9 +268,10 @@ void SimPerimeter::draw(){
           ((int)isLawnAtRobotMowed()) );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-25), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
-  sprintf(buf, "motor l=%dW r=%dW",
+  sprintf(buf, "motor l=%dW r=%dW  loopsPerSec=%d",
           ((int)Motor.motorLeftSensePower),
-          ((int)Motor.motorRightSensePower)   );
+          ((int)Motor.motorRightSensePower),
+          Robot.loopsPerSec   );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-10), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
   // plot robot bfield sensor

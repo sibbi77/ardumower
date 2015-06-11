@@ -25,7 +25,7 @@ void RobotControl::setup(){
 
   // low-to-high priority
   arbitrator.addBehavior(&driveForwardBehavior);
-  arbitrator.addBehavior(&circleBehavior);
+//  arbitrator.addBehavior(&circleBehavior);
   arbitrator.addBehavior(&hitObstacleBehavior);
   arbitrator.addBehavior(&hitPerimeterBehavior);
   arbitrator.addBehavior(&trackingBehavior);
@@ -86,13 +86,12 @@ void RobotControl::processKey(char key){
 
 void RobotControl::print(){
   Console.print("loopsPerSec=");
-  Console.print(((double)loopCounter)/10.0);
+  Console.print(loopsPerSec);
   Console.print("  behavior=");
   if (arbitrator.activeBehavior){
     Console.print(arbitrator.activeBehavior->name);
   }
   Console.println();
-  loopCounter = 0;
 }
 
 // call this in ANY loop!
@@ -110,9 +109,12 @@ void RobotControl::run(){
   Perimeter.run();
   LED.run();
 
+  //printf("----millis=%d  %d\n", millis(), nextPrintTime);
   if (millis() >= nextPrintTime){
-    nextPrintTime = millis() + 10000;
-    print();
+    nextPrintTime = millis() + 1000;
+    loopsPerSec = ((double)loopCounter);
+    loopCounter = 0;
+    //print();
   }
 
   char key = readKey();

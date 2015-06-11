@@ -98,7 +98,10 @@ class AConsole : public Stream
 {
     int key;
   public:
-    virtual int available(){ key = cvWaitKey( 1 ); return (key != 0); }
+    virtual int available(){
+        key = cvWaitKey( 1 );
+        return (key != 0);
+    }
     virtual int read(){ return key; }
     virtual int peek(){ return key; }
     virtual void flush(){}

@@ -27,7 +27,7 @@ void TimerControl::run(){
   if (millis() < nextTimerTime) return;
   nextTimerTime = millis() + 60000;
   powerTimeMinutes++;
-  readRTC(datetime);
+  driverReadRTC(datetime);
   print();
   checkTimer();
 }
@@ -86,14 +86,6 @@ String TimerControl::date2str(date_t date){
 }
 
 
-bool TimerControl::readRTC(datetime_t &dt){
-  return true;
-}
-
-bool TimerControl::setRTC(datetime_t &dt){
-  return true;
-}
-
 void TimerControl::setDefaultTime(){
   datetime.time.hour = 12;
   datetime.time.minute = 0;
@@ -117,7 +109,7 @@ void TimerControl::print(){
 void TimerControl::writeRTCDateTime(){
   Console.print(F("RTC date set: "));
   Console.println(date2str(datetime.date));
-  setRTC(datetime);
+  driverSetRTC(datetime);
 }
 
 
@@ -141,6 +133,14 @@ void TimerControl::checkTimer(){
         }
       }
   }
+}
+
+bool TimerControl::driverReadRTC(datetime_t &dt){
+  return true;
+}
+
+bool TimerControl::driverSetRTC(datetime_t &dt){
+ return true;
 }
 
 

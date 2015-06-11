@@ -30,7 +30,7 @@ void ButtonControl::setBeepCount(int count){
 // call this in main loop
 void ButtonControl::run(){
   //if (pressed) Console.println(F("BUTTON pressed"));
-  //pressed = (digitalRead(pinButton) == LOW);
+  pressed = driverButtonPressed();
 
   if ( (!pressed) && (tempBeepCounter > 0) ){
     setBeepCount(tempBeepCounter);
@@ -47,5 +47,7 @@ void ButtonControl::run(){
 }
 
 
-
+bool ButtonControl::driverButtonPressed(){
+    return false;
+}
 
