@@ -19,7 +19,7 @@ void DriveForwardBehavior::action(){
   MotorMow.setState(true);
 
   // forward
-  Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
+  Motor.travelLineSpeedRpm(Motor.motorSpeedMaxRpm);
 
   while ( (!suppressed) && (Motor.motion != MOTION_STOP) ){
     Robot.run();
@@ -63,7 +63,8 @@ void HitPerimeterBehavior::action(){
   //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
 
   // reverse
-  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  //Motor.travelLineSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  Console.println("REV");
   Motor.travelLineDistance(-60, Motor.motorSpeedMaxRpm);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     if (Perimeter.isInside(0)) {
@@ -74,6 +75,7 @@ void HitPerimeterBehavior::action(){
   }
 
   // rotate
+  Console.println("ROT");
   Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
 
   // wait until motion stop
@@ -106,7 +108,7 @@ void HitObstacleBehavior::action(){
   //if (!Buzzer.isPlaying()) Buzzer.play(BC_SHORT_SHORT);
 
   // reverse
-  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  //Motor.travelLineSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
   while ( (!suppressed) && (!Motor.hasStopped()) ) {
     /*if (Perimeter.isInside(0)) {
@@ -151,7 +153,7 @@ void TrackingBehavior::action(){
     }
   }
   // reverse
-  //Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+  //Motor.travelLineSpeedRpm(-Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
   //Motor.travelLineDistance(-30, Motor.motorSpeedMaxRpm);
 
   Motor.enableSpeedControl = false;

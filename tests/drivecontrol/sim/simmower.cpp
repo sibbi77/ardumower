@@ -14,6 +14,7 @@ SimButton Button;
 SimTimer Timer;
 SimRobot Robot;
 
+//#define ENABLE_OBSTACLES
 
 // ------------------------------------------
 
@@ -112,6 +113,7 @@ SimPerimeter::SimPerimeter(){
   imgWorld = cv::Mat(WORLD_SIZE_Y, WORLD_SIZE_X, CV_8UC3, cv::Scalar(0,0,0));
   plotPerimeter = cv::Mat(140, 500, CV_8UC3, cv::Scalar(0,0,0));
 
+  #ifdef ENABLE_OBSTACLES
   // obstacles (cm)
   obstacles.push_back( (point_t) {120, 155 } );
   obstacles.push_back( (point_t) {70, 165 } );
@@ -124,6 +126,7 @@ SimPerimeter::SimPerimeter(){
   obstacles.push_back( (point_t) {90, 390 } );
   obstacles.push_back( (point_t) {90, 390 } );
   obstacles.push_back( (point_t) {90, 330 } );
+  #endif
 
   // perimeter lines coordinates (cm)
   std::vector<point_t> list;
@@ -416,8 +419,8 @@ SimRobot::SimRobot(){
   simY = 170;
   simOrientation = 0;
 
-  motor_noise = 90;
-  slope_noise = 5;
+  motor_noise = 0; //90;
+  slope_noise = 0; //5;
 }
 
 void SimRobot::move(){
@@ -428,9 +431,16 @@ void SimRobot::move(){
   float rightnoise = 0;
   if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = motor_noise;
   if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = motor_noise;
-  Motor.motorLeftRpmCurr  = min(33, max(-33, 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
-  Motor.motorRightRpmCurr = min(33, max(-33, 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise)));
+  // right tire rpm experiences some noise (e.g. due to climbing up a hill)
+  if (abs(Motor.motorRightRpmCurr) > 2)
+     Motor.motorRightRpmCurr = min(33, max(1, 0.1 * Motor.motorRightRpmCurr + 0.9 * gauss(Motor.motorRightRpmCurr , 33) ));
+  //if (abs(Motor.motorLeftRpmCurr) > 2)
+  //   Motor.motorLeftRpmCurr = max(1, 0.1 * Motor.motorLeftRpmCurr + 0.9 * gauss(Motor.motorLeftRpmCurr , 30) );
 
+  Motor.motorLeftRpmCurr  = min(33, max(-33, 0.1 * Motor.motorLeftRpmCurr  + 0.9 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
+  Motor.motorRightRpmCurr = min(33, max(-33, 0.1 * Motor.motorRightRpmCurr + 0.9 * gauss(Motor.motorRightPWMCurr, rightnoise)));
+
+  // obstacle stop robot actual speed
   if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2 + 1.5*OBSTACLE_RADIUS, Robot.simOrientation )){
     if ( (Motor.motorLeftPWMCurr > 0) || (Motor.motorRightPWMCurr > 0) )  {
       Motor.motorLeftRpmCurr = 0;

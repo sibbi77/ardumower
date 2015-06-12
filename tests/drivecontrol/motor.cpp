@@ -181,28 +181,26 @@ void MotorControl::speedControl(){
   lastMotorControlTime = millis();
   if (TaC > 500) TaC = 1;
   //double TaS = ((double)TaC) / 1000.0;
-  //motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
-  //motorRightPID.w = motorRightSpeedRpmSet;               // SET
-  /*float RLdiff = (abs(motorLeftRpmCurr) - abs(motorRightRpmCurr)) / motorLeftRpmCurr;
+  motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
+  motorRightPID.w = motorRightSpeedRpmSet;               // SET
+  //float RLdiff = motorLeftRpmCurr - motorRightRpmCurr;
+  float RLdiff = 0;
 
   switch (motion){
     case MOTION_LINE_SPEED:
     case MOTION_LINE_DISTANCE:
-      if ( RLdiff > 0.7 )
-        motorLeftPID.w = motorRightRpmCurr;
-      else if (RLdiff < -0.7)
-        motorRightPID.w = motorLeftRpmCurr;
+      motorLeftPID.w  = motorLeftSpeedRpmSet  - RLdiff/2;
+      motorRightPID.w = motorRightSpeedRpmSet + RLdiff/2;
+      //printf("%.0f\n", RLdiff);
       break;
     case MOTION_ROTATE_ANGLE:
-      if ( RLdiff > 0.2 )
-        motorLeftPID.w = -motorRightRpmCurr;
-      else if (RLdiff < -0.2 )
-        motorRightPID.w = -motorLeftRpmCurr;
+      motorLeftPID.w  = motorLeftSpeedRpmSet  - RLdiff/2;
+      motorRightPID.w = motorRightSpeedRpmSet + RLdiff/2;
       break;
-  }*/
+  }
 
   motorLeftPID.x = motorLeftRpmCurr;                 // CURRENT
-  motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
+  //motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
   motorLeftPID.y_min = -motorSpeedMaxPwm;        // CONTROL-MIN
   motorLeftPID.y_max = motorSpeedMaxPwm;     // CONTROL-MAX
   motorLeftPID.max_output = motorSpeedMaxPwm;    // LIMIT
@@ -215,7 +213,7 @@ void MotorControl::speedControl(){
   motorRightPID.Ki = motorLeftPID.Ki;
   motorRightPID.Kd = motorLeftPID.Kd;
   motorRightPID.x = motorRightRpmCurr;               // IST
-  motorRightPID.w = motorRightSpeedRpmSet;             // SOLL
+ //motorRightPID.w = motorRightSpeedRpmSet;             // SOLL
   motorRightPID.y_min = -motorSpeedMaxPwm;       // Regel-MIN
   motorRightPID.y_max = motorSpeedMaxPwm;        // Regel-MAX
   motorRightPID.max_output = motorSpeedMaxPwm;   // Begrenzung
