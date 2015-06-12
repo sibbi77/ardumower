@@ -183,8 +183,8 @@ void MotorControl::speedControl(){
   //double TaS = ((double)TaC) / 1000.0;
   motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
   motorRightPID.w = motorRightSpeedRpmSet;               // SET
-  //float RLdiff = motorLeftRpmCurr - motorRightRpmCurr;
-  float RLdiff = 0;
+  float RLdiff = motorLeftRpmCurr - motorRightRpmCurr;
+  //float RLdiff = 0;
 
   switch (motion){
     case MOTION_LINE_SPEED:

@@ -550,7 +550,7 @@
 	"robot.h"
 	"sim/simmower.h"
 
-1434110593 d:\projects\robomower\ardumower\github\tests\drivecontrol\mower.h
+1434112322 d:\projects\robomower\ardumower\github\tests\drivecontrol\mower.h
 	"common.h"
 	"objects.h"
 
@@ -651,15 +651,10 @@
 	"common.h"
 	"pid.h"
 
-1434100351 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
+1434122978 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
 	"simmower.h"
 
-1434110748 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
-	"../led.h"
-	"../motor.h"
-	"../perimeter.h"
-	"../settings.h"
-	"../robot.h"
+1434122848 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
 	"../common.h"
 	"../objects.h"
 
@@ -688,7 +683,7 @@
 1434098424 d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.h
 	"pid.h"
 
-1434100521 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
+1434123075 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
 	"common.h"
 	"objects.h"
 	"motor.h"

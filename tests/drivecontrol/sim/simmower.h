@@ -8,10 +8,10 @@
 #include "../objects.h"
 
 
-
 // world size (cm)
 #define WORLD_SIZE_X 700
 #define WORLD_SIZE_Y 500
+
 
 
 // simulator settings
@@ -64,6 +64,16 @@ class SimMotorMow : public MotorMowControl
     virtual void driverSetPWM(int pwm);
 };
 
+class SimPlot
+{
+  public:
+    float vmin;
+    float vmax;
+    std::string name;
+    cv::Scalar color;
+    std::vector<float> values;
+};
+
 // simulated perimeter
 class SimPerimeter : public PerimeterControl
 {
@@ -74,6 +84,7 @@ class SimPerimeter : public PerimeterControl
     int chgStationX, chgStationY; // cm
     float chgStationOrientation; // entrance
     std::vector<point_t> obstacles; // obstacles
+    std::vector<SimPlot> simPlots;
     SimPerimeter();
     virtual void run();
     virtual bool isInside(char coilIdx);
@@ -96,7 +107,8 @@ class SimPerimeter : public PerimeterControl
     // magnetic field
     float bfield[WORLD_SIZE_Y][WORLD_SIZE_X];
     int pnpoly(std::vector<point_t> &vertices, float testx, float testy);
-    void plotXY(cv::Mat &image, int x, int y, int r, int g, int b, bool clearplot);
+    void addPlot(int plotIdx, float value);
+    void plot();
 };
 
 // simulated timer

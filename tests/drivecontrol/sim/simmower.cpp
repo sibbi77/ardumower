@@ -64,6 +64,7 @@ void SimSettings::setup(){
 
 // ------------------------------------------
 
+
 void SimMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
 }
 
@@ -203,6 +204,17 @@ SimPerimeter::SimPerimeter(){
       imgBfield.at<cv::Vec3b>(y, x) = intensity;
     }
   }
+
+  // plots
+  SimPlot plot1;
+  plot1.name = "mag";
+  plot1.color = cv::Scalar(255, 0, 0);
+  simPlots.push_back(plot1);
+
+  SimPlot plot2;
+  plot2.name = "err";
+  plot2.color = cv::Scalar(0, 0, 255);
+  simPlots.push_back(plot2);
 }
 
 // x,y: cm
@@ -230,12 +242,61 @@ int SimPerimeter::sizeY(){
   return WORLD_SIZE_Y;
 }
 
-void SimPerimeter::plotXY(cv::Mat &image, int x, int y, int r, int g, int b, bool clearplot){
-  if (clearplot) for (int y=0; y < image.rows; y++) image.at<cv::Point3_<uchar> >(y, x) = cv::Point3_<uchar>(0,0,0);
-  if ( (x< 0) || (y < 0) || (x >= image.cols) || (y >= image.rows)) return;
-  image.at<cv::Point3_<uchar> >(image.rows-y-1, x) = cv::Point3_<uchar>(r,g,b);
-  //line( image, Point( x, image.rows ), Point( x, image.rows-y-1), Scalar( r, g, b),  1, 8 );
+// plotting
+void SimPerimeter::addPlot(int plotIdx, float value) {
+  if (simPlots[plotIdx].values.size() > 500)
+    simPlots[plotIdx].values.erase(simPlots[plotIdx].values.begin());
+  simPlots[plotIdx].values.push_back(value);
 }
+
+void SimPerimeter::plot()
+{
+    int rows = 100;
+    int height  = rows + 10;
+    cv::Mat image = cv::Mat::zeros( height * simPlots.size() + 3, 500, CV_8UC3 );
+    image.setTo(255);
+    int ofs = 3;
+
+    for (int idx=0; idx < simPlots.size(); idx++){
+      std::vector<float> &vals = simPlots[idx].values;
+      if (vals.size() != 0) {
+        float newmax = *( std::max_element(vals.begin(), vals.end()) );
+        float newmin = *( std::min_element(vals.begin(), vals.end()) );
+        float newminmax = max( abs(newmax), abs(newmin) );
+        simPlots[idx].vmin = min(simPlots[idx].vmin, -newminmax);
+        simPlots[idx].vmax = max(simPlots[idx].vmax, newminmax);
+        float vmax = newminmax; // simPlots[idx].vmax;
+        float vmin = -newminmax; //simPlots[idx].vmin;
+        float scale = 1./ceil(vmax - vmin);
+        float bias = vmin;
+
+        cv::line(image,
+                 cv::Point(0, rows - 1 - (0 - bias)*scale*rows + ofs),
+                 cv::Point(499, rows - 1 - (0 - bias)*scale*rows + ofs),
+                 cv::Scalar(227, 227, 227), 1);
+        cv::line(image,
+                 cv::Point(0, ofs),
+                 cv::Point(499, ofs),
+                 cv::Scalar(0, 0, 0), 1);
+
+        for (int i = 0; i < min(500, (int)vals.size()) -1; i++){
+          cv::line(image,
+                 cv::Point(i, rows - 1 - (vals[i] - bias)*scale*rows + ofs),
+                 cv::Point(i+1, rows - 1 - (vals[i+1] - bias)*scale*rows + ofs),
+                 simPlots[idx].color, 1);
+        }
+        char buf[64];
+        putText(image, simPlots[idx].name, cv::Point(10,ofs+height/2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        sprintf(buf, "%.3f", vmin);
+        putText(image, std::string(buf), cv::Point(10,ofs+height-5), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        sprintf(buf, "%.3f", vmax);
+        putText(image, std::string(buf), cv::Point(10,ofs+14), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+      }
+      ofs += height;
+    }
+    imshow("plots", image);
+}
+
 
 void SimPerimeter::draw(){
   char buf[64];
@@ -280,10 +341,9 @@ void SimPerimeter::draw(){
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-10), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
   // plot robot bfield sensor
-  float mag = max(-2.0f, min(24.0f, Perimeter.getMagnitude(0) ));
-  plotXY(plotPerimeter, plotIdx % plotPerimeter.cols, 15+mag*5, 255,255,255, true);
-  imshow("mag", plotPerimeter);
-  plotIdx++;
+  addPlot(0, Perimeter.getMagnitude(0));
+  addPlot(1, Motor.motorLeftPID.eold);
+  plot();
 }
 
 // approximate circle pattern
