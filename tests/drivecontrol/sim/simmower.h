@@ -1,24 +1,20 @@
+// Ardumower simulator classes
+
 #ifndef SIMMOWER_H
 #define SIMMOWER_H
 
-/*#include "../types.h"
-#include "../led.h"
-#include "../motor.h"
-#include "../perimeter.h"
-#include "../settings.h"
-#include "../robot.h"*/
 
 #include "../common.h"
 #include "../objects.h"
 
 
-// Ardumower classes implementation for simulator
 
 // world size (cm)
 #define WORLD_SIZE_X 700
 #define WORLD_SIZE_Y 500
 
 
+// simulator settings
 class SimSettings : public FactorySettings
 {
   public:
@@ -26,6 +22,7 @@ class SimSettings : public FactorySettings
 };
 
 
+// simulated LED
 class SimLED : public LEDControl
 {
   private:
@@ -49,7 +46,7 @@ class SimButton : public ButtonControl
 {
 };
 
-
+// simulated gear motors
 class SimMotor : public MotorControl
 {
   private:
@@ -59,6 +56,7 @@ class SimMotor : public MotorControl
     virtual void readOdometry();
 };
 
+// simulated mower motor
 class SimMotorMow : public MotorMowControl
 {
   private:
@@ -66,6 +64,7 @@ class SimMotorMow : public MotorMowControl
     virtual void driverSetPWM(int pwm);
 };
 
+// simulated perimeter
 class SimPerimeter : public PerimeterControl
 {
   public:

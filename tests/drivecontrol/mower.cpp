@@ -1,4 +1,4 @@
-// Arduino robot classes
+// Ardumower Arduino Mega robot classes
 
 #include "mower.h"
 

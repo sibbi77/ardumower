@@ -1,6 +1,9 @@
+// Ardumower simulator classes
+
 #include "simmower.h"
 
 #define OBSTACLE_RADIUS 8
+//#define ENABLE_OBSTACLES
 
 SimLED LED;
 SimMotor Motor;
@@ -14,7 +17,6 @@ SimButton Button;
 SimTimer Timer;
 SimRobot Robot;
 
-//#define ENABLE_OBSTACLES
 
 // ------------------------------------------
 
