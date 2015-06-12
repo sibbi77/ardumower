@@ -120,6 +120,11 @@ class SimBattery : public BatteryControl
     virtual void read();
 };
 
+// simulated R/C
+class SimModelReceiver : public ModelReceiverControl
+{
+};
+
 
 // simulated robot
 class SimRobot : public RobotControl

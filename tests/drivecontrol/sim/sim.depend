@@ -550,7 +550,7 @@
 	"robot.h"
 	"sim/simmower.h"
 
-1434046397 d:\projects\robomower\ardumower\github\tests\drivecontrol\mower.h
+1434110593 d:\projects\robomower\ardumower\github\tests\drivecontrol\mower.h
 	"common.h"
 	"objects.h"
 
@@ -654,7 +654,7 @@
 1434100351 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.cpp
 	"simmower.h"
 
-1433789594 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
+1434110748 d:\projects\robomower\ardumower\github\tests\drivecontrol\sim\simmower.h
 	"../led.h"
 	"../motor.h"
 	"../perimeter.h"
@@ -688,7 +688,7 @@
 1434098424 d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.h
 	"pid.h"
 
-1434100428 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
+1434100521 source:d:\projects\robomower\ardumower\github\tests\drivecontrol\motor.cpp
 	"common.h"
 	"objects.h"
 	"motor.h"
@@ -729,7 +729,7 @@
 	"objects.h"
 	"robot.h"
 
-1434042982 d:\projects\robomower\ardumower\github\tests\drivecontrol\objects.h
+1434110769 d:\projects\robomower\ardumower\github\tests\drivecontrol\objects.h
 	"led.h"
 	"motor.h"
 	"motormow.h"
@@ -739,6 +739,7 @@
 	"buzzer.h"
 	"sonar.h"
 	"button.h"
+	"modelrc.h"
 	"settings.h"
 	"robot.h"
 	"adcman.h"
@@ -753,6 +754,7 @@
 	"buzzer.h"
 	"sonar.h"
 	"button.h"
+	"modelrc.h"
 	"settings.h"
 	"robot.h"
 	"sim/simmower.h"
@@ -809,4 +811,7 @@
 1434043774 d:\projects\robomower\ardumower\github\tests\drivecontrol\mowerperimeter.h
 	<Arduino.h>
 	"perimeter.h"
+
+1434110328 d:\projects\robomower\ardumower\github\tests\drivecontrol\modelrc.h
+	"common.h"
 

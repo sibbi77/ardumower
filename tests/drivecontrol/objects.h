@@ -17,6 +17,7 @@
   class MowerSonar;
   class MowerBuzzer;
   class MowerPerimeter;
+  class MowerModelReceiver;
   class MowerRobot;
 
   extern MowerLED LED;
@@ -29,7 +30,8 @@
   extern MowerBuzzer Buzzer;
   extern MowerButton Button;
   extern MowerBattery Battery;
-  extern MowerPerimeter Perimeter;  
+  extern MowerPerimeter Perimeter;
+  extern MowerModelReceiver ModelReceiver;
   extern MowerRobot Robot;
 
 
@@ -42,10 +44,11 @@
   #include "buzzer.h"
   #include "sonar.h"
   #include "button.h"
+  #include "modelrc.h"
   #include "settings.h"
   #include "robot.h"
-  
-  #include "adcman.h"  
+
+  #include "adcman.h"
   #include "mowerperimeter.h"
 
   #include "mower.h"
@@ -61,6 +64,7 @@
   class SimBattery;
   class SimButton;
   class SimSonar;
+  class SimModelReceiver;
   class SimBuzzer;
   class SimRobot;
 
@@ -74,6 +78,7 @@
   extern SimBuzzer Buzzer;
   extern SimButton Button;
   extern SimBattery Battery;
+  extern SimModelReceiver ModelReceiver;
   extern SimRobot Robot;
 
 
@@ -86,6 +91,7 @@
   #include "buzzer.h"
   #include "sonar.h"
   #include "button.h"
+  #include "modelrc.h"
   #include "settings.h"
   #include "robot.h"
 

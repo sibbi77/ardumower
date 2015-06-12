@@ -1,3 +1,5 @@
+// Arduino robot classes
+
 #include "mower.h"
 
 
@@ -129,6 +131,7 @@ void MowerSettings::setup(){
   Battery.batGoHomeIfBelow = 23.7;
   Battery.batVoltage = Battery.batFull;  
   // ------------------------------------------ config end ----------------------------------------------
+ 
      
 // keep battery switched ON
   pinMode(pinBatterySwitch, OUTPUT);
@@ -208,12 +211,24 @@ void MowerSettings::setup(){
   pinMode(pinRemoteSteer, INPUT);
   pinMode(pinRemoteSpeed, INPUT); 
   pinMode(pinRemoteSwitch, INPUT);       
+  
+  // R/C interrupt configuration
+  PCICR |= (1<<PCIE0);
+  PCMSK0 |= (1<<PCINT4);
+  PCMSK0 |= (1<<PCINT5);
+  PCMSK0 |= (1<<PCINT6);
+  PCMSK0 |= (1<<PCINT1);    
 
   // odometry
   pinMode(pinOdometryLeft, INPUT_PULLUP);  
   pinMode(pinOdometryLeft2, INPUT_PULLUP);    
   pinMode(pinOdometryRight, INPUT_PULLUP);
   pinMode(pinOdometryRight2, INPUT_PULLUP);  
+  
+   // odometry interrupt configuration
+  PCICR |= (1<<PCIE2);
+  PCMSK2 |= (1<<PCINT20);
+  PCMSK2 |= (1<<PCINT22);            
   
   // user switches
   pinMode(pinUserSwitch1, OUTPUT);
@@ -223,6 +238,7 @@ void MowerSettings::setup(){
   // other
   pinMode(pinVoltageMeasurement, INPUT);
 
+  TCCR3B = (TCCR3B & 0xF8) | 0x02;    // set PWM frequency 3.9 Khz (pin2,3,5)
 
   // ADC
   ADCMan.setup();
@@ -237,6 +253,122 @@ void MowerSettings::setup(){
 }
 
 // ------------------------------------------
+
+volatile static boolean odometryLeftLastState;
+volatile static boolean odometryRightLastState;       
+volatile static unsigned long odometryLeftLastHighTime = 0;
+volatile static unsigned long odometryRightLastHighTime = 0;
+volatile static unsigned long odometryLeftTickTime = 0;
+volatile static unsigned long odometryRightTickTime = 0;
+
+
+// odometry interrupt handler
+ISR(PCINT2_vect, ISR_NOBLOCK){
+//  ISR(PCINT2_vect){
+  unsigned long timeMicros = micros();
+  boolean odometryLeftState = digitalRead(pinOdometryLeft);
+  boolean odometryRightState = digitalRead(pinOdometryRight);      
+  if (odometryLeftState != odometryLeftLastState){    
+    if (odometryLeftState){ // pin1 makes LOW->HIGH transition
+      if (timeMicros > odometryLeftLastHighTime) odometryLeftTickTime = timeMicros - odometryLeftLastHighTime;
+      if (Motor.motorLeftPWMCurr >=0) Motor.odometryLeftTicks ++; else Motor.odometryLeftTicks --;           
+      odometryLeftLastHighTime = timeMicros;      
+    } else {
+      //odometryLeftLowTime = timeMicros;
+    }
+    odometryLeftLastState = odometryLeftState;
+  } 
+  if (odometryRightState != odometryRightLastState){
+    if (odometryRightState){ // pin1 makes LOW->HIGH transition
+      if (timeMicros > odometryRightLastHighTime) odometryRightTickTime = timeMicros - odometryRightLastHighTime;
+      if (Motor.motorRightPWMCurr >=0) Motor.odometryRightTicks ++; else Motor.odometryRightTicks --;    
+      odometryRightLastHighTime = timeMicros;
+    } else {
+      //odometryRightLowTime = timeMicros;
+    }
+    odometryRightLastState = odometryRightState;
+  }  
+}
+
+static unsigned long remoteSteerLastTime ;
+static unsigned long remoteSpeedLastTime ;
+static unsigned long remoteMowLastTime ;        
+static boolean remoteSteerLastState ;
+static boolean remoteSpeedLastState ;        
+static boolean remoteMowLastState ;
+
+
+// RC remote control helper
+// convert ppm time (us) to percent (-100..+100)
+// ppmtime: zero stick pos: 1500 uS 		
+//          right stick pos: 2000 uS 		
+//          left stick pos: 1000 uS
+int rcValue(int ppmTime){
+  int value = (int) (((double)((ppmTime) - 1500)) / 3.4);
+  if ((value < 5) && (value > -5)) value = 0;  //  ensures exact zero position
+  return value;
+}
+
+// remote control (RC) ppm signal change interrupt
+ISR(PCINT0_vect){   
+  unsigned long timeMicros = micros();
+  boolean remoteSpeedState = digitalRead(pinRemoteSpeed);
+  boolean remoteSteerState = digitalRead(pinRemoteSteer);
+  boolean remoteMowState = digitalRead(pinRemoteMow);    
+  if (remoteSpeedState != remoteSpeedLastState) {    
+    remoteSpeedLastState = remoteSpeedState;
+    if (remoteSpeedState) remoteSpeedLastTime = timeMicros; else ModelReceiver.remoteSpeed = rcValue(timeMicros - remoteSpeedLastTime);
+  }
+  if (remoteSteerState != remoteSteerLastState) {    
+    remoteSteerLastState = remoteSteerState;
+    if (remoteSteerState) remoteSteerLastTime = timeMicros; else ModelReceiver.remoteSteer = rcValue(timeMicros - remoteSteerLastTime);
+  }      
+  if (remoteMowState != remoteMowLastState) {    
+    remoteMowLastState = remoteMowState;
+    if (remoteMowState) remoteMowLastTime = timeMicros; else ModelReceiver.remoteMow = rcValue(timeMicros - remoteMowLastTime);
+  }
+}
+
+// ---- I2C helpers --------------------------------------------------------------
+void I2CwriteTo(uint8_t device, uint8_t address, uint8_t val) {
+   Wire.beginTransmission(device); //start transmission to device 
+   Wire.write(address);        // send register address
+   Wire.write(val);        // send value to write
+   Wire.endTransmission(); //end transmission
+}
+
+void I2CwriteTo(uint8_t device, uint8_t address, int num, uint8_t buff[]) {
+   Wire.beginTransmission(device); //start transmission to device 
+   Wire.write(address);        // send register address
+   for (int i=0; i < num; i++){
+     Wire.write(buff[i]);        // send value to write
+   }
+   Wire.endTransmission(); //end transmission
+}
+
+int I2CreadFrom(uint8_t device, uint8_t address, uint8_t num, uint8_t buff[], int retryCount) {
+  int i = 0;
+  for (int j=0; j < retryCount+1; j++){
+    i=0;
+    Wire.beginTransmission(device); //start transmission to device 
+    Wire.write(address);        //sends address to read from
+    Wire.endTransmission(); //end transmission
+  
+    //Wire.beginTransmission(device); //start transmission to device (initiate again)
+    Wire.requestFrom(device, num);    // request 6 bytes from device
+  
+    while(Wire.available())    //device may send less than requested (abnormal)
+    {  
+      buff[i] = Wire.read(); // receive a byte
+      i++;
+    }
+    //Wire.endTransmission(); //end transmission
+    if (num == i) return i;
+    if (j != retryCount) delay(3);
+  }
+  return i;
+}
+
 
 // MC33926 motor driver
 // Check http://forum.pololu.com/viewtopic.php?f=15&t=5272#p25031 for explanations.
@@ -254,8 +386,6 @@ void setMC33926(int pinDir, int pinPWM, int speed){
   }
 }
 
-
-
 void MowerMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
   setMC33926(pinMotorLeftDir, pinMotorLeftPWM, leftMotorPWM);
   setMC33926(pinMotorRightDir, pinMotorRightPWM, rightMotorPWM);
@@ -269,8 +399,17 @@ int MowerMotor::driverReadRightCurrentADC(){
   return ADCMan.read(pinMotorRightSense);
 }
 
+bool MowerMotor::driverReadRightFault(){
+  return (digitalRead(pinMotorLeftFault) == LOW);
+}
 
-void MowerMotor::readOdometry(){
+bool MowerMotor::driverReadLeftFault(){
+  return (digitalRead(pinMotorRightFault) == LOW);
+}
+
+void MowerMotor::driverResetFault(){
+  digitalWrite(pinMotorEnable, LOW);
+  digitalWrite(pinMotorEnable, HIGH);  
 }
 
 // ------------------------------------------
@@ -283,25 +422,152 @@ int MowerMotorMow::driverReadCurrentADC(){
   return ADCMan.read(pinMotorMowSense);
 }
 
+bool MowerMotorMow::driverReadFault(){
+  return (digitalRead(pinMotorMowFault)==LOW);
+}
+
+void MowerMotorMow::driverResetFault(){
+  digitalWrite(pinMotorMowEnable, LOW);
+  digitalWrite(pinMotorMowEnable, HIGH);
+}
+
+
 // ------------------------------------------
+
+#define NO_ECHO 0
+// ultrasonic sensor max echo time (WARNING: do not set too high, it consumes CPU time!)
+#define MAX_ECHO_TIME 3000
+//#define MIN_ECHO_TIME 350                  
+#define MIN_ECHO_TIME 0
+
+
+// HC-SR04 ultrasonic sensor driver
+unsigned int readHCSR04(int triggerPin, int echoPin){
+  unsigned int uS;  
+  digitalWrite(triggerPin, LOW);   
+  delayMicroseconds(2); 
+  digitalWrite(triggerPin, HIGH);
+  delayMicroseconds(10); 
+  digitalWrite(triggerPin, LOW);
+  // ultrasonic sensor max echo time (WARNING: do not set too high, it consumes CPU time!)
+  uS = pulseIn(echoPin, HIGH, MAX_ECHO_TIME + 1000);  
+  if (uS > MAX_ECHO_TIME) uS = NO_ECHO;
+    else if (uS < MIN_ECHO_TIME) uS = NO_ECHO;
+  return (uS/2) / 29.1; // convert uS to cm
+}
 
 int MowerSonar::driverReadCenterDistanceCm(){
-  return 1000;
+  return readHCSR04(pinSonarCenterTrigger, pinSonarCenterEcho);
 }
 
+int MowerSonar::driverReadLeftDistanceCm(){
+  return readHCSR04(pinSonarLeftTrigger, pinSonarLeftEcho);
+}
+
+int MowerSonar::driverReadRightDistanceCm(){
+  return readHCSR04(pinSonarRightTrigger, pinSonarRightEcho);
+}
 
 // ------------------------------------------
 
-MowerTimer::MowerTimer(){
+#define DS1307_ADDRESS B1101000
+
+// DS1307 real time driver
+boolean readDS1307(datetime_t &dt){
+  byte buf[8];  
+  if (I2CreadFrom(DS1307_ADDRESS, 0x00, 8, buf, 3) != 8) {
+    Console.println(F("ERROR: DS1307 comm"));    
+    return false;
+  }      
+  if (   ((buf[0] >> 7) != 0) || ((buf[1] >> 7) != 0) || ((buf[2] >> 7) != 0) || ((buf[3] >> 3) != 0) 
+      || ((buf[4] >> 6) != 0) || ((buf[5] >> 5) != 0) || ((buf[7] & B01101100) != 0) ) {    
+    Console.println(F("ERROR: DS1307 data1"));    
+    return false;
+  }
+  datetime_t r;
+  r.time.minute    = 10*((buf[1] >>4) & B00000111) + (buf[1] & B00001111);
+  r.time.hour      = 10*((buf[2] >>4) & B00000111) + (buf[2] & B00001111);
+  r.date.dayOfWeek = (buf[3] & B00000111);
+  r.date.day       = 10*((buf[4] >>4) & B00000011) + (buf[4] & B00001111);
+  r.date.month     = 10*((buf[5] >>4) & B00000001) + (buf[5] & B00001111);
+  r.date.year      = 10*((buf[6] >>4) & B00001111) + (buf[6] & B00001111);
+  if (    (r.time.minute > 59) || (r.time.hour > 23) || (r.date.dayOfWeek > 6)  
+       || (r.date.month > 12)  || (r.date.day > 31)  || (r.date.day < 1)         
+       || (r.date.month < 1)   || (r.date.year > 99) ){
+    Console.println(F("ERROR: DS1307 data2"));    
+    return false;
+  }  
+  r.date.year      += 2000;
+  dt = r;
+  return true;
 }
 
-void MowerTimer::run(){
-  TimerControl::run();  
+boolean setDS1307(datetime_t &dt){
+  byte buf[7];
+  if (I2CreadFrom(DS1307_ADDRESS, 0x00, 7, buf, 3) != 7){
+    Console.println(F("ERROR: DS1307 comm"));    
+    return false;
+  }
+  buf[0] = buf[0] & B01111111; // enable clock
+  buf[1] = ((dt.time.minute / 10) << 4) | (dt.time.minute % 10);
+  buf[2] = ((dt.time.hour   / 10) << 4) | (dt.time.hour   % 10);
+  buf[3] = dt.date.dayOfWeek;
+  buf[4] = ((dt.date.day    / 10) << 4) | (dt.date.day    % 10);
+  buf[5] = ((dt.date.month  / 10) << 4) | (dt.date.month  % 10);
+  buf[6] = ((dt.date.year % 100  / 10) << 4) | (dt.date.year % 10);
+  I2CwriteTo(DS1307_ADDRESS, 0x00, 7, buf);
+  return true;
+}
+
+
+bool MowerTimer::driverReadRTC(datetime_t &dt){
+  return readDS1307(dt); 
+}
+
+bool MowerTimer::driverSetRTC(datetime_t &dt){
+  return setDS1307(dt);
 }
 
 // ------------------------------------------
 
-void MowerBattery::read(){
+void MowerBattery::driverSetBatterySwitch(bool state){
+  digitalWrite(pinBatterySwitch, state);
+}
+
+void MowerBattery::driverSetChargeRelay(bool state){
+  digitalWrite(pinChargeRelay, state);  
+}
+
+int MowerBattery::driverReadBatteryVoltageADC(){
+  return ADCMan.read(pinBatteryVoltage);
+}
+ 
+int MowerBattery::driverReadChargeVoltageADC(){
+  return ADCMan.read(pinChargeVoltage);  
+}
+
+int MowerBattery::driverReadChargeCurrentADC(){
+  return ADCMan.read(pinChargeCurrent);    
+}
+ 
+int MowerBattery::driverReadVoltageMeasurementADC(){
+  return ADCMan.read(pinVoltageMeasurement);  
+}
+
+// ------------------------------------------
+
+void MowerBuzzer::driverNoTone(){
+  noTone(pinBuzzer);
+}
+
+void MowerBuzzer::driverTone(int frequencyHz){
+  tone(pinBuzzer, frequencyHz);
+}
+
+// ------------------------------------------
+
+bool MowerButton::driverButtonPressed(){
+  return (digitalRead(pinButton == LOW));
 }
 
 // ------------------------------------------
@@ -311,6 +577,7 @@ MowerRobot::MowerRobot(){
 }
 
 char MowerRobot::readKey(){
+  if (Console.available()) return ((char)Console.read());
   return 0;
 }
 
@@ -345,6 +612,7 @@ MowerBuzzer Buzzer;
 MowerSonar Sonar;
 MowerButton Button;
 MowerTimer Timer;
+MowerModelReceiver ModelReceiver;
 MowerRobot Robot;
 
 
