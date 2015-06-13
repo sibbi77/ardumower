@@ -75,6 +75,7 @@ void HitPerimeterBehavior::action(){
   }
 
   // rotate
+  Motor.resetStalled();
   Console.println("ROT");
   Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
 
@@ -164,9 +165,8 @@ void TrackingBehavior::action(){
     if (millis() >= nextControlTime){
       nextControlTime = millis() + 50;
       int mag = Perimeter.getMagnitude(0);
-      if (mag < 0) Robot.perimeterPID.x = -1;
+      if (mag <= 0) Robot.perimeterPID.x = -1;
         else if (mag > 0) Robot.perimeterPID.x = 1;
-        else Robot.perimeterPID.x = 0;
       Robot.perimeterPID.w = 0;
       Robot.perimeterPID.y_min = -Motor.motorSpeedMaxPwm;
       Robot.perimeterPID.y_max = Motor.motorSpeedMaxPwm;

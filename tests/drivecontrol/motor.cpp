@@ -367,6 +367,9 @@ void MotorControl::readCurrent(){
     motorLeftEfficiency  = motorLeftEfficiency  * smooth + (abs(motorLeftRpmCurr) / max(0.01f, fabs(motorLeftSensePower))   * 100.0) * (1.0-smooth);
     motorRightEfficiency = motorRightEfficiency * smooth + (abs(motorRightRpmCurr) / max(0.01f, fabs(motorRightSensePower)) * 100.0) * (1.0-smooth);
 
+    motorLeftEfficiency = min(motorEfficiencyMin*1.5, motorLeftEfficiency);
+    motorRightEfficiency = min(motorEfficiencyMin*1.5, motorRightEfficiency);
+
     // tracktion control
     // idea:     sigma_b = (Vf - Vu) / Vf    (break tracktion)
     //           sigma_a = (Vu - Vf) / Vu    (acceleration tracktion)

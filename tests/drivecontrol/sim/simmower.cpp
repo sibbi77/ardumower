@@ -29,7 +29,7 @@ void SimSettings::setup(){
   Motor.motorSenseRightScale = 9.3;  // motor right sense scale (mA=(ADC-zero) * scale)
   Motor.motorSenseLeftScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
   Motor.motorSpeedMaxRpm = 25;
-  Motor.motorEfficiencyMin = 200;
+  Motor.motorEfficiencyMin = 10;
   Motor.enableStallDetection = true;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
@@ -48,7 +48,7 @@ void SimSettings::setup(){
   // --- perimeter motors ----
   Perimeter.enable = true;
   Robot.perimeterPID.Kp    = 160;  // perimeter PID controller
-  Robot.perimeterPID.Ki    = 4;
+  Robot.perimeterPID.Ki    = 5;
   Robot.perimeterPID.Kd    = 50;
   // --- sonar ----
   Sonar.enableCenter = true;
@@ -206,27 +206,42 @@ SimPerimeter::SimPerimeter(){
   }
 
   // plots
-  SimPlot plot1;
-  plot1.name = "mag";
-  plot1.color = cv::Scalar(255, 0, 0);
-  simPlots.push_back(plot1);
+  SimPlot plot6;
+  plot6.name = "lmotor_pwm";
+  plot6.color = cv::Scalar(0, 200, 0);
+  simPlots.push_back(plot6);
+
+  SimPlot plot7;
+  plot7.name = "rmotor_pwm";
+  plot7.color = cv::Scalar(255, 0, 0);
+  simPlots.push_back(plot7);
 
   SimPlot plot2;
-  plot2.name = "rpm_curr";
+  plot2.name = "lmotor_rpm_curr";
   plot2.color = cv::Scalar(0, 0, 255);
   simPlots.push_back(plot2);
 
   SimPlot plot3;
-  plot3.name = "power";
+  plot3.name = "lmotor_power";
   plot3.color = cv::Scalar(0, 200, 0);
   simPlots.push_back(plot3);
 
   SimPlot plot4;
-  plot4.name = "eff";
+  plot4.name = "lmotor_eff";
   plot4.color = cv::Scalar(0, 200, 255);
   simPlots.push_back(plot4);
 
-  imgPlots = cv::Mat::zeros( 110 * simPlots.size() + 3, 500, CV_8UC3 );
+  SimPlot plot1;
+  plot1.name = "peri_mag";
+  plot1.color = cv::Scalar(255, 0, 0);
+  simPlots.push_back(plot1);
+
+  SimPlot plot5;
+  plot5.name = "peri_pid_y";
+  plot5.color = cv::Scalar(255, 200, 0);
+  simPlots.push_back(plot5);
+
+  imgPlots = cv::Mat::zeros( 60 * simPlots.size() + 3, 500, CV_8UC3 );
 }
 
 // x,y: cm
@@ -263,13 +278,17 @@ void SimPerimeter::addPlot(int plotIdx, float value) {
 
 void SimPerimeter::plot()
 {
-    int rows = 100;
+    int rows = 50;
     int height  = rows + 10;
     imgPlots.setTo(255);
-    int ofs = 3;
+    int ofs = 0;
 
     for (int idx=0; idx < simPlots.size(); idx++){
       std::vector<float> &vals = simPlots[idx].values;
+      cv::line(imgPlots,
+                 cv::Point(0, ofs),
+                 cv::Point(499, ofs),
+                 cv::Scalar(0, 0, 0), 1);
       if (vals.size() != 0) {
         float newmax = *( std::max_element(vals.begin(), vals.end()) );
         float newmin = *( std::min_element(vals.begin(), vals.end()) );
@@ -278,31 +297,30 @@ void SimPerimeter::plot()
         simPlots[idx].vmax = max(simPlots[idx].vmax, newminmax);
         float vmax = newminmax; // simPlots[idx].vmax;
         float vmin = -newminmax; //simPlots[idx].vmin;
-        float scale = 1./ceil(vmax - vmin);
+        //float scale = 1./ceil(vmax - vmin);
+        float scale = 1./(vmax - vmin);
         float bias = vmin;
 
         cv::line(imgPlots,
-                 cv::Point(0, rows - 1 - (0 - bias)*scale*rows + ofs),
-                 cv::Point(499, rows - 1 - (0 - bias)*scale*rows + ofs),
+                 cv::Point(0, rows +1 - (0 - bias)*scale*rows + ofs),
+                 cv::Point(499, rows +1 - (0 - bias)*scale*rows + ofs),
                  cv::Scalar(227, 227, 227), 1);
-        cv::line(imgPlots,
-                 cv::Point(0, ofs),
-                 cv::Point(499, ofs),
-                 cv::Scalar(0, 0, 0), 1);
 
         for (int i = 0; i < min(500, (int)vals.size()) -1; i++){
           cv::line(imgPlots,
-                 cv::Point(i, rows - 1 - (vals[i] - bias)*scale*rows + ofs),
-                 cv::Point(i+1, rows - 1 - (vals[i+1] - bias)*scale*rows + ofs),
-                 simPlots[idx].color, 1);
+                 cv::Point(i, rows +1 - (vals[i] - bias)*scale*rows + ofs),
+                 cv::Point(i+1, rows +1 - (vals[i+1] - bias)*scale*rows + ofs),
+                 simPlots[idx].color, 2);
         }
         char buf[64];
-        putText(imgPlots, simPlots[idx].name, cv::Point(10,ofs+height/2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
         sprintf(buf, "%.3f", vmin);
         putText(imgPlots, std::string(buf), cv::Point(10,ofs+height-5), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
         sprintf(buf, "%.3f", vmax);
         putText(imgPlots, std::string(buf), cv::Point(10,ofs+14), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
       }
+      cv::Mat roi(imgPlots(cv::Rect(0,ofs+height/2-10,140,16)));
+      roi.setTo(240);
+      putText(imgPlots, simPlots[idx].name, cv::Point(0,ofs+height/2+2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
       ofs += height;
     }
     imshow("plots", imgPlots);
@@ -335,7 +353,8 @@ void SimPerimeter::draw(){
     circle( imgWorld, cv::Point( x, y), 10, cv::Scalar( 0, 255, 255 ), -1, OBSTACLE_RADIUS );
   }
   // draw information
-  sprintf(buf, "time=%.0fmin bat=%.1fv chg=%.1fv dist=%.0fm  orient=%d  mow=%dW  mowed=%d",
+  sprintf(buf, "fast=%d time=%.0fmin bat=%.1fv chg=%.1fv dist=%.0fm  orient=%d  mow=%dW  mowed=%d",
+          Timer.simFast,
           Timer.simTimeTotal/60.0,
           Battery.batVoltage,
           Battery.chgVoltage,
@@ -355,12 +374,15 @@ void SimPerimeter::draw(){
   static unsigned long nextPlotTime = 0;
   static unsigned long nextPlotShowTime = 0;
   if (millis() > nextPlotTime){
-    nextPlotTime = millis() + 50;
+    nextPlotTime = millis() + 10;
     // plot robot bfield sensor
-    addPlot(0, Perimeter.getMagnitude(0));
-    addPlot(1, Motor.motorLeftRpmCurr);
-    addPlot(2, Motor.motorLeftSensePower);
-    addPlot(3, Motor.motorLeftEfficiency);
+    addPlot(0, Motor.motorLeftPWMCurr);
+    addPlot(1, Motor.motorRightPWMCurr);
+    addPlot(2, Motor.motorLeftRpmCurr);
+    addPlot(3, Motor.motorLeftSensePower);
+    addPlot(4, Motor.motorLeftEfficiency);
+    addPlot(5, Perimeter.getMagnitude(0));
+    addPlot(6, Robot.perimeterPID.y);
     if (millis() >= nextPlotShowTime) {
       nextPlotShowTime = millis() + 500;
       plot();
@@ -523,8 +545,8 @@ void SimRobot::move(){
   //if (abs(Motor.motorLeftRpmCurr) > 2)
   //   Motor.motorLeftRpmCurr = max(1, 0.1 * Motor.motorLeftRpmCurr + 0.9 * gauss(Motor.motorLeftRpmCurr , 30) );
 
-  Motor.motorLeftRpmCurr  = min(33, max(-33, 0.1 * Motor.motorLeftRpmCurr  + 0.9 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
-  Motor.motorRightRpmCurr = min(33, max(-33, 0.1 * Motor.motorRightRpmCurr + 0.9 * gauss(Motor.motorRightPWMCurr, rightnoise)));
+  Motor.motorLeftRpmCurr  = min(33, max(-33, 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
+  Motor.motorRightRpmCurr = min(33, max(-33, 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise)));
 
   // slope
   float leftrpm;
@@ -546,11 +568,12 @@ void SimRobot::move(){
   simY = simY + (avg_cm * sin(simOrientation)) ;
 
 
-// obstacle set robots actual speed to zero
+  // obstacle set robots actual speed to zero
   if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2 + 1.5*OBSTACLE_RADIUS, Robot.simOrientation )){
     //if ( (Motor.motorLeftPWMCurr > 0) || (Motor.motorRightPWMCurr > 0) )  {
       Motor.motorLeftRpmCurr = 0;
       Motor.motorRightRpmCurr = 0;
+      // undo move into obstacle
       simX = oldSimX;
       simY = oldSimY;
       //printf("OBSTACLE\n");
@@ -594,6 +617,12 @@ void SimRobot::processKey(char key){
       break;
     case 27:
       exit(0);
+      break;
+    case 'h':
+      simX = 400;
+      simY = 270;
+      simOrientation = 0;
+      Battery.batVoltage = 18;
       break;
     case ' ':
       Timer.simStopped=!Timer.simStopped;

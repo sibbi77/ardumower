@@ -26,8 +26,8 @@ void RobotControl::setup(){
   // low-to-high priority
   arbitrator.addBehavior(&driveForwardBehavior);
 //  arbitrator.addBehavior(&circleBehavior);
-  arbitrator.addBehavior(&hitObstacleBehavior);
   arbitrator.addBehavior(&hitPerimeterBehavior);
+  arbitrator.addBehavior(&hitObstacleBehavior);
   arbitrator.addBehavior(&trackingBehavior);
   arbitrator.addBehavior(&chargingBehavior);
 
@@ -63,11 +63,11 @@ void RobotControl::processKey(char key){
         // simulate motor error
         Motor.motorLeftError = true;
         break;
-      case 'h':
+      case 'b':
         // simulate low battery voltage
         Battery.batVoltage = 18;
         break;
-      case 'b':
+      case 'c':
         // simulate charger connection
         if (Battery.chgVoltage > 5){
           Battery.chgVoltage = 0;
