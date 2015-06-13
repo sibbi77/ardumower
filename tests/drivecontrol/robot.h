@@ -1,7 +1,8 @@
+// Ardumower robot
+
 #ifndef ROBOT_H
 #define ROBOT_H
 
-// Ardumower robot
 
 #include "arbitrator.h"
 #include "behavior.h"

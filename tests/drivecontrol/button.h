@@ -1,8 +1,8 @@
-#ifndef BUTTON_H
-#define BUTTON_H
-
 // Ardumower ON/start button
 
+
+#ifndef BUTTON_H
+#define BUTTON_H
 
 
 class ButtonControl

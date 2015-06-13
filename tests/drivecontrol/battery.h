@@ -1,7 +1,10 @@
+// Ardumower battery/charger management
+// * battery, charging voltage, charging current
+// * charging relay, battery switch
+// * statistics
+
 #ifndef BATTERY_H
 #define BATTERY_H
-
-// Ardumower battery/charger management
 
 #include "common.h"
 

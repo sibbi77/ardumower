@@ -1,7 +1,10 @@
+// Ardumower RTC/timer
+// *RTC time/date
+// *time schedule table for timer mowing 
+
 #ifndef TIMER_H
 #define TIMER_H
 
-// Ardumower RTC/timer
 
 #include "common.h"
 

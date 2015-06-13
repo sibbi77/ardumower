@@ -1,14 +1,14 @@
-#ifndef BEHAVIOR_H
-#define BEHAVIOR_H
-
-#include "common.h"
-
-
 // subsumption architecture
 // external resources:
 //   http://www.convict.lu/Jeunes/Subsumption.htm
 //   http://www.lejos.org/nxt/nxj/tutorial/Behaviors/BehaviorProgramming.htm
 //   http://www.ibm.com/developerworks/library/j-robots/
+
+
+#ifndef BEHAVIOR_H
+#define BEHAVIOR_H
+
+#include "common.h"
 
 
 // abstract superclass

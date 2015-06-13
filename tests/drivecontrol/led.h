@@ -1,7 +1,8 @@
+// Ardumower LEDs  (play LED 'sequences')
+
 #ifndef LED_H
 #define LED_H
 
-// Ardumower LEDs  (play LED 'sequences')
 
 // playable LED sequences
 enum {

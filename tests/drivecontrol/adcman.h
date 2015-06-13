@@ -21,6 +21,8 @@
   Private-use only! (you need to ask for a commercial-use)
 */
 /*
+ADC sample capture manager
+
 Problem: you have multiple analog inputs, some need only to be sampled once, other need
 a fixed sample rate. 
 

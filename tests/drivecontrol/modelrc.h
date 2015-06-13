@@ -1,7 +1,8 @@
+// model R/C receiver
+
 #ifndef MODELRC_H
 #define MODELRC_H
 
-// model R/C receiver
 
 #include "common.h"
 

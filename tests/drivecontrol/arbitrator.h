@@ -1,12 +1,13 @@
+/* Behavior Pattern Arbitrator
+   the arbitrator decides 
+   -if there is any behavior with higher priority requiring action (monitor)
+   -if so, sets next behavior (run) 
+*/                                               
+
 #ifndef ARBITRATOR_H
 #define ARBITRATOR_H
 
 #include "behavior.h"
-
-/* the arbitrator decides 
-   -if there is any behavior with higher priority requiring action (monitor)
-   -if so, sets next behavior (run) 
-*/                                               
 
 class Arbitrator
 {

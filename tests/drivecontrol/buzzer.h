@@ -1,7 +1,8 @@
+// Ardumower buzzer (play 'beep codes')
+
+
 #ifndef BUZZER_H
 #define BUZZER_H
-
-// Ardumower buzzer (play 'beep codes')
 
 
 

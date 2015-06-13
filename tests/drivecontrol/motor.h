@@ -1,13 +1,16 @@
-#ifndef MOTOR_H
-#define MOTOR_H
-
-// differential drive motor controller - requires motors with 1-way encoder (odometry)
+// differential drive motor controller 
+// for 2 gear motors with 1-way encoder (odometry)
+//
 // how to use:
 //
 //  MotorCtrl.travelLineDistance(-30, 5);
 //  void loop(){
 //    MotorCtrl.run();
 //  }
+
+#ifndef MOTOR_H
+#define MOTOR_H
+
 
 
 #include "pid.h"

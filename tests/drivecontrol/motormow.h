@@ -1,7 +1,8 @@
+// Ardumower mower motor controller
+
 #ifndef MOTORMOW_H
 #define MOTORMOW_H
 
-// Ardumower mower motor controller
 
 
 
