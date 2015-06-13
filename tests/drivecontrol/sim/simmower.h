@@ -81,6 +81,7 @@ class SimPerimeter : public PerimeterControl
     cv::Mat imgBfield;
     cv::Mat imgWorld;
     cv::Mat plotPerimeter;
+    cv::Mat imgPlots;
     int chgStationX, chgStationY; // cm
     float chgStationOrientation; // entrance
     std::vector<point_t> obstacles; // obstacles

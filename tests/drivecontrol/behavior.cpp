@@ -119,6 +119,7 @@ void HitObstacleBehavior::action(){
   }
 
   // rotate
+  Motor.resetStalled();
   Motor.rotate(angle, Motor.motorSpeedMaxRpm/2);
 
   // wait until motion stop

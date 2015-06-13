@@ -3,7 +3,7 @@
 #include "simmower.h"
 
 #define OBSTACLE_RADIUS 8
-//#define ENABLE_OBSTACLES
+#define ENABLE_OBSTACLES
 
 SimLED LED;
 SimMotor Motor;
@@ -69,11 +69,11 @@ void SimMotor::driverSetPWM(int leftMotorPWM, int rightMotorPWM){
 }
 
 int SimMotor::driverReadLeftCurrentADC(){
-  return abs(Motor.motorLeftPWMCurr) * 10 / Motor.motorSenseLeftScale;
+  return abs(Motor.motorLeftPWMCurr) * 100 / Motor.motorSenseLeftScale;
 }
 
 int SimMotor::driverReadRightCurrentADC(){
-  return abs(Motor.motorRightPWMCurr) * 10 / Motor.motorSenseRightScale;
+  return abs(Motor.motorRightPWMCurr) * 100 / Motor.motorSenseRightScale;
 }
 
 
@@ -212,9 +212,21 @@ SimPerimeter::SimPerimeter(){
   simPlots.push_back(plot1);
 
   SimPlot plot2;
-  plot2.name = "err";
+  plot2.name = "rpm_curr";
   plot2.color = cv::Scalar(0, 0, 255);
   simPlots.push_back(plot2);
+
+  SimPlot plot3;
+  plot3.name = "power";
+  plot3.color = cv::Scalar(0, 200, 0);
+  simPlots.push_back(plot3);
+
+  SimPlot plot4;
+  plot4.name = "eff";
+  plot4.color = cv::Scalar(0, 200, 255);
+  simPlots.push_back(plot4);
+
+  imgPlots = cv::Mat::zeros( 110 * simPlots.size() + 3, 500, CV_8UC3 );
 }
 
 // x,y: cm
@@ -253,8 +265,7 @@ void SimPerimeter::plot()
 {
     int rows = 100;
     int height  = rows + 10;
-    cv::Mat image = cv::Mat::zeros( height * simPlots.size() + 3, 500, CV_8UC3 );
-    image.setTo(255);
+    imgPlots.setTo(255);
     int ofs = 3;
 
     for (int idx=0; idx < simPlots.size(); idx++){
@@ -270,31 +281,31 @@ void SimPerimeter::plot()
         float scale = 1./ceil(vmax - vmin);
         float bias = vmin;
 
-        cv::line(image,
+        cv::line(imgPlots,
                  cv::Point(0, rows - 1 - (0 - bias)*scale*rows + ofs),
                  cv::Point(499, rows - 1 - (0 - bias)*scale*rows + ofs),
                  cv::Scalar(227, 227, 227), 1);
-        cv::line(image,
+        cv::line(imgPlots,
                  cv::Point(0, ofs),
                  cv::Point(499, ofs),
                  cv::Scalar(0, 0, 0), 1);
 
         for (int i = 0; i < min(500, (int)vals.size()) -1; i++){
-          cv::line(image,
+          cv::line(imgPlots,
                  cv::Point(i, rows - 1 - (vals[i] - bias)*scale*rows + ofs),
                  cv::Point(i+1, rows - 1 - (vals[i+1] - bias)*scale*rows + ofs),
                  simPlots[idx].color, 1);
         }
         char buf[64];
-        putText(image, simPlots[idx].name, cv::Point(10,ofs+height/2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        putText(imgPlots, simPlots[idx].name, cv::Point(10,ofs+height/2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
         sprintf(buf, "%.3f", vmin);
-        putText(image, std::string(buf), cv::Point(10,ofs+height-5), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        putText(imgPlots, std::string(buf), cv::Point(10,ofs+height-5), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
         sprintf(buf, "%.3f", vmax);
-        putText(image, std::string(buf), cv::Point(10,ofs+14), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        putText(imgPlots, std::string(buf), cv::Point(10,ofs+14), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
       }
       ofs += height;
     }
-    imshow("plots", image);
+    imshow("plots", imgPlots);
 }
 
 
@@ -334,16 +345,27 @@ void SimPerimeter::draw(){
           ((int)isLawnAtRobotMowed()) );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-25), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
-  sprintf(buf, "motor l=%dW r=%dW  loopsPerSec=%d",
+  sprintf(buf, "motor l=%dW r=%dW  loopsPerSec=%d  beh=%s",
           ((int)Motor.motorLeftSensePower),
           ((int)Motor.motorRightSensePower),
-          Robot.loopsPerSec   );
+          Robot.loopsPerSec,
+          Robot.arbitrator.activeBehavior->name.c_str()   );
   putText(imgWorld, std::string(buf), cv::Point(10,WORLD_SIZE_Y-10), cv::FONT_HERSHEY_PLAIN, 1, cv::Scalar(0,0,0) );
 
-  // plot robot bfield sensor
-  addPlot(0, Perimeter.getMagnitude(0));
-  addPlot(1, Motor.motorLeftPID.eold);
-  plot();
+  static unsigned long nextPlotTime = 0;
+  static unsigned long nextPlotShowTime = 0;
+  if (millis() > nextPlotTime){
+    nextPlotTime = millis() + 50;
+    // plot robot bfield sensor
+    addPlot(0, Perimeter.getMagnitude(0));
+    addPlot(1, Motor.motorLeftRpmCurr);
+    addPlot(2, Motor.motorLeftSensePower);
+    addPlot(3, Motor.motorLeftEfficiency);
+    if (millis() >= nextPlotShowTime) {
+      nextPlotShowTime = millis() + 500;
+      plot();
+    }
+  }
 }
 
 // approximate circle pattern
@@ -486,6 +508,8 @@ SimRobot::SimRobot(){
 }
 
 void SimRobot::move(){
+  float oldSimX = simX;
+  float oldSimY = simY;
   float cmPerRound = Motor.odometryTicksPerRevolution / Motor.odometryTicksPerCm;
 
   // motor pwm-to-rpm
@@ -501,14 +525,6 @@ void SimRobot::move(){
 
   Motor.motorLeftRpmCurr  = min(33, max(-33, 0.1 * Motor.motorLeftRpmCurr  + 0.9 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
   Motor.motorRightRpmCurr = min(33, max(-33, 0.1 * Motor.motorRightRpmCurr + 0.9 * gauss(Motor.motorRightPWMCurr, rightnoise)));
-
-  // obstacle stop robot actual speed
-  if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2 + 1.5*OBSTACLE_RADIUS, Robot.simOrientation )){
-    if ( (Motor.motorLeftPWMCurr > 0) || (Motor.motorRightPWMCurr > 0) )  {
-      Motor.motorLeftRpmCurr = 0;
-      Motor.motorRightRpmCurr = 0;
-    }
-  }
 
   // slope
   float leftrpm;
@@ -529,10 +545,23 @@ void SimRobot::move(){
   simX = simX + (avg_cm * cos(simOrientation)) ;
   simY = simY + (avg_cm * sin(simOrientation)) ;
 
-  Motor.totalDistanceTraveled += fabs(avg_cm/100.0);
 
-  Motor.odometryDistanceCmCurr += avg_cm;
-  Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
+// obstacle set robots actual speed to zero
+  if ( Perimeter.hitObstacle(Robot.simX, Robot.simY, Motor.odometryWheelBaseCm/2 + 1.5*OBSTACLE_RADIUS, Robot.simOrientation )){
+    //if ( (Motor.motorLeftPWMCurr > 0) || (Motor.motorRightPWMCurr > 0) )  {
+      Motor.motorLeftRpmCurr = 0;
+      Motor.motorRightRpmCurr = 0;
+      simX = oldSimX;
+      simY = oldSimY;
+      //printf("OBSTACLE\n");
+    //}
+  } else {
+    Motor.totalDistanceTraveled += fabs(avg_cm/100.0);
+
+    Motor.odometryDistanceCmCurr += avg_cm;
+    Motor.odometryThetaRadCurr = scalePI( Motor.odometryThetaRadCurr + wheel_theta );
+  }
+
 }
 
 
