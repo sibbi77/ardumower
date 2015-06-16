@@ -55,7 +55,7 @@ void SimSettings::setup(){
   Sonar.enableLeft = false;
   Sonar.enableRight = false;
   // --- battery ----
-  Battery.enableMonitor = true;
+  Battery.enableMonitor = false;
   Battery.batFull = 29.4;
   //Battery.batGoHomeIfBelow = 29.39;
   Battery.batGoHomeIfBelow = 23.7;
@@ -118,17 +118,17 @@ SimPerimeter::SimPerimeter(){
 
   #ifdef ENABLE_OBSTACLES
   // obstacles (cm)
-  obstacles.push_back( (point_t) {120, 155 } );
-  obstacles.push_back( (point_t) {70, 165 } );
-  obstacles.push_back( (point_t) {300, 190 } );
-  obstacles.push_back( (point_t) {210, 350 } );
-  obstacles.push_back( (point_t) {120, 190 } );
-  obstacles.push_back( (point_t) {250, 160 } );
-  obstacles.push_back( (point_t) {220, 110 } );
-  obstacles.push_back( (point_t) {110, 200 } );
-  obstacles.push_back( (point_t) {90, 390 } );
-  obstacles.push_back( (point_t) {90, 390 } );
-  obstacles.push_back( (point_t) {90, 330 } );
+  obstacles.push_back( (point_t) {320, 170 } );
+  obstacles.push_back( (point_t) {400, 80 } );
+  obstacles.push_back( (point_t) {430, 150 } );
+  obstacles.push_back( (point_t) {460, 120 } );
+  obstacles.push_back( (point_t) {490, 140 } );
+  obstacles.push_back( (point_t) {320, 220 } );
+  obstacles.push_back( (point_t) {370, 150} );
+  obstacles.push_back( (point_t) {400, 80 } );
+  obstacles.push_back( (point_t) {330, 150 } );
+  obstacles.push_back( (point_t) {460, 110 } );
+  obstacles.push_back( (point_t) {490, 150 } );
   #endif
 
   // perimeter lines coordinates (cm)
@@ -137,9 +137,9 @@ SimPerimeter::SimPerimeter(){
   list.push_back( (point_t) {50, 45 } );
   list.push_back( (point_t) {610, 40 } );
   list.push_back( (point_t) {620, 50 } );
-  list.push_back( (point_t) {630, 180 } );
-  list.push_back( (point_t) {450, 200 } );
-  list.push_back( (point_t) {420, 290 } );
+  list.push_back( (point_t) {630, 200 } );
+  list.push_back( (point_t) {450, 220 } );
+  list.push_back( (point_t) {420, 330 } );
   list.push_back( (point_t) {410, 450 } );
   list.push_back( (point_t) {60, 450 } );
   list.push_back( (point_t) {40, 450 } );
@@ -521,9 +521,9 @@ void SimBattery::read(){
 SimRobot::SimRobot(){
   distanceToChgStation = 0;
 
-  simX = 170;
-  simY = 170;
-  simOrientation = 0;
+  simX = 380;
+  simY = 270;
+  simOrientation = -PI/2;
 
   motor_noise = 0; //90;
   slope_noise = 0; //5;
