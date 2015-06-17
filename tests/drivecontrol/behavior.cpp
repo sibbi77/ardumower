@@ -21,6 +21,8 @@ void DriveForwardBehavior::action(){
   // forward
   Motor.travelLineSpeedRpm(Motor.motorSpeedMaxRpm);
 
+  bool rotateLeft = true;
+  unsigned long nextChangeTime = 0;
   while ( (!suppressed) && (Motor.motion != MOTION_STOP) ){
     Robot.run();
 
@@ -28,6 +30,18 @@ void DriveForwardBehavior::action(){
       MotorMow.resetStalled();
       MotorMow.setState(true);
     }
+
+    /*if (Perimeter.getMagnitude(0) < -40){
+      if (rotateLeft) Motor.setSpeedRpm(Motor.motorSpeedMaxRpm, -Motor.motorSpeedMaxRpm);
+        else Motor.setSpeedRpm(-Motor.motorSpeedMaxRpm, Motor.motorSpeedMaxRpm);
+    } else {
+      Motor.travelLineSpeedRpm(Motor.motorSpeedMaxRpm);
+    }
+    if (millis() >= nextChangeTime){
+      nextChangeTime = millis() + 60000;
+      //rotateLeft = ((rand() % 2) == 0);
+      rotateLeft = !rotateLeft;
+    }*/
   }
 }
 

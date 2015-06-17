@@ -3,7 +3,7 @@
 #include "simmower.h"
 
 #define OBSTACLE_RADIUS 8
-#define ENABLE_OBSTACLES
+//#define ENABLE_OBSTACLES
 
 SimLED LED;
 SimMotor Motor;
@@ -29,7 +29,7 @@ void SimSettings::setup(){
   Motor.motorSenseRightScale = 9.3;  // motor right sense scale (mA=(ADC-zero) * scale)
   Motor.motorSenseLeftScale  = 9.3;  // motor left sense scale  (mA=(ADC-zero) * scale)
   Motor.motorSpeedMaxRpm = 25;
-  Motor.motorEfficiencyMin = 10;
+  Motor.motorEfficiencyMin = 5;
   Motor.enableStallDetection = true;
   Motor.enableErrorDetection = false;
   Motor.odometryTicksPerRevolution = 1060;   // encoder ticks per one full resolution
