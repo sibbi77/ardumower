@@ -1,0 +1,38 @@
+
+
+Ardumower code 2.0 ideas/open questions
+
+1) ----Abstract+Concrete classes---
+Idea: seperate general code and hardware specific code
+  
+1.1)abstract classes for sensors, actors etc. (button.h, sonar.h, motor.h, perimeter.h etc.)
+-define application interfaces
+-define driver interfaces (for subclasses)
+-implement common code
+
+1.2)a robot 'configuration' (mower.cpp / simmower.cpp):
+-subclasses for all sensors and actors
+-implement any specific robot hardware code
+
+
+2) ---Behaviors----
+Idea: a flexible design to develop and test the robot's behavior.  
+
+Behaviors implement the robot's behavior. Only one behavior can be 
+active at a certain time. Behaviors have priorities (layered structure). 
+Behaviors with a higher priority can always suppress a behavior with lower priority. 
+Behaviors can be disabled if not needed in a certain 'mode' (example: manual steering).
+
+3) ---Error counters---
+There exist fatal error counters for sensors and actors.
+UNSURE: where should they belong to? One general error class or should 
+they belong to each sensor/actor.
+
+   
+4) ---pfodApp---
+Should be implemented as in v1.0 ?
+
+5) ---    
+
+
+ 
