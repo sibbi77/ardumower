@@ -58,7 +58,8 @@ void SimSettings::setup(){
   Battery.enableMonitor = true;
   Battery.batFull = 29.4;
   //Battery.batGoHomeIfBelow = 29.39;
-  Battery.batGoHomeIfBelow = 23.7;
+  //Battery.batGoHomeIfBelow = 23.7;
+  Battery.batGoHomeIfBelow = 26.0;
   Battery.batVoltage = Battery.batFull;
 }
 
@@ -508,7 +509,7 @@ void SimBattery::read(){
 
   if (chargerConnected()){
     // simulate charging
-    batVoltage = min(batFull, batVoltage + 0.01);
+    batVoltage = min(batFull, batVoltage + 0.1);
   } else {
     // simulate discharging
     batVoltage = max(0, batVoltage - 0.01);
@@ -521,9 +522,9 @@ void SimBattery::read(){
 SimRobot::SimRobot(){
   distanceToChgStation = 0;
 
-  simX = 380;
-  simY = 270;
-  simOrientation = -PI/2;
+  simX = 180;
+  simY = 170;
+  simOrientation = PI/2;
 
   motor_noise = 0; //90;
   slope_noise = 0; //5;

@@ -43,11 +43,11 @@ class BatteryControl
     bool isCharging();
     int getChargingTimeMinutes();
     bool robotShouldGoHome();
-  private:
+    bool robotShouldCharge();
     void setBatterySwitch(bool state);
     void enableChargingRelay(bool state);
     bool robotShouldSwitchOff();
-    bool robotShouldCharge();
+  private:
     unsigned long nextBatteryTime;
     // ----- driver -----
     virtual void driverSetBatterySwitch(bool state);

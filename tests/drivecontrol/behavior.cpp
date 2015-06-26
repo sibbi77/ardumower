@@ -215,7 +215,16 @@ void ChargingBehavior::action(){
   //Buzzer.play(BC_SHORT_SHORT_SHORT);
 
   // wait until some other behavior was activated
-  while ( (!suppressed ) && (Battery.chargerConnected()) ) {
+  while ( (!suppressed ) && (Battery.chargerConnected()) && (Battery.robotShouldCharge())  ) {
+    Robot.run();
+  }
+  // leave station
+  Motor.travelLineDistance(-60, Motor.motorSpeedMaxRpm);
+  while ( (!suppressed) && (!Motor.hasStopped()) ) {
+    Robot.run();
+  }
+  Motor.rotate(PI/2, Motor.motorSpeedMaxRpm/2);
+  while ( (!suppressed) && (!Motor.hasStopped()) ) {
     Robot.run();
   }
 }
