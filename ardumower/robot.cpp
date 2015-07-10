@@ -862,9 +862,9 @@ void Robot::motorControlPerimeter(){
   if ((millis() > stateStartTime + 5000) && (millis() > perimeterLastTransitionTime + trackingPerimeterTransitionTimeOut)){
     // robot is wheel-spinning while tracking => roll to get ground again
     if (trackingBlockInnerWheelWhilePerimeterStruggling == 0){
-    if (perimeterMag < 0) setMotorPWM( -motorSpeedMaxPwm/1.5, motorSpeedMaxPwm/1.5, false);
-        else setMotorPWM( motorSpeedMaxPwm/1.5, -motorSpeedMaxPwm/1.5, false);}
-
+      if (perimeterMag < 0) setMotorPWM( -motorSpeedMaxPwm/1.5, motorSpeedMaxPwm/1.5, false);
+        else setMotorPWM( motorSpeedMaxPwm/1.5, -motorSpeedMaxPwm/1.5, false);
+    }
     else if (trackingBlockInnerWheelWhilePerimeterStruggling == 1){
       if (perimeterMag < 0) setMotorPWM( 0, motorSpeedMaxPwm/1.5, false);
         else setMotorPWM( motorSpeedMaxPwm/1.5, 0, false);
@@ -882,14 +882,19 @@ void Robot::motorControlPerimeter(){
     else if (perimeterMag > 0) perimeterPID.x = 1; 
     else perimeterPID.x = 0;
   perimeterPID.w = 0;
-  perimeterPID.y_min = -motorSpeedMaxPwm;
-  perimeterPID.y_max = motorSpeedMaxPwm;		
-  perimeterPID.max_output = motorSpeedMaxPwm;
+  perimeterPID.y_min = -motorSpeedMaxRpm;
+  perimeterPID.y_max = motorSpeedMaxRpm;		
+  perimeterPID.max_output = motorSpeedMaxRpm;
   perimeterPID.compute();
   //setMotorPWM( motorLeftPWMCurr  +perimeterPID.y, 
   //               motorRightPWMCurr -perimeterPID.y, false);      
-  setMotorPWM( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 - perimeterPID.y)), 
-                 max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);      
+
+  motorRightSpeedRpmSet = motorSpeedMaxRpm/2 - perimeterPID.y;
+  motorLeftSpeedRpmSet  = motorSpeedMaxRpm/2 + perimeterPID.y;
+  motorControl();
+
+//  setMotorPWM( max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 - perimeterPID.y)), 
+//                 max(-motorSpeedMaxPwm, min(motorSpeedMaxPwm, motorSpeedMaxPwm/2 + perimeterPID.y)), false);      
   /*Console.print(perimeterPID.x);
   Console.print("\t");          
   Console.println(perimeterPID.y);  */
