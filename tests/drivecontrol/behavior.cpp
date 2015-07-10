@@ -182,13 +182,19 @@ void TrackingBehavior::action(){
       if (mag <= 0) Robot.perimeterPID.x = -1;
         else if (mag > 0) Robot.perimeterPID.x = 1;
       Robot.perimeterPID.w = 0;
-      Robot.perimeterPID.y_min = -Motor.motorSpeedMaxPwm;
-      Robot.perimeterPID.y_max = Motor.motorSpeedMaxPwm;
-      Robot.perimeterPID.max_output = Motor.motorSpeedMaxPwm;
+      //Robot.perimeterPID.y_min = -Motor.motorSpeedMaxPwm;
+      //Robot.perimeterPID.y_max = Motor.motorSpeedMaxPwm;
+      //Robot.perimeterPID.max_output = Motor.motorSpeedMaxPwm;
+      Robot.perimeterPID.y_min = -Motor.motorSpeedMaxRpm;
+      Robot.perimeterPID.y_max = Motor.motorSpeedMaxRpm;
+      Robot.perimeterPID.max_output = Motor.motorSpeedMaxRpm;
       Robot.perimeterPID.compute();
+
       //printf("%d, %.3f\n", mag, pidTrack.y);
-      Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - Robot.perimeterPID.y,
-                         Motor.motorSpeedMaxPwm/2 + Robot.perimeterPID.y );
+      //Motor.setSpeedPWM( Motor.motorSpeedMaxPwm/2 - Robot.perimeterPID.y,
+      //                   Motor.motorSpeedMaxPwm/2 + Robot.perimeterPID.y );
+      Motor.setSpeedPWM( Motor.motorSpeedMaxRpm/2 - Robot.perimeterPID.y,
+                         Motor.motorSpeedMaxRpm/2 + Robot.perimeterPID.y );
     }
     Robot.run();
   }
