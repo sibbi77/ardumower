@@ -73,7 +73,7 @@ int main()
             break;
           case 'k':
             sim.robot.x = sim.robot.y = 100;
-            sim.filter.reset();
+            //sim.filter.reset();
             break;
 		}
 		sim.step();

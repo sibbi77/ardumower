@@ -76,7 +76,7 @@ void Particles::sense(Sim &sim, float measurement){
     new_overall_measurement_prob = max(new_overall_measurement_prob, measurement_prob);
     w.push_back(measurement_prob);
   }
-  overall_measurement_prob = 0.9 * overall_measurement_prob + 0.1 * new_overall_measurement_prob;
+  overall_measurement_prob = 0.95 * overall_measurement_prob + 0.05 * new_overall_measurement_prob;
   // resampling (careful, this is using shallow copy)
   vector<SimRobot>p3;
   int index = floor(random() * N);

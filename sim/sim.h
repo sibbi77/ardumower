@@ -32,12 +32,25 @@ class SimRobot;
 class World;
 
 
+class SimPlot
+{
+  public:
+    float vmin;
+    float vmax;
+    std::string name;
+    cv::Scalar color;
+    std::vector<float> values;
+};
+
+
 // simulation
 class Sim
 {
   public:
     int plotIdx;
+    std::vector<SimPlot> simPlots;
     Mat imgBfieldRobot;
+    cv::Mat imgPlots;
     float simTime; // seconds
     float timeStep; // seconds
     int stepCounter;
@@ -47,7 +60,8 @@ class Sim
     Sim();
     void step();
     void draw();
-    void plotXY(Mat &image, int x, int y, int r, int g, int b, bool clearplot);
+    void addPlot(int plotIdx, float value);
+    void plot();
 };
 
 

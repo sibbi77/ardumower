@@ -28,8 +28,78 @@ Sim::Sim(){
   robot.set_noise(steering_noise, distance_noise, measurement_noise);
   filter.init(robot.x, robot.y, robot.orientation,
               steering_noise, distance_noise, measurement_noise, 2000);
+
+  // plots
+  SimPlot plot1;
+  plot1.name = "bfield";
+  plot1.color = cv::Scalar(255, 0, 0);
+  simPlots.push_back(plot1);
+
+  SimPlot plot2;
+  plot2.name = "prob";
+  plot2.color = cv::Scalar(0, 200, 0);
+  simPlots.push_back(plot2);
+
+  imgPlots = cv::Mat::zeros( 60 * simPlots.size() + 3, 500, CV_8UC3 );
 }
 
+
+// plotting
+void Sim::addPlot(int plotIdx, float value) {
+  if (simPlots[plotIdx].values.size() > 500)
+    simPlots[plotIdx].values.erase(simPlots[plotIdx].values.begin());
+  simPlots[plotIdx].values.push_back(value);
+}
+
+void Sim::plot()
+{
+    int rows = 50;
+    int height  = rows + 10;
+    imgPlots.setTo(255);
+    int ofs = 0;
+
+    for (int idx=0; idx < simPlots.size(); idx++){
+      std::vector<float> &vals = simPlots[idx].values;
+      cv::line(imgPlots,
+                 cv::Point(0, ofs),
+                 cv::Point(499, ofs),
+                 cv::Scalar(0, 0, 0), 1);
+      if (vals.size() != 0) {
+        float newmax = *( std::max_element(vals.begin(), vals.end()) );
+        float newmin = *( std::min_element(vals.begin(), vals.end()) );
+        float newminmax = max( abs(newmax), abs(newmin) );
+        simPlots[idx].vmin = min(simPlots[idx].vmin, -newminmax);
+        simPlots[idx].vmax = max(simPlots[idx].vmax, newminmax);
+        float vmax = newmax; // simPlots[idx].vmax;
+        float vmin = newmin; //simPlots[idx].vmin;
+        //float scale = 1./ceil(vmax - vmin);
+        float scale = 1./(vmax - vmin);
+        float bias = vmin;
+
+        cv::line(imgPlots,
+                 cv::Point(0, rows +1 - (0 - bias)*scale*rows + ofs),
+                 cv::Point(499, rows +1 - (0 - bias)*scale*rows + ofs),
+                 cv::Scalar(227, 227, 227), 1);
+
+        for (int i = 0; i < min(500, (int)vals.size()) -1; i++){
+          cv::line(imgPlots,
+                 cv::Point(i, rows +1 - (vals[i] - bias)*scale*rows + ofs),
+                 cv::Point(i+1, rows +1 - (vals[i+1] - bias)*scale*rows + ofs),
+                 simPlots[idx].color, 2);
+        }
+        char buf[64];
+        sprintf(buf, "%.3f", vmin);
+        putText(imgPlots, std::string(buf), cv::Point(10,ofs+height-5), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+        sprintf(buf, "%.3f", vmax);
+        putText(imgPlots, std::string(buf), cv::Point(10,ofs+14), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+      }
+      cv::Mat roi(imgPlots(cv::Rect(0,ofs+height/2-10,140,16)));
+      roi.setTo(240);
+      putText(imgPlots, simPlots[idx].name, cv::Point(0,ofs+height/2+2), cv::FONT_HERSHEY_PLAIN, 1, simPlots[idx].color );
+      ofs += height;
+    }
+    imshow("plots", imgPlots);
+}
 
 // simulation step
 void Sim::step(){
@@ -59,7 +129,7 @@ void Sim::step(){
            robot.totalDistance/10,
            filter.overall_measurement_prob);
   }
-  if (filter.overall_measurement_prob < 0.1) filter.reset();
+  if (filter.overall_measurement_prob < 0.4) filter.reset();
   stepCounter++;
 }
 
@@ -76,16 +146,9 @@ void Sim::draw(){
   robot.draw(world.imgWorld);
 
   // plot robot bfield sensor
-  float bfieldStrength = max(-2.0f, min(24.0f, robot.bfieldStrength));
-  plotXY(imgBfieldRobot, plotIdx % imgBfieldRobot.cols, 15+bfieldStrength*5, 255,255,255, true);
-  imshow("bfieldrobot", imgBfieldRobot);
-  plotIdx++;
+  float bfieldStrength = max(-1.0f, min(24.0f, robot.bfieldStrength));
+  addPlot(0, bfieldStrength);
+  addPlot(1, filter.overall_measurement_prob);
+  plot();
 }
 
-
-void Sim::plotXY(Mat &image, int x, int y, int r, int g, int b, bool clearplot){
-  if (clearplot) for (int y=0; y < image.rows; y++) image.at<Point3_<uchar> >(y, x) = Point3_<uchar>(0,0,0);
-  if ( (x< 0) || (y < 0) || (x >= image.cols) || (y >= image.rows)) return;
-  image.at<Point3_<uchar> >(image.rows-y-1, x) = Point3_<uchar>(r,g,b);
-  //line( image, Point( x, image.rows ), Point( x, image.rows-y-1), Scalar( r, g, b),  1, 8 );
-}
