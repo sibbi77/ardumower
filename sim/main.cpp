@@ -46,9 +46,11 @@ int main()
 	printf("-   - decrease step wait\n");
 	printf("s   - skip tracking\n");
 	printf("k   - kidnap robot\n");
+	printf("p   - toggle pause\n");
 	printf("ESC - exit\n");
 
     int stepWait = 10;
+    bool paused = false;
 	while( 1 ){
 		// Exit on esc key
 		char key = cvWaitKey( stepWait );
@@ -75,9 +77,14 @@ int main()
             sim.robot.x = sim.robot.y = 100;
             //sim.filter.reset();
             break;
+          case 'p':
+            paused = !paused;
+            break;
 		}
-		sim.step();
-        sim.draw();
+        if (!paused){
+		  sim.step();
+          sim.draw();
+        }
 	}
 
 	return 0;

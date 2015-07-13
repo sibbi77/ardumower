@@ -40,6 +40,11 @@ Sim::Sim(){
   plot2.color = cv::Scalar(0, 200, 0);
   simPlots.push_back(plot2);
 
+  SimPlot plot3;
+  plot3.name = "error";
+  plot3.color = cv::Scalar(0, 0, 255);
+  simPlots.push_back(plot3);
+
   imgPlots = cv::Mat::zeros( 60 * simPlots.size() + 3, 500, CV_8UC3 );
 }
 
@@ -147,8 +152,11 @@ void Sim::draw(){
 
   // plot robot bfield sensor
   float bfieldStrength = max(-1.0f, min(24.0f, robot.bfieldStrength));
+  float error = distance( x,y, robot.x, robot.y );
   addPlot(0, bfieldStrength);
   addPlot(1, filter.overall_measurement_prob);
+  addPlot(2, error/10);
   plot();
 }
+
 
