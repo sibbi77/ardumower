@@ -40,6 +40,7 @@ class Particles
     float steering_noise;
     float distance_noise;
     float measurement_noise;
+    float overall_measurement_prob; // overall measurement probability
     vector <SimRobot>data; // particles
     Particles();
     // creates particle set with given initial position
@@ -53,6 +54,7 @@ class Particles
     void sense(Sim &sim, float measurement);
     void draw(Mat &img);
     void drawCenter(Mat &img, float x, float y, float theta);
+    void reset();
 };
 
 

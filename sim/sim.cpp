@@ -22,12 +22,12 @@ Sim::Sim(){
   robot.y = world.chgStationY-5; // + 10;
   //robot.x = 100;
   //robot.y = 100;
-  float steering_noise    = 0.01;
-  float distance_noise    = 0.2;
-  float measurement_noise = 0.5;
+  float steering_noise    = 0.05;  // robot steering noise sigma (rad units)
+  float distance_noise    = 0.2; // distance sensor measurement noise sigma (10cm units)
+  float measurement_noise = 0.5; // bfield sensor measurement noise sigma
   robot.set_noise(steering_noise, distance_noise, measurement_noise);
   filter.init(robot.x, robot.y, robot.orientation,
-              steering_noise, distance_noise, measurement_noise);
+              steering_noise, distance_noise, measurement_noise, 2000);
 }
 
 
@@ -37,11 +37,11 @@ void Sim::step(){
 
   // simulate robot movement
   robot.move(*this, robot.orientation, robot.speed*10 * timeStep);
-  //filter.move(*this, robot.orientation, robot.speed*10 * timeStep);
+  filter.move(*this, robot.orientation, robot.speed*10 * timeStep);
   world.setLawnMowed(robot.x, robot.y);
 
   robot.sense(*this);
-  //filter.sense(*this, robot.bfieldStrength);
+  filter.sense(*this, robot.bfieldStrength);
 
   // run robot controller
   robot.control(*this, timeStep);
@@ -50,14 +50,16 @@ void Sim::step(){
   simTime += timeStep;
 
   if ((stepCounter % 100) == 0){
-    printf("time=%5.1fs  orient=%3.1f  laneHeading=%3.1f  laneCounter=%d  distChg=%3.1fm  totalDist=%3.1fm\n",
+    printf("time=%5.1fs  orient=%3.1f  laneHeading=%3.1f  laneCounter=%d  distChg=%3.1fm  totalDist=%3.1fm  measprob=%3.2f\n",
            simTime,
            robot.orientation/M_PI*180.0,
            robot.laneHeading/M_PI*180.0,
            robot.laneCounter,
            robot.distanceToChgStation/10,
-           robot.totalDistance/10);
+           robot.totalDistance/10,
+           filter.overall_measurement_prob);
   }
+  if (filter.overall_measurement_prob < 0.1) filter.reset();
   stepCounter++;
 }
 

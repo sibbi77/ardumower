@@ -26,6 +26,13 @@ void Particles::init(float x, float y, float theta,
     }
 }
 
+void Particles::reset(){
+  for (int i=0; i < N; i++){
+    data[i].x = random() * WORLD_SIZE_X;
+    data[i].y = random() * WORLD_SIZE_Y;
+    //printf("%3f, %3f\n", data[i].x, data[i].y);
+  }
+}
 
 // extract position from a particle set
 void Particles::get_position(float &x, float &y, float &orientation){
@@ -63,9 +70,13 @@ void Particles::move(Sim &sim, float course, float speed){
 // sensing and resampling
 void Particles::sense(Sim &sim, float measurement){
   vector<float>w;
+  float new_overall_measurement_prob=0;
   for (int i=0; i < N; i++){
-    w.push_back(data[i].measurement_prob(sim, measurement));
+    float measurement_prob = data[i].measurement_prob(sim, measurement);
+    new_overall_measurement_prob = max(new_overall_measurement_prob, measurement_prob);
+    w.push_back(measurement_prob);
   }
+  overall_measurement_prob = 0.9 * overall_measurement_prob + 0.1 * new_overall_measurement_prob;
   // resampling (careful, this is using shallow copy)
   vector<SimRobot>p3;
   int index = floor(random() * N);

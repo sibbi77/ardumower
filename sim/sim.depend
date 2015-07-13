@@ -393,3 +393,98 @@
 	"particles.h"
 	"sim.h"
 
+1430684778 source:d:\projects\robomower\ardumower\github\sim\common.cpp
+	"common.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\common.h
+	<vector>
+	<opencv2/core/core.hpp>
+	<opencv/cv.h>
+	<opencv2/legacy/legacy.hpp>
+	<opencv2/legacy/compat.hpp>
+	<opencv2/highgui/highgui.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/features2d/features2d.hpp>
+
+1430684778 source:d:\projects\robomower\ardumower\github\sim\kalman.cpp
+	"Kalman.h"
+	"Matrix.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\kalman.h
+	"KalmanParams.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\kalmanparams.h
+	"Matrix.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\matrix.h
+
+1436808101 source:d:\projects\robomower\ardumower\github\sim\main.cpp
+	<opencv2/core/core.hpp>
+	<opencv/cv.h>
+	<opencv2/legacy/legacy.hpp>
+	<opencv2/legacy/compat.hpp>
+	<opencv2/highgui/highgui.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/features2d/features2d.hpp>
+	<iostream>
+	<vector>
+	<stdio.h>
+	"sim.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\sim.h
+	<vector>
+	<opencv2/core/core.hpp>
+	"world.h"
+	"simrobot.h"
+	"particles.h"
+
+1430684778 d:\projects\robomower\ardumower\github\sim\world.h
+	"common.h"
+	<vector>
+	<opencv2/core/core.hpp>
+	<opencv/cv.h>
+	<opencv2/legacy/legacy.hpp>
+	<opencv2/legacy/compat.hpp>
+	<opencv2/highgui/highgui.hpp>
+	<opencv2/imgproc/imgproc.hpp>
+	<opencv2/features2d/features2d.hpp>
+
+1436808121 d:\projects\robomower\ardumower\github\sim\simrobot.h
+	<opencv2/core/core.hpp>
+	"common.h"
+	"pid.h"
+
+1433021663 d:\projects\robomower\ardumower\github\sim\pid.h
+
+1436808126 d:\projects\robomower\ardumower\github\sim\particles.h
+	<vector>
+	<opencv2/core/core.hpp>
+
+1430684778 source:d:\projects\robomower\ardumower\github\sim\matrix.cpp
+	"Matrix.h"
+	<math.h>
+
+1436809963 source:d:\projects\robomower\ardumower\github\sim\particles.cpp
+	"particles.h"
+	"simrobot.h"
+	"sim.h"
+	<vector>
+	<algorithm>
+
+1433021659 source:d:\projects\robomower\ardumower\github\sim\pid.cpp
+	"pid.h"
+	<stdint.h>
+	<stdio.h>
+
+1430684778 source:d:\projects\robomower\ardumower\github\sim\simrobot.cpp
+	"simrobot.h"
+	"world.h"
+	"particles.h"
+	"sim.h"
+
+1430684778 source:d:\projects\robomower\ardumower\github\sim\world.cpp
+	"world.h"
+
+1436810423 source:d:\projects\robomower\ardumower\github\sim\sim.cpp
+	"sim.h"
+

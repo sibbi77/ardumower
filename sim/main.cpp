@@ -45,6 +45,7 @@ int main()
 	printf("+   - increase step wait\n");
 	printf("-   - decrease step wait\n");
 	printf("s   - skip tracking\n");
+	printf("k   - kidnap robot\n");
 	printf("ESC - exit\n");
 
     int stepWait = 10;
@@ -69,6 +70,10 @@ int main()
           case 's':
             sim.robot.x = sim.robot.y = 100;
             sim.robot.state = STATE_LANE_FORW;
+            break;
+          case 'k':
+            sim.robot.x = sim.robot.y = 100;
+            sim.filter.reset();
             break;
 		}
 		sim.step();
