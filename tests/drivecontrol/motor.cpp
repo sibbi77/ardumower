@@ -183,7 +183,12 @@ void MotorControl::speedControl(){
   //double TaS = ((double)TaC) / 1000.0;
   motorLeftPID.w = motorLeftSpeedRpmSet;               // SET
   motorRightPID.w = motorRightSpeedRpmSet;               // SET
-  float RLdiff = motorLeftRpmCurr - motorRightRpmCurr;
+  //float RLdiff = motorLeftRpmCurr - motorRightRpmCurr;
+  float angleToTargetRad = distancePI(odometryThetaRadCurr, odometryThetaRadSet);
+  float RLdiff = -(angleToTargetRad / M_PI) * motorLeftSpeedRpmSet*20;
+  if (RLdiff > motorLeftSpeedRpmSet/2) RLdiff = motorLeftSpeedRpmSet/2;
+  if (RLdiff < -motorLeftSpeedRpmSet/2) RLdiff = -motorLeftSpeedRpmSet/2;
+  //printf("angleTarget=%.0f  RLdiff=%.0f\n", angleToTargetRad/M_PI*180, RLdiff);
   //float RLdiff = 0;
 
   switch (motion){
@@ -271,10 +276,12 @@ void MotorControl::travelLineSpeedRpm(int speedRpm){
   motorRightPID.reset();
   motorLeftPID.reset();
   motion = MOTION_LINE_SPEED;
+  odometryThetaRadSet = odometryThetaRadCurr;
 }
 
 void MotorControl::travelLineDistance(int distanceCm, int speedRpm){
   motion = MOTION_LINE_DISTANCE;
+  odometryThetaRadSet = odometryThetaRadCurr;
   odometryDistanceCmSet = odometryDistanceCmCurr + distanceCm;
   leftRightCompensation = 0;
   motorRightPID.reset();

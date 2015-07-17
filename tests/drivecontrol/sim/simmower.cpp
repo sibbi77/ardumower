@@ -541,8 +541,8 @@ void SimRobot::move(){
   if (abs(Motor.motorLeftPWMCurr) > 2) leftnoise = motor_noise;
   if (abs(Motor.motorRightPWMCurr) > 2) rightnoise = motor_noise;
   // right tire rpm experiences some noise (e.g. due to climbing up a hill)
-//  if (abs(Motor.motorRightRpmCurr) > 2)
-//     Motor.motorRightRpmCurr = min(33, max(1, 0.1 * Motor.motorRightRpmCurr + 0.9 * gauss(Motor.motorRightRpmCurr , 33) ));
+  if (abs(Motor.motorRightRpmCurr) > 2)
+     Motor.motorRightRpmCurr = min(33, max(1, 0.01 * Motor.motorRightRpmCurr + 0.99 * gauss(Motor.motorRightRpmCurr , 33) ));
 
   Motor.motorLeftRpmCurr  = min(33, max(-33, 0.9 * Motor.motorLeftRpmCurr  + 0.1 * gauss(Motor.motorLeftPWMCurr,  leftnoise)));
   Motor.motorRightRpmCurr = min(33, max(-33, 0.9 * Motor.motorRightRpmCurr + 0.1 * gauss(Motor.motorRightPWMCurr, rightnoise)));
