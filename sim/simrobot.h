@@ -40,11 +40,13 @@ enum {
 class World;
 class Sim;
 
+
 // simulated robot
 class SimRobot
 {
   public:
     //float robotMap[WORLD_SIZE_Y/10][WORLD_SIZE_X/10];
+    vector <polar_t>perimeterOutline; // perimeter outline
     PID pidTrack;
     PID pidHeading;
     float distanceToChgStation;
@@ -67,6 +69,7 @@ class SimRobot
     float measurement_noise;
     int num_collision;
     int num_steps;
+    bool isParticle;
     // initializes robot
     SimRobot();
     // sets a robot coordinate
@@ -83,6 +86,7 @@ class SimRobot
     float measurement_prob(Sim &sim, float measurement);
     // draw robot on surface
     void draw(Mat &img, bool drawAsFilter = false);
+    void drawMap(World &world);
     // run robot controller
     void control(Sim &sim, float timeStep);
     void sense(Sim &sim);

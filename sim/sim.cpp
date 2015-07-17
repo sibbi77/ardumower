@@ -17,6 +17,7 @@ Sim::Sim(){
   time(&t);
   srand((unsigned int)t);
   // place robot onto world
+  robot.isParticle = false;
   robot.orientation = 0;
   robot.x = world.chgStationX+5; //+ 10;
   robot.y = world.chgStationY-5; // + 10;
@@ -149,6 +150,7 @@ void Sim::draw(){
   filter.drawCenter(world.imgWorld, x,y,theta);
 
   robot.draw(world.imgWorld);
+  robot.drawMap(world);
 
   // plot robot bfield sensor
   float bfieldStrength = max(-1.0f, min(24.0f, robot.bfieldStrength));

@@ -39,6 +39,13 @@ struct point_t {
 
 typedef struct point_t point_t;
 
+struct polar_t {
+  float r;
+  float phi;
+};
+
+typedef struct polar_t polar_t;
+
 
 float random();
 float gaussRandom();

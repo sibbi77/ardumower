@@ -8,6 +8,7 @@ using namespace std;
 SimRobot::SimRobot(){
   //	creates robot and initializes location/orientation to 0, 0, 0
   //memset(robotMap, 0, sizeof robotMap);
+  isParticle = true;
   distanceToChgStation = 0;
   totalDistance = 0;
   state = STATE_TRACK;
@@ -77,6 +78,16 @@ void SimRobot::move(Sim &sim, float course, float distance,
     y = y + (distance2 * sin(course2)) ;
     //orientation = scalePI( orientation + turn);
     orientation = scalePI( course2 );
+
+    if (!isParticle){
+      if (state == STATE_TRACK){
+        polar_t pol;
+        pol.r = gauss(distance2, 0.5);
+        pol.phi = gauss(orientation, 0.2);
+        perimeterOutline.push_back(pol);
+      }
+    }
+
   /*} else {
     // approximate bicycle model for motion
     float radius = distance2 / turn;
@@ -205,6 +216,22 @@ void SimRobot::draw(Mat &img, bool drawAsFilter){
   } else {
     circle( img, Point( x, y), length, Scalar( 0, 0, 0 ), 2, 8 );
     line( img, Point(x, y), Point(x + length * cos(orientation), y + length * sin(orientation)), Scalar(0,0,0), 2, 8);
+  }
+}
+
+// draw perimeter outline map
+void SimRobot::drawMap(World &world){
+  float x=world.chgStationX;
+  float y=world.chgStationY;
+  float lastX=x;
+  float lastY=y;
+  for (int i=0; i < perimeterOutline.size(); i++){
+    polar_t pol = perimeterOutline[i];
+    x = x + pol.r * cos(pol.phi);
+    y = y + pol.r * sin(pol.phi);
+    line( world.imgWorld, Point(lastX, lastY), Point(x, y), Scalar(0,0,0), 2, 8);
+    lastX = x;
+    lastY = y;
   }
 }
 
