@@ -32,6 +32,7 @@ void Particles::reset(){
     data[i].y = random() * WORLD_SIZE_Y;
     //printf("%3f, %3f\n", data[i].x, data[i].y);
   }
+  overall_measurement_prob = 1000;
 }
 
 // extract position from a particle set
@@ -73,7 +74,8 @@ void Particles::sense(Sim &sim, float measurement){
   float new_overall_measurement_prob=0;
   for (int i=0; i < N; i++){
     float measurement_prob = data[i].measurement_prob(sim, measurement);
-    new_overall_measurement_prob = max(new_overall_measurement_prob, measurement_prob);
+    //new_overall_measurement_prob = max(new_overall_measurement_prob, measurement_prob);
+    new_overall_measurement_prob += measurement_prob;
     w.push_back(measurement_prob);
   }
   overall_measurement_prob = 0.95 * overall_measurement_prob + 0.05 * new_overall_measurement_prob;
@@ -83,7 +85,8 @@ void Particles::sense(Sim &sim, float measurement){
   float beta = 0.0;
   float mw = *max_element(w.begin(), w.end());
   for (int i=0; i < N; i++){
-    beta += random() * 2.0 * mw;
+    //beta += random() * 2.0 * mw;
+    beta += 1.0 * mw;
     while (beta > w[index]){
       beta -= w[index];
       index = (index + 1) % N;

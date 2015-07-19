@@ -29,6 +29,7 @@ Sim::Sim(){
   robot.set_noise(steering_noise, distance_noise, measurement_noise);
   filter.init(robot.x, robot.y, robot.orientation,
               steering_noise, distance_noise, measurement_noise, 2000);
+  filter.reset();
 
   // plots
   SimPlot plot1;
@@ -126,16 +127,17 @@ void Sim::step(){
   simTime += timeStep;
 
   if ((stepCounter % 100) == 0){
-    printf("time=%5.1fs  orient=%3.1f  laneHeading=%3.1f  laneCounter=%d  distChg=%3.1fm  totalDist=%3.1fm  measprob=%3.2f\n",
+    printf("time=%5.1fs  orient=%3.1f  laneHeading=%3.1f  laneCounter=%d  distChg=%3.1fm  totalDist=%3.1fm  mapsz=%d\n",
            simTime,
            robot.orientation/M_PI*180.0,
            robot.laneHeading/M_PI*180.0,
            robot.laneCounter,
            robot.distanceToChgStation/10,
            robot.totalDistance/10,
-           filter.overall_measurement_prob);
+           robot.perimeterOutline.size() );
+           //filter.overall_measurement_prob);
   }
-  if (filter.overall_measurement_prob < 0.4) filter.reset();
+  if (filter.overall_measurement_prob < 400.4) filter.reset();
   stepCounter++;
 }
 

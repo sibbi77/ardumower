@@ -63,8 +63,8 @@ void SimRobot::move(Sim &sim, float course, float distance,
   // apply noise
   // gauss(mean, std)
   //float steering2 = gauss(steering, steering_noise);
-  float course2 = gauss(course, steering_noise);
-  float distance2 = gauss(distance, distance_noise) ;
+  float course2 = gauss(course, steering_noise);  // steering noise
+  float distance2 = gauss(distance, distance_noise) ;  // distance noise
   totalDistance += fabs(distance2);
   // printf("distance: %3.3f  steering: %3.3f\n", distance2, steering2);
 
@@ -82,8 +82,8 @@ void SimRobot::move(Sim &sim, float course, float distance,
     if (!isParticle){
       if (state == STATE_TRACK){
         polar_t pol;
-        pol.r = gauss(distance2, 0.5);
-        pol.phi = gauss(orientation, 0.2);
+        pol.r = fabs(gauss(distance2, 1.0));
+        pol.phi = gauss(orientation, 0.3);
         perimeterOutline.push_back(pol);
       }
     }
