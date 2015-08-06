@@ -1,9 +1,9 @@
 /*
   Ardumower (www.ardumower.de)
   Copyright (c) 2013-2015 by Alexander Grau
-  
+
   Private-use only! (you need to ask for a commercial-use)
- 
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
+
   Private-use only! (you need to ask for a commercial-use)
 */
 
@@ -40,9 +40,9 @@ Sim::Sim(){
   srand((unsigned int)t);
   // place robot onto world
   robot.isParticle = false;
-  robot.orientation = 0;
-  robot.x = world.chgStationX+5; //+ 10;
-  robot.y = world.chgStationY-5; // + 10;
+  robot.orientation = 1.5*M_PI;
+  robot.x = world.chgStationX; //+ 10;
+  robot.y = world.chgStationY+10; // + 10;
   //robot.x = 100;
   //robot.y = 100;
   float steering_noise    = 0.05;  // robot steering noise sigma (rad units)

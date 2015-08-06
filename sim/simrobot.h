@@ -1,9 +1,9 @@
 /*
   Ardumower (www.ardumower.de)
   Copyright (c) 2013-2015 by Alexander Grau
-  
+
   Private-use only! (you need to ask for a commercial-use)
- 
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
+
   Private-use only! (you need to ask for a commercial-use)
 */
 
@@ -35,7 +35,8 @@ using namespace cv;
 // states
 enum {
   STATE_OFF,
-  STATE_TRACK,
+  STATE_MAP_TRACK,
+  STATE_HOME_TRACK,
   STATE_LANE_FORW,
   STATE_LANE_REV,
   STATE_LANE_ROLL,

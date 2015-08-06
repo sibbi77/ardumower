@@ -1,9 +1,9 @@
 /*
   Ardumower (www.ardumower.de)
   Copyright (c) 2013-2015 by Alexander Grau
-  
+
   Private-use only! (you need to ask for a commercial-use)
- 
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
+
   Private-use only! (you need to ask for a commercial-use)
 */
 
@@ -33,7 +33,7 @@ SimRobot::SimRobot(){
   isParticle = true;
   distanceToChgStation = 0;
   totalDistance = 0;
-  state = STATE_TRACK;
+  state = STATE_MAP_TRACK;
   //state = STATE_LANE_FORW;
   pidTrack.Kp    = 0.08;  // perimeter PID controller
   pidTrack.Ki    = 0.02;
@@ -102,7 +102,7 @@ void SimRobot::move(Sim &sim, float course, float distance,
     orientation = scalePI( course2 );
 
     if (!isParticle){
-      if (state == STATE_TRACK){
+      if (state == STATE_MAP_TRACK){
         polar_t pol;
         pol.r = fabs(gauss(distance2, 1.0));
         pol.phi = gauss(orientation, 0.3);
@@ -153,7 +153,8 @@ void SimRobot::control(Sim &sim, float timeStep){
     case STATE_OFF:
            speed = 0;
            break;
-    case STATE_TRACK:
+    case STATE_HOME_TRACK:
+    case STATE_MAP_TRACK:
            if (sim.simTime > 10) {
              if (distanceToChgStation < 10){
                printf("LANE_REV\n");
@@ -164,6 +165,7 @@ void SimRobot::control(Sim &sim, float timeStep){
            pidTrack.x = 0;
            if (bfieldStrength < 0) pidTrack.x = -1;
             else if (bfieldStrength > 0) pidTrack.x = 1;
+           if (state == STATE_MAP_TRACK) pidTrack.x *= -1;
            pidTrack.w = 0;
            pidTrack.y_min = -M_PI;
            pidTrack.y_max = M_PI;
