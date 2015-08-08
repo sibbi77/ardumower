@@ -1,9 +1,9 @@
 /*
   Ardumower (www.ardumower.de)
   Copyright (c) 2013-2015 by Alexander Grau
-  
+
   Private-use only! (you need to ask for a commercial-use)
- 
+
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
   the Free Software Foundation, either version 3 of the License, or
@@ -16,7 +16,7 @@
 
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  
+
   Private-use only! (you need to ask for a commercial-use)
 */
 
@@ -84,6 +84,12 @@ int main()
             break;
           case 'p':
             paused = !paused;
+            break;
+          case ',':
+            sim.robot.rescaleMap(0.95);
+            break;
+          case '.':
+            sim.robot.rescaleMap(1.05);
             break;
 		}
         if (!paused){

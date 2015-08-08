@@ -42,7 +42,7 @@ Sim::Sim(){
   robot.isParticle = false;
   robot.orientation = -1.5*M_PI;
   robot.x = world.chgStationX; //+ 10;
-  robot.y = world.chgStationY-10; // + 10;
+  robot.y = world.chgStationY; // + 10;
   //robot.x = 100;
   //robot.y = 100;
   float steering_noise    = 0.05;  // robot steering noise sigma (rad units)

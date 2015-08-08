@@ -39,20 +39,21 @@ World::World(){
   list.push_back( (point_t) {30, 250 } );*/
 
   list.push_back( (point_t) {450, 200 } );
-  list.push_back( (point_t) {450, 40 } );
+  list.push_back( (point_t) {450, 150 } );
+  list.push_back( (point_t) {420, 40 } );
   list.push_back( (point_t) {350, 40 } );
   list.push_back( (point_t) {350, 100 } );
   list.push_back( (point_t) {150, 100 } );
   list.push_back( (point_t) {150, 40 } );
-  list.push_back( (point_t) {50,  40 } );
+  list.push_back( (point_t) {60,  50 } );
   list.push_back( (point_t) {50,  450 } );
-  list.push_back( (point_t) {450, 450 } );
-  list.push_back( (point_t) {450, 400 } );
+  list.push_back( (point_t) {440, 460 } );
+  list.push_back( (point_t) {450, 390 } );
   list.push_back( (point_t) {200, 400 } );
   list.push_back( (point_t) {200, 300 } );
   list.push_back( (point_t) {250, 300 } );
-  list.push_back( (point_t) {250, 350 } );
-  list.push_back( (point_t) {450, 350 } );
+  list.push_back( (point_t) {260, 350 } );
+  list.push_back( (point_t) {450, 330 } );
 
 
   chgStationX = 450;

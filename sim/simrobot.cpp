@@ -104,7 +104,12 @@ void SimRobot::move(Sim &sim, float course, float distance,
     if (!isParticle){
       if (state == STATE_MAP_TRACK){
         polar_t pol;
-        pol.r = distance2 + fabs(gauss(0, 0.2)); // measurement noise
+        pol.r = distance2 + fabs(gauss(0, 0.1)); // measurement noise
+        //if (random() > 0.5) pol.r += 0.2;
+        if (random() > 0.999) {
+          printf("slope\n");
+          pol.r += 7;
+        }
         pol.phi = gauss(orientation, 0.3);
         perimeterOutline.push_back(pol);
       }
@@ -158,6 +163,7 @@ void SimRobot::control(Sim &sim, float timeStep){
            if (sim.simTime > 10) {
              if (distanceToChgStation < 10){
                correctMap();
+               rescaleMap(0.95);
                printf("LANE_REV\n");
                state=STATE_LANE_REV;
                stateTime=0;
@@ -260,14 +266,42 @@ void SimRobot::drawMap(World &world){
   }
 }
 
+void SimRobot::rescaleMap(float factor){
+  for (int i=0; i < perimeterOutline.size(); i++){
+    polar_t pol = perimeterOutline[i];
+    pol.r = factor * pol.r;
+    perimeterOutline[i] = pol;
+  }
+}
 
 void SimRobot::correctMap(){
   printf("correctMap\n");
   if (perimeterOutline.size() < 50) return;
-  //perimeterOutline[perimeterOutline.size()-1].phi = -1.5*M_PI;
-  //perimeterOutline[perimeterOutline.size()-1].r += 10;
+  perimeterOutline[perimeterOutline.size()-1].phi = 1.5*M_PI;
+  perimeterOutline[perimeterOutline.size()-1].r += 10;
+  //return;
 
-  float startfac = 0.7;  float endfac = 1.3;
+  float errx=0;
+  float erry=0;
+  for (int i=0; i < perimeterOutline.size(); i++){
+    polar_t pol = perimeterOutline[i];
+    errx += pol.r * cos(pol.phi);
+    erry += pol.r * sin(pol.phi);
+  }
+  printf("errx=%3.2f  erry=%3.2f\n", errx, erry);
+  for (int i=0; i < perimeterOutline.size(); i++){
+    polar_t pol = perimeterOutline[i];
+    float x = pol.r * cos(pol.phi);
+    float y = pol.r * sin(pol.phi);
+    x -= errx / ((float)perimeterOutline.size());
+    y -= erry / ((float)perimeterOutline.size());
+    pol.r   = sqrt(x*x+y*y);
+    pol.phi = atan2(y,x);
+    perimeterOutline[i]=pol;
+  }
+
+
+  /*float startfac = 0.7;  float endfac = 1.3;
   float bestfac = 1.0;
   double besterr = 99999;
   float fac=startfac;
@@ -279,18 +313,19 @@ void SimRobot::correctMap(){
     for (int i=0; i < perimeterOutline.size(); i++){
       polar_t pol = perimeterOutline[i];
       float usefac = fac;
-      //if (i < 50) usefac = 1.0;
+      //if (i < 200) usefac = 1.0;
       sumx += pol.r*usefac * cos(pol.phi);
       sumy += pol.r*usefac * sin(pol.phi);
       dist += fabs(pol.r*usefac);
     }
-    double err = sqrt(((float)sumx*sumx) + ((float)sumy*sumy)); //   /dist;
+    double err = sqrt(((float)sumx*sumx) + ((float)sumy*sumy)) / dist;
+    //double err = fabs(sumx);
     printf("fac=%3.5f  err=%3.9f  dist=%3.5f\n", fac, err, dist);
     if (err < besterr){
       bestfac = fac;
       besterr = err;
     }
-    fac += 0.05;
+    fac += 0.02;
     if (fac > endfac) break;
   }
   printf("bestfac=%3.5f\n", bestfac);
@@ -298,7 +333,9 @@ void SimRobot::correctMap(){
     polar_t pol = perimeterOutline[i];
     pol.r = bestfac * pol.r;
     perimeterOutline[i] = pol;
-  }
+  }*/
+
+
   printf("done\n");
 }
 
