@@ -264,8 +264,8 @@ void SimRobot::drawMap(World &world){
 void SimRobot::correctMap(){
   printf("correctMap\n");
   if (perimeterOutline.size() < 50) return;
-  perimeterOutline[perimeterOutline.size()-1].phi = -1.5*M_PI;
-  perimeterOutline[perimeterOutline.size()-1].r += 10;
+  //perimeterOutline[perimeterOutline.size()-1].phi = -1.5*M_PI;
+  //perimeterOutline[perimeterOutline.size()-1].r += 10;
 
   float startfac = 0.7;  float endfac = 1.3;
   float bestfac = 1.0;
@@ -284,7 +284,7 @@ void SimRobot::correctMap(){
       sumy += pol.r*usefac * sin(pol.phi);
       dist += fabs(pol.r*usefac);
     }
-    double err = sqrt(((float)sumx*sumx) + ((float)sumy*sumy))/dist;
+    double err = sqrt(((float)sumx*sumx) + ((float)sumy*sumy)); //   /dist;
     printf("fac=%3.5f  err=%3.9f  dist=%3.5f\n", fac, err, dist);
     if (err < besterr){
       bestfac = fac;
