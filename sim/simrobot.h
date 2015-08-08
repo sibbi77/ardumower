@@ -93,6 +93,7 @@ class SimRobot
     // draw robot on surface
     void draw(Mat &img, bool drawAsFilter = false);
     void drawMap(World &world);
+    void correctMap();
     // run robot controller
     void control(Sim &sim, float timeStep);
     void sense(Sim &sim);
