@@ -104,7 +104,7 @@ void SimRobot::move(Sim &sim, float course, float distance,
     if (!isParticle){
       if (state == STATE_MAP_TRACK){
         polar_t pol;
-        pol.r = distance2 + 0.2;// fabs(gauss(0, 0.3)); // measurement noise
+        pol.r = distance2 + fabs(gauss(0, 0.2)); // measurement noise
         pol.phi = gauss(orientation, 0.3);
         perimeterOutline.push_back(pol);
       }
@@ -265,25 +265,27 @@ void SimRobot::correctMap(){
   printf("correctMap\n");
   if (perimeterOutline.size() < 50) return;
   perimeterOutline[perimeterOutline.size()-1].phi = -1.5*M_PI;
-  perimeterOutline[perimeterOutline.size()-1].r += 20;
+  perimeterOutline[perimeterOutline.size()-1].r += 10;
 
-  float startfac = 0.5;  float endfac = 1.5;
+  float startfac = 0.7;  float endfac = 1.3;
   float bestfac = 1.0;
-  float besterr = 99999;
+  double besterr = 99999;
   float fac=startfac;
   while (true){
     polar_t pol = perimeterOutline[0];
     float sumx=0;
     float sumy=0;
+    float dist=0;
     for (int i=0; i < perimeterOutline.size(); i++){
       polar_t pol = perimeterOutline[i];
       float usefac = fac;
-      if (i < 50) usefac = 1.0;
+      //if (i < 50) usefac = 1.0;
       sumx += pol.r*usefac * cos(pol.phi);
       sumy += pol.r*usefac * sin(pol.phi);
+      dist += fabs(pol.r*usefac);
     }
-    float err = sqrt(sumx*sumx + sumy*sumy);
-    printf("fac=%3.2f  err=%3.2f\n", fac, err);
+    double err = sqrt(((float)sumx*sumx) + ((float)sumy*sumy))/dist;
+    printf("fac=%3.5f  err=%3.9f  dist=%3.5f\n", fac, err, dist);
     if (err < besterr){
       bestfac = fac;
       besterr = err;
@@ -291,6 +293,7 @@ void SimRobot::correctMap(){
     fac += 0.05;
     if (fac > endfac) break;
   }
+  printf("bestfac=%3.5f\n", bestfac);
   for (int i=0; i < perimeterOutline.size(); i++){
     polar_t pol = perimeterOutline[i];
     pol.r = bestfac * pol.r;
