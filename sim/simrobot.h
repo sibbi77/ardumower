@@ -95,6 +95,7 @@ class SimRobot
     void drawMap(World &world);
     void rescaleMap(float factor);
     void correctMap();
+    void smoothMap();
     // run robot controller
     void control(Sim &sim, float timeStep);
     void sense(Sim &sim);

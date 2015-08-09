@@ -91,6 +91,9 @@ int main()
           case '.':
             sim.robot.rescaleMap(1.05);
             break;
+          case '#':
+            sim.robot.smoothMap();
+            break;
 		}
         if (!paused){
 		  sim.step();

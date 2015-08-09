@@ -33,10 +33,10 @@ World::World(){
 
   // perimeter lines coordinates (1/10 meter)  500x500
   std::vector<point_t> list;
- /* list.push_back( (point_t) {30, 35 } );
-  list.push_back( (point_t) {400, 35 } );
-  list.push_back( (point_t) {400, 250 } );
-  list.push_back( (point_t) {30, 250 } );*/
+  /*list.push_back( (point_t) {450, 40 } );
+  list.push_back( (point_t) {450, 390 } );
+  list.push_back( (point_t) {50, 390 } );
+  list.push_back( (point_t) {30, 40 } );*/
 
   list.push_back( (point_t) {450, 200 } );
   list.push_back( (point_t) {450, 150 } );
