@@ -252,20 +252,32 @@ void SimRobot::draw(Mat &img, bool drawAsFilter){
 
 // draw perimeter outline map
 void SimRobot::drawMap(World &world){
+  if (perimeterOutline.size() == 0) return;
   float x=world.chgStationX;
   float y=world.chgStationY;
   float lastX=x;
   float lastY=y;
+  float lastPhi = 0; //perimeterOutline[0].phi;
+  bool colorGrey = true;
   for (int i=0; i < perimeterOutline.size(); i++){
     polar_t pol = perimeterOutline[i];
     x = x + pol.r * cos(pol.phi);
     y = y + pol.r * sin(pol.phi);
-    line( world.imgWorld, Point(lastX, lastY), Point(x, y), Scalar(0,0,0), 2, 8);
+    float diff = distancePI(pol.phi, lastPhi);
+    if (fabs(diff) > 2*M_PI/4) {
+      colorGrey = !colorGrey;
+      lastPhi = pol.phi;
+    }
+    if (colorGrey)
+      line( world.imgWorld, Point(lastX, lastY), Point(x, y), Scalar(127,127,127), 2, 8);
+    else
+      line( world.imgWorld, Point(lastX, lastY), Point(x, y), Scalar(0,0,0), 2, 8);
     lastX = x;
     lastY = y;
   }
 }
 
+// rescale each vector length
 void SimRobot::rescaleMap(float factor){
   printf("rescaleMap %3.2f\n", factor);
   for (int i=0; i < perimeterOutline.size(); i++){
@@ -275,6 +287,7 @@ void SimRobot::rescaleMap(float factor){
   }
 }
 
+// euclidean averaging
 void SimRobot::smoothMap(){
   printf("smoothMap\n");
   vector <polar_t>smap;
@@ -292,7 +305,7 @@ void SimRobot::smoothMap(){
     sumx += sx;
     sumy += sy;
     count++;
-    if (count == 4){
+    if (count == 20){
       float x = sumx /((float)count);
       float y = sumy /((float)count);
       pol.r  = fabs(distance(x,y,lastx,lasty));
@@ -308,6 +321,7 @@ void SimRobot::smoothMap(){
   perimeterOutline = smap;
 }
 
+// resize x/y to fill-in start/end displacement
 void SimRobot::correctMap(){
   printf("correctMap\n");
   if (perimeterOutline.size() < 50) return;
