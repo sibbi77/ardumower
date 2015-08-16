@@ -1288,16 +1288,19 @@ void Robot::delayInfo(int ms){
   }
 }
 
-void Robot::testOdometry(){
+void Robot::testOdometry()
+{
   char ch;
   int lastLeft = 0;
   int lastRight = 0;
-  motorLeftPWMCurr = motorSpeedMaxPwm/2; motorRightPWMCurr = motorSpeedMaxPwm/2;  
+  int speed = motorSpeedMaxPwm/2;
+  int dir = 0;
+  motorLeftPWMCurr = motorRightPWMCurr = speed;
   setMotorPWM(motorLeftPWMCurr, motorRightPWMCurr, false);
-  while (true){ 
+  while (true) {
     resetIdleTime();
     if ((odometryLeft != lastLeft) || (odometryRight != lastRight)) {
-      Console.print(F("Press'f' forward, 'r' reverse, 'z' reset  "));
+      Console.print(F("Press 'f' forward, 'r' reverse, 'z' reset, '+' faster, '-' slower  "));
       Console.print(F("left="));
       Console.print(odometryLeft);
       Console.print(F("  right="));
@@ -1306,23 +1309,36 @@ void Robot::testOdometry(){
       lastRight = odometryRight;
     }
     delay(100);
-    if (Console.available() > 0){
+    if (Console.available() > 0) {
       ch = (char)Console.read();            
-      if (ch == '0') break;
-      if (ch == 'f') {
-          motorLeftPWMCurr = motorSpeedMaxPwm/2; motorRightPWMCurr = motorSpeedMaxPwm/2;  
-          setMotorPWM(motorLeftPWMCurr, motorRightPWMCurr, false);
+      if (ch == '0')
+    	  break;
+      else if (ch == 'f') {
+          dir = 0;
       }
-      if (ch == 'r') {
-          motorLeftPWMCurr = -motorSpeedMaxPwm/2; motorRightPWMCurr = -motorSpeedMaxPwm/2;  
-          setMotorPWM(motorLeftPWMCurr, motorRightPWMCurr, false);
+      else if (ch == 'r') {
+          dir = 1;
       } 
-      if (ch == 'z') {
-          odometryLeft = 0; odometryRight = 0;
+      else if (ch == 'z') {
+          odometryLeft = odometryRight = 0;
       }            
+      else if (ch == '-') {
+          speed = max(0, speed - 20);
+      }
+      else if (ch == '+') {
+          speed = min(255, speed + 20);
+      }
+
+      if (dir == 0) {
+    	  motorLeftPWMCurr = motorRightPWMCurr = speed;
+      } else {
+    	  motorLeftPWMCurr = motorRightPWMCurr = -speed;
+      }
+      setMotorPWM(motorLeftPWMCurr, motorRightPWMCurr, false);
     }
   };
-  motorLeftPWMCurr = 0; motorRightPWMCurr = 0;
+
+  motorLeftPWMCurr = motorRightPWMCurr = 0;
   setMotorPWM(motorLeftPWMCurr, motorRightPWMCurr, false);          
 }
 
