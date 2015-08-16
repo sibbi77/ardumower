@@ -45,8 +45,9 @@
 
 // ------ pins---------------------------------------
 #define pinMotorEnable  37         // EN motors enable
-#define pinMotorLeftPWM 5          // M1_IN1 left motor PWM pin
-#define pinMotorLeftDir 31         // M1_IN2 left motor Dir pin
+#define pinMotorLeftPWM 6          // M1_PWM left motor PWM pin
+#define pinMotorLeftDir2 31         // M1_IN2 left motor Dir pin
+#define pinMotorLeftDir1 5          // M1_IN1 left motor Dir pin
 #define pinMotorLeftSense A1       // M1_FB  left motor current sense
 #define pinMotorLeftFault 25       // M1_SF  left motor fault
                                                              
@@ -324,7 +325,8 @@ void Mower::setup(){
   pinMode(pinMotorEnable, OUTPUT);  
   digitalWrite(pinMotorEnable, HIGH);
   pinMode(pinMotorLeftPWM, OUTPUT);
-  pinMode(pinMotorLeftDir, OUTPUT);   
+  pinMode(pinMotorLeftDir1, OUTPUT);
+  pinMode(pinMotorLeftDir2, OUTPUT);
   pinMode(pinMotorLeftSense, INPUT);     
   pinMode(pinMotorLeftFault, INPUT);    
   
@@ -566,7 +568,7 @@ int Mower::readSensor(char type){
 void Mower::setActuator(char type, int value){
   switch (type){
     case ACT_MOTOR_MOW: setMC33926(pinMotorMowDir, pinMotorMowPWM, value); break;// Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
-    case ACT_MOTOR_LEFT: setMC33926(pinMotorLeftDir, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
+    case ACT_MOTOR_LEFT: setMC33926_2(pinMotorLeftDir1, pinMotorLeftDir2, pinMotorLeftPWM, value); break;//                                                                  Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_MOTOR_RIGHT: setMC33926(pinMotorRightDir, pinMotorRightPWM, value); break; //                                                              Motortreiber einstellung - bei Bedarf ändern z.B setL298N auf setMC33926
     case ACT_BUZZER: if (value == 0) noTone(pinBuzzer); else tone(pinBuzzer, value); break;
     case ACT_LED: digitalWrite(pinLED, value); break;    
