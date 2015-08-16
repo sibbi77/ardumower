@@ -221,6 +221,20 @@ void setMC33926(int pinDir, int pinPWM, int speed){
     analogWrite(pinPWM, ((byte)speed));
   }
 }
+void setMC33926_2(int pinDir1, int pinDir2, int pinPWM, int speed){
+	analogWrite(pinPWM, 0);
+	if (speed < 0) {
+	    digitalWrite(pinDir1, HIGH) ;
+	    digitalWrite(pinDir2, LOW) ;
+	} else if (speed > 0) {
+	    digitalWrite(pinDir1, LOW) ;
+	    digitalWrite(pinDir2, HIGH) ;
+	} else {
+	    digitalWrite(pinDir1, LOW) ;
+	    digitalWrite(pinDir2, LOW) ;
+	}
+	analogWrite(pinPWM, abs(speed));
+}
 
 // ---- sensor drivers --------------------------------------------------------------
 

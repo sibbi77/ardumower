@@ -170,6 +170,7 @@ void setL298N(int pinDir, int pinPWM, int speed);
 void setL9958(int pinDir, int pinPWM, int speed);
 void setRomeoMotor(int pinDir, int pinPWM, int speed);
 void setMC33926(int pinDir, int pinPWM, int speed);
+void setMC33926_2(int pinDir1, int pinDir2, int pinPWM, int speed);
 
 // lawn sensor
 int measureLawnCapacity(int pinSend, int pinReceive);
